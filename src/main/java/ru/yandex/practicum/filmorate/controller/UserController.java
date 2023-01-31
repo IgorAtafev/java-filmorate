@@ -26,7 +26,7 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody User user) {
-        log.info("Получен запрос POST /users: '{}'", user);
+        log.info("Request received POST /users: '{}'", user);
         return service.create(user);
     }
 

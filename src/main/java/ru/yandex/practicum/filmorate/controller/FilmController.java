@@ -26,7 +26,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
-        log.info("Получен запрос POST /films: '{}'", film);
+        log.info("Request received POST /films: '{}'", film);
         return service.create(film);
     }
 
