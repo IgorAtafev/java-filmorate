@@ -25,14 +25,14 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
+    public User createUser(@RequestBody User user) {
         log.info("Request received POST /users: '{}'", user);
-        return service.create(user);
+        return service.createUser(user);
     }
 
     @PutMapping
-    public User update(@RequestBody User user) {
-        log.info("Получен запрос PUT /users: '{}'", user);
-        return service.update(user);
+    public User updateUser(@RequestBody User user) {
+        log.info("Request received PUT /users: '{}'", user);
+        return service.updateUser(user);
     }
 }

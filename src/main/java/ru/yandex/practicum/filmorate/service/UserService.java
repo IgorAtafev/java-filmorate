@@ -24,7 +24,7 @@ public class UserService {
      * @param user
      * @return new user
      */
-    public User create(User user) {
+    public User createUser(User user) {
         return null;
     }
 
@@ -33,7 +33,7 @@ public class UserService {
      * @param user
      * @return updated user
      */
-    public User update(User user) {
+    public User updateUser(User user) {
         return null;
     }
 }

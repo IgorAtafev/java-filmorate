@@ -27,12 +27,12 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         log.info("Request received POST /films: '{}'", film);
-        return service.create(film);
+        return service.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         log.info("Получен запрос PUT /films: '{}'", film);
-        return service.update(film);
+        return service.updateFilm(film);
     }
 }

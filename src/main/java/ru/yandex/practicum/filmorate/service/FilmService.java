@@ -24,7 +24,7 @@ public class FilmService {
      * @param film
      * @return new film
      */
-    public Film create(Film film) {
+    public Film createFilm(Film film) {
         return null;
     }
 
@@ -33,7 +33,7 @@ public class FilmService {
      * @param film
      * @return updated film
      */
-    public Film update(Film film) {
+    public Film updateFilm(Film film) {
         return null;
     }
 }
