@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 public @interface After {
     String message() default "{DateAfter.invalid}";
 
-    String date();
+    String current();
 
     Class<?>[] groups() default {};
 
