@@ -28,7 +28,7 @@ public class UserService {
      * @param user
      * @return new user
      */
-    public User createUser(@NotNull @Valid User user) {
+    public User createUser(User user) {
         if (user.getId() != 0) {
             throw new ValidationException("The user must have an empty ID when created");
         }
@@ -45,7 +45,7 @@ public class UserService {
      * @param user
      * @return updated user
      */
-    public User updateUser(@NotNull @Valid User user) {
+    public User updateUser(User user) {
         if (user.getId() == 0) {
             throw new ValidationException("The user must not have an empty ID when updating");
         }

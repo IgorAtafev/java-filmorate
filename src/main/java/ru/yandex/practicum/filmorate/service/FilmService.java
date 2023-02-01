@@ -28,7 +28,7 @@ public class FilmService {
      * @param film
      * @return new film
      */
-    public Film createFilm(@NotNull @Valid Film film) {
+    public Film createFilm(Film film) {
         if (film.getId() != 0) {
             throw new ValidationException("The movie must have an empty ID when created");
         }
@@ -44,7 +44,7 @@ public class FilmService {
      * @param film
      * @return updated film
      */
-    public Film updateFilm(@NotNull @Valid Film film) {
+    public Film updateFilm(Film film) {
         if (film.getId() == 0) {
             throw new ValidationException("The movie must not have an empty ID when updating");
         }

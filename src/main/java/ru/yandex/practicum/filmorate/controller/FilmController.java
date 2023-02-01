@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -25,13 +27,13 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) {
+    public Film createFilm(@RequestBody @NotNull @Valid Film film) {
         log.info("Request received POST /films: '{}'", film);
         return service.createFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@RequestBody @NotNull @Valid Film film) {
         log.info("Получен запрос PUT /films: '{}'", film);
         return service.updateFilm(film);
     }
