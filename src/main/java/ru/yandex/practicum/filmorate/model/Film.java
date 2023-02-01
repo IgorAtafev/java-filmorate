@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ru.yandex.practicum.filmorate.validator.After;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,17 +22,18 @@ public class Film {
 
     private int id;
 
-    @NotBlank
-    @Size(min=3, max=50)
+    @NotBlank(message = "Name cannot be empty")
+    @Size(min = 3, max = 50, message = "Name must contain at least 3 and no more than 50 characters")
     private String name;
 
-    @NotNull
-    @Size(max=200)
+    @NotNull(message = "Description cannot be null")
+    @Size(max = 200, message = "Description must be no more than 200 characters")
     private String description;
 
-    @NotNull
+    @NotNull(message = "Release date cannot be null")
+    @After(current = "1895-12-28", message = "Release date must be no earlier than 28.12.1895")
     private LocalDate releaseDate;
 
-    @Positive
+    @Positive(message = "Duration must be positive")
     private int duration;
 }

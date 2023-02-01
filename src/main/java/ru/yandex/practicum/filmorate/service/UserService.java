@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ public class UserService {
      * @param user
      * @return new user
      */
-    public User createUser(@Valid User user) {
+    public User createUser(@NotNull @Valid User user) {
         if (user.getId() != 0) {
             throw new ValidationException("The user must have an empty ID when created");
         }
@@ -44,7 +45,7 @@ public class UserService {
      * @param user
      * @return updated user
      */
-    public User updateUser(@Valid User user) {
+    public User updateUser(@NotNull @Valid User user) {
         if (user.getId() == 0) {
             throw new ValidationException("The user must not have an empty ID when updating");
         }

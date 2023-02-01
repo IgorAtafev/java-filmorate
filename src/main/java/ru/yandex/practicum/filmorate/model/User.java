@@ -23,18 +23,18 @@ public class User {
 
     private int id;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Email must be valid")
     private String email;
 
-    @NotNull
-    @Pattern(regexp="^\\S{5,20}$")
+    @NotNull(message = "Login cannot be null")
+    @Pattern(regexp = "^\\S{5,20}$", message = "Login must contain at least 5 and no more than 20 characters")
     private String login;
 
-    @Size(min=3, max=30)
+    @Size(min = 3, max = 30, message = "Name must contain at least 3 and no more than 30 characters")
     private String name;
 
-    @NotNull
-    @Past
+    @NotNull(message = "Birthday cannot be null")
+    @Past(message = "Birthday cannot be in the future")
     private LocalDate birthday;
 }
