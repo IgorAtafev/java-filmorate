@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = DateAfterValidator.class)
 @Documented
 public @interface After {
+
     String message() default "{DateAfter.invalid}";
 
     String current();
