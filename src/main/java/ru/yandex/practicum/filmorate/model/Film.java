@@ -31,7 +31,7 @@ public class Film {
     private String description;
 
     @NotNull(message = "Release date cannot be null")
-    @After(current = "1895-12-28", message = "Release date must be no earlier than 28.12.1895")
+    @After(date = "1895-12-28", message = "Release date must be no earlier than 28.12.1895")
     private LocalDate releaseDate;
 
     @Positive(message = "Duration must be positive")

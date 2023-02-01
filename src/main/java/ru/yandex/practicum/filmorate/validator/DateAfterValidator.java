@@ -10,7 +10,7 @@ public class DateAfterValidator implements ConstraintValidator<After, LocalDate>
 
     @Override
     public void initialize(After constraintAnnotation) {
-        currentDate = constraintAnnotation.current();
+        currentDate = constraintAnnotation.date();
     }
 
     @Override
