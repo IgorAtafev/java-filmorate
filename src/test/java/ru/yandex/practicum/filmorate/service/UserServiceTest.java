@@ -1,10 +1,9 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -58,6 +57,20 @@ class UserServiceTest {
     }
 
     @Test
+    void createUser_shouldChangeNameToLogin_ifNameIsNull() {
+        user1.setName(null);
+        user1 = service.createUser(user1);
+        assertEquals(user1.getName(), user1.getLogin());
+    }
+
+    @Test
+    void createUser_shouldChangeNameToLogin_ifNameIsNotNullAndEmpty() {
+        user1.setName("");
+        user1 = service.createUser(user1);
+        assertEquals(user1.getName(), user1.getLogin());
+    }
+
+    @Test
     void createUser_shouldThrowAnException_ifTheUserIdIsNotEmpty() {
         user1.setId(1);
 
@@ -80,6 +93,24 @@ class UserServiceTest {
         List<User> actual = service.getUsers();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void updateUser_shouldChangeNameToLogin_ifNameIsNull() {
+        service.createUser(user1);
+        user1.setName(null);
+
+        user1 = service.updateUser(user1);
+        assertEquals(user1.getName(), user1.getLogin());
+    }
+
+    @Test
+    void updateUser_shouldChangeNameToLogin_ifNameIsNotNullAndEmpty() {
+        service.createUser(user1);
+        user1.setName("");
+
+        user1 = service.updateUser(user1);
+        assertEquals(user1.getName(), user1.getLogin());
     }
 
     @Test

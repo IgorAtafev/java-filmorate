@@ -14,9 +14,10 @@ import java.lang.annotation.Target;
 @Documented
 public @interface After {
 
-    String message() default "{DateAfter.invalid}";
+    String message() default "invalid date";
 
-    String current();
+    String currentDate();
+    String pattern() default "yyyy-MM-dd";
 
     Class<?>[] groups() default {};
 
