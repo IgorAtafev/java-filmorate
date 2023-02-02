@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.validator.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        if (user.getId() != null && user.getId() != 0) {
+        if (!isIdValueNullOrZero(user)) {
             throw new ValidationException("The user must have an empty ID when created");
         }
 
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(User user) {
-        if (user.getId() == null || user.getId() == 0) {
+        if (isIdValueNullOrZero(user)) {
             throw new ValidationException("The user must not have an empty ID when updating");
         }
 
@@ -53,5 +53,9 @@ public class UserServiceImpl implements UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+    }
+
+    private boolean isIdValueNullOrZero(User user) {
+        return user.getId() == null || user.getId() == 0;
     }
 }

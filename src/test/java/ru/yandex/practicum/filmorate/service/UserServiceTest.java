@@ -138,7 +138,7 @@ class UserServiceTest {
     }
 
     private void initUsers() {
-        user1 = new User(0, "mail@mail.ru", "dolore", "Nick Name",
+        user1 = new User(null, "mail@mail.ru", "dolore", "Nick Name",
                 LocalDate.of(1946, 8, 20));
         user2 = new User(0, "mail2@mail.ru", "dolore2", "Nick Name2",
                 LocalDate.of(1986, 1, 2));

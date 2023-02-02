@@ -106,7 +106,7 @@ class FilmServiceTest {
     }
 
     private void initFilms() {
-        film1 = new Film(0, "nisi eiusmod", "adipisicing",
+        film1 = new Film(null, "nisi eiusmod", "adipisicing",
                 LocalDate.of(1967, 3, 25), 100);
         film2 = new Film(0, "nisi eiusmod2", "adipisicing2",
                 LocalDate.of(1986, 1, 2), 200);
