@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ class FilmServiceTest {
     private Film film1;
     private Film film2;
 
-    private final FilmService service = new FilmService();
+    private final FilmService service = new FilmServiceImpl();
 
     @BeforeEach
     void setUp() {

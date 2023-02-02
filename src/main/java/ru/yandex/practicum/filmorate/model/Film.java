@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Film {
 
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Name cannot be empty")
     @Size(min = 3, max = 50, message = "Name must contain at least 3 and no more than 50 characters")

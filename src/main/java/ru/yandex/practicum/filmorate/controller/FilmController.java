@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -19,7 +18,11 @@ import java.util.List;
 @Slf4j
 public class FilmController {
 
-    FilmService service = new FilmService();
+    private final FilmService service;
+
+    public FilmController(FilmService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<Film> getFilms() {
@@ -27,13 +30,13 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody @NotNull @Valid Film film) {
+    public Film createFilm(@RequestBody @Valid Film film) {
         log.info("Request received POST /films: '{}'", film);
         return service.createFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody @NotNull @Valid Film film) {
+    public Film updateFilm(@RequestBody @Valid Film film) {
         log.info("Получен запрос PUT /films: '{}'", film);
         return service.updateFilm(film);
     }

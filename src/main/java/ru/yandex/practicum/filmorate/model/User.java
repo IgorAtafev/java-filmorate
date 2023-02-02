@@ -21,7 +21,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class User {
 
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Email must be valid")

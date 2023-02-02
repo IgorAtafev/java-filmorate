@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -15,12 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DateAfterValidatorTest {
 
-    private Validator validator;
-
-    @BeforeEach
-    void setupValidatorInstance() {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
-    }
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
     void isValid_shouldCheckTheReleaseDateIsAfter28121895() {
