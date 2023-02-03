@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.validator.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,13 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserServiceTest {
 
     private User user1;
-    private User user2;
 
     private final UserService service = new UserServiceImpl();
 
     @BeforeEach
     void setUp() {
-        initUsers();
+        user1 = initUser();
     }
 
     @Test
@@ -38,6 +37,7 @@ class UserServiceTest {
     @Test
     void getUsers_shouldReturnListOfUsers() {
         service.createUser(user1);
+        User user2 = initUser();
         service.createUser(user2);
 
         List<User> expected = List.of(user1, user2);
@@ -84,8 +84,11 @@ class UserServiceTest {
     @Test
     void updateUser_shouldUpdateTheUser() {
         service.createUser(user1);
-        user1 = new User(1, "mail@yandex.ru", "doloreUpdate", "est adipisicing",
-                LocalDate.of(1976, 9, 20));
+        user1.setId(1);
+        user1.setEmail("mail@yandex.ru");
+        user1.setLogin("doloreUpdate");
+        user1.setName("est adipisicing");
+        user1.setBirthday(LocalDate.of(1976, 9, 20));
 
         service.updateUser(user1);
 
@@ -125,10 +128,15 @@ class UserServiceTest {
     @Test
     void updateUser_shouldThrowAnException_ifTheUserDoesNotExist() {
         service.createUser(user1);
+        User user2 = initUser();
         service.createUser(user2);
 
-        User user3 = new User(999, "mail3@mail.ru", "dolore3", "Nick Name3",
-                LocalDate.of(1996, 8, 20));
+        User user3 = new User();
+        user3.setId(999);
+        user3.setEmail("mail3@mail.ru");
+        user3.setLogin("dolore3");
+        user3.setName("Nick Name3");
+        user3.setBirthday(LocalDate.of(1996, 8, 20));
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -137,10 +145,12 @@ class UserServiceTest {
         assertEquals("This user does not exist", exception.getMessage());
     }
 
-    private void initUsers() {
-        user1 = new User(null, "mail@mail.ru", "dolore", "Nick Name",
-                LocalDate.of(1946, 8, 20));
-        user2 = new User(0, "mail2@mail.ru", "dolore2", "Nick Name2",
-                LocalDate.of(1986, 1, 2));
+    private User initUser() {
+        User user = new User();
+        user.setEmail("mail@mail.ru");
+        user.setLogin("dolore");
+        user.setName("Nick Name");
+        user.setBirthday(LocalDate.of(1946, 8, 20));
+        return user;
     }
 }

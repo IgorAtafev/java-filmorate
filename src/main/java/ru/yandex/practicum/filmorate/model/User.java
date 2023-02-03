@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,7 @@ import lombok.ToString;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 @Setter
 @EqualsAndHashCode
 @ToString
-@AllArgsConstructor
 public class User {
 
     private Integer id;
@@ -35,6 +33,6 @@ public class User {
     private String name;
 
     @NotNull(message = "Birthday cannot be null")
-    @Past(message = "Birthday cannot be in the future")
+    @PastOrPresent(message = "Birthday cannot be in the future")
     private LocalDate birthday;
 }

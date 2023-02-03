@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.validator.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,13 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FilmServiceTest {
 
     private Film film1;
-    private Film film2;
 
     private final FilmService service = new FilmServiceImpl();
 
     @BeforeEach
     void setUp() {
-        initFilms();
+        film1 = initFilm();
     }
 
     @Test
@@ -38,6 +37,7 @@ class FilmServiceTest {
     @Test
     void getFilms_shouldReturnListOfFilms() {
         service.createFilm(film1);
+        Film film2 = initFilm();
         service.createFilm(film2);
 
         List<Film> expected = List.of(film1, film2);
@@ -70,8 +70,11 @@ class FilmServiceTest {
     @Test
     void updateFilm_shouldUpdateTheFilm() {
         service.createFilm(film1);
-        film1 = new Film(1, "Film Updated", "New film update decriptio",
-                LocalDate.of(1989, 4, 17), 190);
+        film1.setId(1);
+        film1.setName("Film Updated");
+        film1.setDescription("New film update decriptio");
+        film1.setReleaseDate(LocalDate.of(1989, 4, 17));
+        film1.setDuration(190);
 
         service.updateFilm(film1);
 
@@ -93,10 +96,15 @@ class FilmServiceTest {
     @Test
     void updateFilm_shouldThrowAnException_ifTheFilmDoesNotExist() {
         service.createFilm(film1);
+        Film film2 = initFilm();
         service.createFilm(film2);
 
-        Film film3 = new Film(999, "nisi eiusmod3", "adipisicing3",
-                LocalDate.of(2006, 2, 2), 250);
+        Film film3 = new Film();
+        film3.setId(999);
+        film3.setName("nisi eiusmod3");
+        film3.setDescription("adipisicing3");
+        film3.setReleaseDate(LocalDate.of(2006, 2, 2));
+        film3.setDuration(250);
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -105,10 +113,12 @@ class FilmServiceTest {
         assertEquals("This movie does not exist", exception.getMessage());
     }
 
-    private void initFilms() {
-        film1 = new Film(null, "nisi eiusmod", "adipisicing",
-                LocalDate.of(1967, 3, 25), 100);
-        film2 = new Film(0, "nisi eiusmod2", "adipisicing2",
-                LocalDate.of(1986, 1, 2), 200);
+    private Film initFilm() {
+        Film film = new Film();
+        film.setName("nisi eiusmod");
+        film.setDescription("adipisicing");
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
+        film.setDuration(100);
+        return film;
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.validator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -14,12 +15,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DateAfterValidatorTest {
 
+    private Film film;
+
     private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+    @BeforeEach
+    void setUp() {
+        film = initFim();
+    }
 
     @Test
     void isValid_shouldCheckTheReleaseDateIsAfter28121895() {
-        Film film = new Film(1, "Film Updated", "New film update decriptio",
-                LocalDate.of(1989, 4, 17), 190);
+        film.setReleaseDate(LocalDate.of(1989, 4, 17));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertTrue(violations.isEmpty());
@@ -27,8 +34,7 @@ class DateAfterValidatorTest {
 
     @Test
     void isValid_shouldCheckTheReleaseDateIsBefore28121895() {
-        Film film = new Film(1, "Film Updated", "New film update decriptio",
-                LocalDate.of(1800, 1, 9), 190);
+        film.setReleaseDate(LocalDate.of(1800, 1, 9));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertFalse(violations.isEmpty());
@@ -41,10 +47,18 @@ class DateAfterValidatorTest {
 
     @Test
     void isValid_shouldCheckTheReleaseDateIsEqual28121895() {
-        Film film = new Film(1, "Film Updated", "New film update decriptio",
-                LocalDate.of(1895, 12, 28), 190);
+        film.setReleaseDate(LocalDate.of(1895, 12, 28));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertTrue(violations.isEmpty());
+    }
+
+    private Film initFim() {
+        Film film = new Film();
+        film.setName("nisi eiusmod");
+        film.setDescription("adipisicing");
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
+        film.setDuration(100);
+        return film;
     }
 }
