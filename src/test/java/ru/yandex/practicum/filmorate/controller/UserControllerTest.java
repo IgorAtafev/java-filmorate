@@ -5,6 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,6 +18,8 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -72,7 +77,34 @@ class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private User initUser() {
+    @ParameterizedTest
+    @MethodSource("provideInvalidUsers")
+    void createUser_shouldResponseWithBadRequest_ifUserIsInvalid(User user) throws Exception {
+        String json = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/users").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/users").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> provideInvalidUsers() {
+        return Stream.of(
+                Arguments.of(initUser(user -> user.setEmail(""))),
+                Arguments.of(initUser(user -> user.setEmail("mail.ru"))),
+                Arguments.of(initUser(user -> user.setLogin(""))),
+                Arguments.of(initUser(user -> user.setLogin("dolore ullamco"))),
+                Arguments.of(initUser(user -> user.setBirthday(LocalDate.parse("2200-01-01"))))
+        );
+    }
+
+    private static User initUser(Consumer<User> consumer) {
+        User user = new User();
+        consumer.accept(user);
+        return user;
+    }
+
+    private static User initUser() {
         User user = new User();
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");

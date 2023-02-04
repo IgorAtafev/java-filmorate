@@ -5,6 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,6 +18,8 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -72,7 +77,33 @@ class FilmControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private Film initFilm() {
+    @ParameterizedTest
+    @MethodSource("provideInvalidFilms")
+    void createFilm_shouldResponseWithBadRequest_ifFilmIsInvalid(Film film) throws Exception {
+        String json = objectMapper.writeValueAsString(film);
+
+        mockMvc.perform(post("/films").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/films").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> provideInvalidFilms() {
+        return Stream.of(
+                Arguments.of(initFilm(film -> film.setName(""))),
+                Arguments.of(initFilm(film -> film.setDescription("a long string".repeat(20)))),
+                Arguments.of(initFilm(film -> film.setReleaseDate(LocalDate.parse("1000-01-01")))),
+                Arguments.of(initFilm(film -> film.setDuration(-100)))
+        );
+    }
+
+    private static Film initFilm(Consumer<Film> consumer) {
+        Film film = new Film();
+        consumer.accept(film);
+        return film;
+    }
+
+    private static Film initFilm() {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
