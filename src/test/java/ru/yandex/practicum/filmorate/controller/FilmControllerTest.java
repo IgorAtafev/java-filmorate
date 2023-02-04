@@ -67,7 +67,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void createFilm_shouldCreateAFilm() throws Exception {
+    void createFilm_shouldResponseWithOk() throws Exception {
         Film film = initFilm();
         String json = objectMapper.writeValueAsString(film);
 

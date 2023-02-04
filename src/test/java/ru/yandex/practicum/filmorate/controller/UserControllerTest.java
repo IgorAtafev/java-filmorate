@@ -67,7 +67,7 @@ class UserControllerTest {
     }
 
     @Test
-    void createUser_shouldCreateAUser() throws Exception {
+    void createUser_shouldResponseWithOk() throws Exception {
         User user = initUser();
         String json = objectMapper.writeValueAsString(user);
 
