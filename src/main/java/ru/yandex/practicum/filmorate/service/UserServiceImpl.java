@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        if (!isIdValueNullOrZero(user)) {
+        if (!isIdValueNull(user)) {
             throw new ValidationException("The user must have an empty ID when created");
         }
 
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(User user) {
-        if (isIdValueNullOrZero(user)) {
+        if (isIdValueNull(user)) {
             throw new ValidationException("The user must not have an empty ID when updating");
         }
 
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private boolean isIdValueNullOrZero(User user) {
-        return user.getId() == null || user.getId() == 0;
+    private boolean isIdValueNull(User user) {
+        return user.getId() == null;
     }
 }

@@ -22,7 +22,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
-        if (!isIdValueNullOrZero(film)) {
+        if (!isIdValueNull(film)) {
             throw new ValidationException("The movie must have an empty ID when created");
         }
 
@@ -34,7 +34,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film updateFilm(Film film) {
-        if (isIdValueNullOrZero(film)) {
+        if (isIdValueNull(film)) {
             throw new ValidationException("The movie must not have an empty ID when updating");
         }
 
@@ -47,7 +47,7 @@ public class FilmServiceImpl implements FilmService {
         return film;
     }
 
-    private boolean isIdValueNullOrZero(Film film) {
-        return film.getId() == null || film.getId() == 0;
+    private boolean isIdValueNull(Film film) {
+        return film.getId() == null;
     }
 }

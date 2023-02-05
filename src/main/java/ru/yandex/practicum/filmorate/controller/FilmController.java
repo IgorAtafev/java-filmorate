@@ -37,7 +37,7 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody @Valid Film film) {
-        log.info("Получен запрос PUT /films: '{}'", film);
+        log.info("Request received PUT /films: '{}'", film);
         return service.updateFilm(film);
     }
 }

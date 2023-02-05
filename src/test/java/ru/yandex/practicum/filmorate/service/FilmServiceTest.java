@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
@@ -15,14 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FilmServiceTest {
 
-    private Film film1;
-
     private final FilmService service = new FilmServiceImpl();
-
-    @BeforeEach
-    void setUp() {
-        film1 = initFilm();
-    }
 
     @Test
     void getFilms_shouldCheckForNull() {
@@ -36,6 +28,7 @@ class FilmServiceTest {
 
     @Test
     void getFilms_shouldReturnListOfFilms() {
+        Film film1 = initFilm();
         service.createFilm(film1);
         Film film2 = initFilm();
         service.createFilm(film2);
@@ -48,9 +41,10 @@ class FilmServiceTest {
 
     @Test
     void createFilm_shouldCreateAFilm() {
-        service.createFilm(film1);
+        Film film = initFilm();
+        service.createFilm(film);
 
-        List<Film> expected = List.of(film1);
+        List<Film> expected = List.of(film);
         List<Film> actual = service.getFilms();
 
         assertEquals(expected, actual);
@@ -58,27 +52,29 @@ class FilmServiceTest {
 
     @Test
     void createFilm_shouldThrowAnException_ifTheFilmIdIsNotEmpty() {
-        film1.setId(1);
+        Film film = initFilm();
+        film.setId(1);
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.createFilm(film1)
+                () -> service.createFilm(film)
         );
         assertEquals("The movie must have an empty ID when created", exception.getMessage());
     }
 
     @Test
     void updateFilm_shouldUpdateTheFilm() {
-        service.createFilm(film1);
-        film1.setId(1);
-        film1.setName("Film Updated");
-        film1.setDescription("New film update decriptio");
-        film1.setReleaseDate(LocalDate.of(1989, 4, 17));
-        film1.setDuration(190);
+        Film film = initFilm();
+        service.createFilm(film);
+        film.setId(1);
+        film.setName("Film Updated");
+        film.setDescription("New film update decriptio");
+        film.setReleaseDate(LocalDate.of(1989, 4, 17));
+        film.setDuration(190);
 
-        service.updateFilm(film1);
+        service.updateFilm(film);
 
-        List<Film> expected = List.of(film1);
+        List<Film> expected = List.of(film);
         List<Film> actual = service.getFilms();
 
         assertEquals(expected, actual);
@@ -86,15 +82,17 @@ class FilmServiceTest {
 
     @Test
     void updateFilm_shouldThrowAnException_ifTheFilmIdIsEmpty() {
+        Film film = initFilm();
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.updateFilm(film1)
+                () -> service.updateFilm(film)
         );
         assertEquals("The movie must not have an empty ID when updating", exception.getMessage());
     }
 
     @Test
     void updateFilm_shouldThrowAnException_ifTheFilmDoesNotExist() {
+        Film film1 = initFilm();
         service.createFilm(film1);
         Film film2 = initFilm();
         service.createFilm(film2);

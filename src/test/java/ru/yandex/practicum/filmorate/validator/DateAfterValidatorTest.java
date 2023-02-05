@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -15,31 +13,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DateAfterValidatorTest {
 
-    private Film film;
+    private TestData testData = new TestData();
 
     private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    @BeforeEach
-    void setUp() {
-        film = initFim();
-    }
-
     @Test
-    void isValid_shouldCheckTheReleaseDateIsAfter28121895() {
-        film.setReleaseDate(LocalDate.of(1989, 4, 17));
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
-
+    void isValid_shouldCheckTheDateIsAfter28121895() {
+        testData.date = LocalDate.of(1989, 4, 17);
+        Set<ConstraintViolation<TestData>> violations = validator.validate(testData);
         assertTrue(violations.isEmpty());
     }
 
     @Test
     void isValid_shouldCheckTheReleaseDateIsBefore28121895() {
-        film.setReleaseDate(LocalDate.of(1800, 1, 9));
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        testData.date = LocalDate.of(1800, 1, 9);
+        Set<ConstraintViolation<TestData>> violations = validator.validate(testData);
 
         assertFalse(violations.isEmpty());
 
-        String message = "Release date must be no earlier than 28.12.1895";
+        String message = "Date must be no earlier than 28.12.1895";
         assertTrue(violations.stream()
                 .map(ConstraintViolation::getMessage)
                 .anyMatch(message::equals));
@@ -47,18 +39,13 @@ class DateAfterValidatorTest {
 
     @Test
     void isValid_shouldCheckTheReleaseDateIsEqual28121895() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 28));
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
-
+        testData.date = LocalDate.of(1895, 12, 28);
+        Set<ConstraintViolation<TestData>> violations = validator.validate(testData);
         assertTrue(violations.isEmpty());
     }
 
-    private Film initFim() {
-        Film film = new Film();
-        film.setName("nisi eiusmod");
-        film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967, 3, 25));
-        film.setDuration(100);
-        return film;
+    private static class TestData {
+        @After(currentDate = "1895-12-28", pattern = "yyyy-MM-dd", message = "Date must be no earlier than 28.12.1895")
+        LocalDate date;
     }
 }

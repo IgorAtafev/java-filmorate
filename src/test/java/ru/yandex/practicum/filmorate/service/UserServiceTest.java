@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
@@ -15,14 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserServiceTest {
 
-    private User user1;
-
     private final UserService service = new UserServiceImpl();
-
-    @BeforeEach
-    void setUp() {
-        user1 = initUser();
-    }
 
     @Test
     void getUsers_shouldCheckForNull() {
@@ -36,6 +28,7 @@ class UserServiceTest {
 
     @Test
     void getUsers_shouldReturnListOfUsers() {
+        User user1 = initUser();
         service.createUser(user1);
         User user2 = initUser();
         service.createUser(user2);
@@ -48,9 +41,10 @@ class UserServiceTest {
 
     @Test
     void createUser_shouldCreateAUser() {
-        service.createUser(user1);
+        User user = initUser();
+        service.createUser(user);
 
-        List<User> expected = List.of(user1);
+        List<User> expected = List.of(user);
         List<User> actual = service.getUsers();
 
         assertEquals(expected, actual);
@@ -58,41 +52,45 @@ class UserServiceTest {
 
     @Test
     void createUser_shouldChangeNameToLogin_ifNameIsNull() {
-        user1.setName(null);
-        user1 = service.createUser(user1);
-        assertEquals(user1.getName(), user1.getLogin());
+        User user = initUser();
+        user.setName(null);
+        user = service.createUser(user);
+        assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
     void createUser_shouldChangeNameToLogin_ifNameIsNotNullAndEmpty() {
-        user1.setName("");
-        user1 = service.createUser(user1);
-        assertEquals(user1.getName(), user1.getLogin());
+        User user = initUser();
+        user.setName("");
+        user = service.createUser(user);
+        assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
     void createUser_shouldThrowAnException_ifTheUserIdIsNotEmpty() {
-        user1.setId(1);
+        User user = initUser();
+        user.setId(1);
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.createUser(user1)
+                () -> service.createUser(user)
         );
         assertEquals("The user must have an empty ID when created", exception.getMessage());
     }
 
     @Test
     void updateUser_shouldUpdateTheUser() {
-        service.createUser(user1);
-        user1.setId(1);
-        user1.setEmail("mail@yandex.ru");
-        user1.setLogin("doloreUpdate");
-        user1.setName("est adipisicing");
-        user1.setBirthday(LocalDate.of(1976, 9, 20));
+        User user = initUser();
+        service.createUser(user);
+        user.setId(1);
+        user.setEmail("mail@yandex.ru");
+        user.setLogin("doloreUpdate");
+        user.setName("est adipisicing");
+        user.setBirthday(LocalDate.of(1976, 9, 20));
 
-        service.updateUser(user1);
+        service.updateUser(user);
 
-        List<User> expected = List.of(user1);
+        List<User> expected = List.of(user);
         List<User> actual = service.getUsers();
 
         assertEquals(expected, actual);
@@ -100,33 +98,37 @@ class UserServiceTest {
 
     @Test
     void updateUser_shouldChangeNameToLogin_ifNameIsNull() {
-        service.createUser(user1);
-        user1.setName(null);
+        User user = initUser();
+        service.createUser(user);
+        user.setName(null);
 
-        user1 = service.updateUser(user1);
-        assertEquals(user1.getName(), user1.getLogin());
+        user = service.updateUser(user);
+        assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
     void updateUser_shouldChangeNameToLogin_ifNameIsNotNullAndEmpty() {
-        service.createUser(user1);
-        user1.setName("");
+        User user = initUser();
+        service.createUser(user);
+        user.setName("");
 
-        user1 = service.updateUser(user1);
-        assertEquals(user1.getName(), user1.getLogin());
+        user = service.updateUser(user);
+        assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
     void updateUser_shouldThrowAnException_ifTheUserIdIsEmpty() {
+        User user = initUser();
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.updateUser(user1)
+                () -> service.updateUser(user)
         );
         assertEquals("The user must not have an empty ID when updating", exception.getMessage());
     }
 
     @Test
     void updateUser_shouldThrowAnException_ifTheUserDoesNotExist() {
+        User user1 = initUser();
         service.createUser(user1);
         User user2 = initUser();
         service.createUser(user2);
