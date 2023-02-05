@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DateAfterValidatorTest {
 
-    private TestData testData = new TestData();
+    private final TestData testData = new TestData();
 
-    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
     void isValid_shouldCheckTheDateIsAfter28121895() {

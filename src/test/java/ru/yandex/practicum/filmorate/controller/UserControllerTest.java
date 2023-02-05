@@ -90,16 +90,23 @@ class UserControllerTest {
 
     private static Stream<Arguments> provideInvalidUsers() {
         return Stream.of(
+                Arguments.of(initUser(user -> user.setEmail(null))),
                 Arguments.of(initUser(user -> user.setEmail(""))),
                 Arguments.of(initUser(user -> user.setEmail("mail.ru"))),
+                Arguments.of(initUser(user -> user.setLogin(null))),
                 Arguments.of(initUser(user -> user.setLogin(""))),
+                Arguments.of(initUser(user -> user.setLogin("logi"))),
+                Arguments.of(initUser(user -> user.setLogin("logi".repeat(5) + "i"))),
                 Arguments.of(initUser(user -> user.setLogin("dolore ullamco"))),
+                Arguments.of(initUser(user -> user.setName("do"))),
+                Arguments.of(initUser(user -> user.setName("dolore".repeat(5) + "d"))),
+                Arguments.of(initUser(user -> user.setBirthday(null))),
                 Arguments.of(initUser(user -> user.setBirthday(LocalDate.parse("2200-01-01"))))
         );
     }
 
     private static User initUser(Consumer<User> consumer) {
-        User user = new User();
+        User user = initUser();
         consumer.accept(user);
         return user;
     }

@@ -90,15 +90,21 @@ class FilmControllerTest {
 
     private static Stream<Arguments> provideInvalidFilms() {
         return Stream.of(
+                Arguments.of(initFilm(film -> film.setName(null))),
                 Arguments.of(initFilm(film -> film.setName(""))),
-                Arguments.of(initFilm(film -> film.setDescription("a long string".repeat(20)))),
+                Arguments.of(initFilm(film -> film.setName("ni"))),
+                Arguments.of(initFilm(film -> film.setName("nisi eiusm".repeat(5) + "o"))),
+                Arguments.of(initFilm(film -> film.setDescription(null))),
+                Arguments.of(initFilm(film -> film.setDescription("long strin".repeat(20) + "g"))),
+                Arguments.of(initFilm(film -> film.setReleaseDate(null))),
                 Arguments.of(initFilm(film -> film.setReleaseDate(LocalDate.parse("1000-01-01")))),
+                Arguments.of(initFilm(film -> film.setDuration(0))),
                 Arguments.of(initFilm(film -> film.setDuration(-100)))
         );
     }
 
     private static Film initFilm(Consumer<Film> consumer) {
-        Film film = new Film();
+        Film film = initFilm();
         consumer.accept(film);
         return film;
     }
