@@ -1,23 +1,22 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.film;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.validator.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    private int nextId = 0;
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmStorage storage;
 
     @Override
     public List<Film> getFilms() {
-        return new ArrayList<>(films.values());
+        return storage.getFilms();
     }
 
     @Override
@@ -26,10 +25,7 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("The movie must have an empty ID when created");
         }
 
-        film.setId(++nextId);
-        films.put(film.getId(), film);
-
-        return film;
+        return storage.createFilm(film);
     }
 
     @Override
@@ -38,13 +34,11 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("The movie must not have an empty ID when updating");
         }
 
-        if (!films.containsKey(film.getId())) {
+        if (storage.getFilmById(film.getId()).isEmpty()) {
             throw new ValidationException("This movie does not exist");
         }
 
-        films.put(film.getId(), film);
-
-        return film;
+        return storage.updateFilm(film);
     }
 
     private boolean isIdValueNull(Film film) {

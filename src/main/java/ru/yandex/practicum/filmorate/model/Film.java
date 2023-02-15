@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @ToString
 public class Film {
 
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Name cannot be empty")
     @Size(min = 3, max = 50, message = "Name must contain at least 3 and no more than 50 characters")
