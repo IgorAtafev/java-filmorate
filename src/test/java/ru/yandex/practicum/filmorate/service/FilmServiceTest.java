@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.time.LocalDate;
@@ -109,8 +110,8 @@ class FilmServiceTest {
         film3.setReleaseDate(LocalDate.of(2006, 2, 2));
         film3.setDuration(250);
 
-        ValidationException exception = assertThrows(
-                ValidationException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.updateFilm(film3)
         );
         assertEquals("This movie does not exist", exception.getMessage());

@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.time.LocalDate;
@@ -145,8 +146,8 @@ class UserServiceTest {
         user3.setName("Nick Name3");
         user3.setBirthday(LocalDate.of(1996, 8, 20));
 
-        ValidationException exception = assertThrows(
-                ValidationException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> service.updateUser(user3)
         );
         assertEquals("This user does not exist", exception.getMessage());
