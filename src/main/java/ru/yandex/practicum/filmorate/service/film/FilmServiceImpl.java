@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class FilmServiceImpl implements FilmService {
         }
 
         if (storage.getFilmById(film.getId()).isEmpty()) {
-            throw new ValidationException("This movie does not exist");
+            throw new NotFoundException("This movie does not exist");
         }
 
         return storage.updateFilm(film);
