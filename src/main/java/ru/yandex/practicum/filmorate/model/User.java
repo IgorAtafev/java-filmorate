@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @ToString
 public class User {
 
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Email must be valid")

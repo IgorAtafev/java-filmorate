@@ -58,7 +58,7 @@ class FilmServiceTest {
     @Test
     void createFilm_shouldThrowAnException_ifTheFilmIdIsNotEmpty() {
         Film film = initFilm();
-        film.setId(1);
+        film.setId(1L);
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -71,7 +71,7 @@ class FilmServiceTest {
     void updateFilm_shouldUpdateTheFilm() {
         Film film = initFilm();
         service.createFilm(film);
-        film.setId(1);
+        film.setId(1L);
         film.setName("Film Updated");
         film.setDescription("New film update decriptio");
         film.setReleaseDate(LocalDate.of(1989, 4, 17));
@@ -103,7 +103,7 @@ class FilmServiceTest {
         service.createFilm(film2);
 
         Film film3 = new Film();
-        film3.setId(999);
+        film3.setId(999L);
         film3.setName("nisi eiusmod3");
         film3.setDescription("adipisicing3");
         film3.setReleaseDate(LocalDate.of(2006, 2, 2));

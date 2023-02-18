@@ -1,24 +1,22 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private int nextId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserStorage storage;
 
     @Override
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return storage.getUsers();
     }
 
     @Override
@@ -28,10 +26,7 @@ public class UserServiceImpl implements UserService {
         }
 
         changeNameToLogin(user);
-        user.setId(++nextId);
-        users.put(user.getId(), user);
-
-        return user;
+        return storage.createUser(user);
     }
 
     @Override
@@ -40,14 +35,12 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("The user must not have an empty ID when updating");
         }
 
-        if (!users.containsKey(user.getId())) {
+        if (storage.getUserById(user.getId()).isEmpty()) {
             throw new ValidationException("This user does not exist");
         }
 
         changeNameToLogin(user);
-        users.put(user.getId(), user);
-
-        return user;
+        return storage.updateUser(user);
     }
 
     private void changeNameToLogin(User user) {

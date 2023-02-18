@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.time.LocalDate;
@@ -16,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserServiceTest {
 
-    private final UserService service = new UserServiceImpl();
+    private final UserStorage storage = new InMemoryUserStorage();
+    private final UserService service = new UserServiceImpl(storage);
 
     @Test
     void getUsers_shouldCheckForNull() {
@@ -71,7 +74,7 @@ class UserServiceTest {
     @Test
     void createUser_shouldThrowAnException_ifTheUserIdIsNotEmpty() {
         User user = initUser();
-        user.setId(1);
+        user.setId(1L);
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -84,7 +87,7 @@ class UserServiceTest {
     void updateUser_shouldUpdateTheUser() {
         User user = initUser();
         service.createUser(user);
-        user.setId(1);
+        user.setId(1L);
         user.setEmail("mail@yandex.ru");
         user.setLogin("doloreUpdate");
         user.setName("est adipisicing");
@@ -136,7 +139,7 @@ class UserServiceTest {
         service.createUser(user2);
 
         User user3 = new User();
-        user3.setId(999);
+        user3.setId(999L);
         user3.setEmail("mail3@mail.ru");
         user3.setLogin("dolore3");
         user3.setName("Nick Name3");
