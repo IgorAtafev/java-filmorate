@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +56,11 @@ public class UserServiceImpl implements UserService {
     public void addFriend(Long id, Long friendId) {
         User user = getUserById(id);
         User friend = getUserById(friendId);
+
+        if (Objects.equals(id, friendId)) {
+            throw new ValidationException("The user cannot add himself as a friend");
+        }
+
         storage.addFriend(user, friend);
         storage.addFriend(friend, user);
     }

@@ -46,6 +46,36 @@ class UserServiceTest {
     }
 
     @Test
+    void getUserById_shouldReturnUserById() {
+        User user1 = initUser();
+        service.createUser(user1);
+
+        User user2 = service.getUserById(user1.getId());
+        assertEquals(user1, user2);
+    }
+
+    @Test
+    void getUserById_shouldThrowAnException_ifUserDoesNotExist() {
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> service.getUserById(0L)
+        );
+        assertEquals("User width id 0 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> service.getUserById(-1L)
+        );
+        assertEquals("User width id -1 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> service.getUserById(999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+    }
+
+    @Test
     void createUser_shouldCreateAUser() {
         User user = initUser();
         service.createUser(user);
@@ -151,6 +181,174 @@ class UserServiceTest {
                 () -> service.updateUser(user3)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void addFriend_shouldAddTheUserAsAFriend() {
+        User user1 = initUser();
+        service.createUser(user1);
+        User user2 = initUser();
+        service.createUser(user2);
+
+        service.addFriend(user1.getId(), user2.getId());
+
+        List<User> expected = List.of(user2);
+        List<User> actual = service.getFriends(user1.getId());
+
+        assertEquals(expected, actual);
+
+        expected = List.of(user1);
+        actual = service.getFriends(user2.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void addFriend_shouldThrowAnException_ifTheUserDoesNotExist() {
+        User user = initUser();
+        service.createUser(user);
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> service.addFriend(user.getId(), 999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> service.addFriend(-1L, user.getId())
+        );
+        assertEquals("User width id -1 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void addFriend_shouldThrowAnException_IfTheUserAddsHimselfAsAFriend() {
+        User user = initUser();
+        service.createUser(user);
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> service.addFriend(user.getId(), user.getId())
+        );
+        assertEquals("The user cannot add himself as a friend", exception.getMessage());
+    }
+
+    @Test
+    void removeFriend_shouldRemoveTheUserFromFriends() {
+        User user1 = initUser();
+        service.createUser(user1);
+        User user2 = initUser();
+        service.createUser(user2);
+        service.addFriend(user1.getId(), user2.getId());
+
+        service.removeFriend(user1.getId(), user2.getId());
+
+        assertTrue(service.getFriends(user1.getId()).isEmpty());
+        assertTrue(service.getFriends(user2.getId()).isEmpty());
+    }
+
+    @Test
+    void removeFriend_shouldThrowAnException_ifTheUserDoesNotExist() {
+        User user = initUser();
+        service.createUser(user);
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> service.removeFriend(user.getId(), 999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> service.addFriend(-1L, user.getId())
+        );
+        assertEquals("User width id -1 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void getFriends_shouldReturnEmptyListOfFriendsOfUser() {
+        User user = initUser();
+        service.createUser(user);
+        assertTrue(service.getFriends(user.getId()).isEmpty());
+    }
+
+    @Test
+    void getFriends_shouldReturnListOfFriendsOfUser() {
+        User user1 = initUser();
+        service.createUser(user1);
+        User user2 = initUser();
+        service.createUser(user2);
+
+        service.addFriend(user1.getId(), user2.getId());
+
+        List<User> expected = List.of(user2);
+        List<User> actual = service.getFriends(user1.getId());
+
+        assertEquals(expected, actual);
+
+        expected = List.of(user1);
+        actual = service.getFriends(user2.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getFriends_shouldThrowAnException_ifTheUserDoesNotExist() {
+        User user = initUser();
+        service.createUser(user);
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> service.getFriends(999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void getCommonFriends_shouldReturnEmptyListOfCommonFriendsOfUsers() {
+        User user1 = initUser();
+        service.createUser(user1);
+        User user2 = initUser();
+        service.createUser(user2);
+
+        assertTrue(service.getCommonFriends(user1.getId(), user2.getId()).isEmpty());
+    }
+
+    @Test
+    void getCommonFriends_shouldReturnListOfCommonFriendsOfUsers() {
+        User user1 = initUser();
+        service.createUser(user1);
+        User user2 = initUser();
+        service.createUser(user2);
+        User user3 = initUser();
+        service.createUser(user3);
+
+        service.addFriend(user1.getId(), user2.getId());
+        service.addFriend(user1.getId(), user3.getId());
+        service.addFriend(user2.getId(), user3.getId());
+
+        List<User> expected = List.of(user3);
+        List<User> actual = service.getCommonFriends(user1.getId(), user2.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getCommonFriends_shouldThrowAnException_ifTheUserDoesNotExist() {
+        User user = initUser();
+        service.createUser(user);
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> service.getCommonFriends(user.getId(), 999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> service.getCommonFriends(-1L, user.getId())
+        );
+        assertEquals("User width id -1 does not exist", exception.getMessage());
     }
 
     private User initUser() {

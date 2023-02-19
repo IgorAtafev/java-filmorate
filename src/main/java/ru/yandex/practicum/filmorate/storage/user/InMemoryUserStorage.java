@@ -52,6 +52,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<Long> getFriends(User user) {
-        return List.copyOf(user.getFriends());
+        return user.getFriends();
     }
 }
