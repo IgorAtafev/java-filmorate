@@ -21,12 +21,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(Long id) {
+        return storage.getUserById(id).orElseThrow(
+                () -> new NotFoundException(String.format("User width id %d does not exist", id))
+        );
+    }
+
+    @Override
     public User createUser(User user) {
         if (!isIdValueNull(user)) {
             throw new ValidationException("The user must have an empty ID when created");
         }
 
         changeNameToLogin(user);
+
         return storage.createUser(user);
     }
 
@@ -36,12 +44,18 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("The user must not have an empty ID when updating");
         }
 
-        if (storage.getUserById(user.getId()).isEmpty()) {
-            throw new NotFoundException("This user does not exist");
-        }
-
+        getUserById(user.getId());
         changeNameToLogin(user);
+
         return storage.updateUser(user);
+    }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
+        storage.addFriend(user, friend);
+        storage.addFriend(friend, user);
     }
 
     private void changeNameToLogin(User user) {

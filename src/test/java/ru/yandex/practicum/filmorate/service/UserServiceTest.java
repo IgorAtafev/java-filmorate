@@ -150,7 +150,7 @@ class UserServiceTest {
                 NotFoundException.class,
                 () -> service.updateUser(user3)
         );
-        assertEquals("This user does not exist", exception.getMessage());
+        assertEquals("User width id 999 does not exist", exception.getMessage());
     }
 
     private User initUser() {

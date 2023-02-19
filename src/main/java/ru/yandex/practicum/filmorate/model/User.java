@@ -12,6 +12,8 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -35,4 +37,10 @@ public class User {
     @NotNull(message = "Birthday cannot be null")
     @PastOrPresent(message = "Birthday cannot be in the future")
     private LocalDate birthday;
+
+    private final Set<Long> friends = new HashSet<>();
+
+    public void addFriend(Long userId) {
+        friends.add(userId);
+    }
 }

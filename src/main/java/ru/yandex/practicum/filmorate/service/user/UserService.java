@@ -13,6 +13,14 @@ public interface UserService {
     List<User> getUsers();
 
     /**
+     * Returns user by id.
+     * If user not found throws NotFoundException
+     * @param id
+     * @return user by id
+     */
+    User getUserById(Long id);
+
+    /**
      * Creates a new user
      * @param user
      * @return new user
@@ -25,4 +33,11 @@ public interface UserService {
      * @return updated user
      */
     User updateUser(User user);
+
+    /**
+     * Adds the user with id = friendId as a friend to the user with id = userId
+     * @param userId
+     * @param friendId
+     */
+    void addFriend(Long userId, Long friendId);
 }

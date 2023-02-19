@@ -16,7 +16,7 @@ public interface UserStorage {
     /**
      * Returns a user by id
      * @param id
-     * @return user or null if there was no one
+     * @return user
      */
     Optional<User> getUserById(Long id);
 
@@ -33,4 +33,11 @@ public interface UserStorage {
      * @return updated user
      */
     User updateUser(User user);
+
+    /**
+     * Adds a user as a friend
+     * @param user
+     * @param friend
+     */
+    void addFriend(User user, User friend);
 }
