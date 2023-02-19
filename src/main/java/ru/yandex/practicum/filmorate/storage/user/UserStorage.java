@@ -40,4 +40,17 @@ public interface UserStorage {
      * @param friend
      */
     void addFriend(User user, User friend);
+
+    /**
+     * Removes a user as a friend
+     * @param user
+     * @param friend
+     */
+    void removeFriend(User user, User friend);
+
+    /**
+     * Returns a list of user id friends
+     * @return a list of user id
+     */
+    List<Long> getFriends(User user);
 }

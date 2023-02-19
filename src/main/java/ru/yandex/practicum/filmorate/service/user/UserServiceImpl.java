@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +52,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addFriend(Long userId, Long friendId) {
-        User user = getUserById(userId);
+    public void addFriend(Long id, Long friendId) {
+        User user = getUserById(id);
         User friend = getUserById(friendId);
         storage.addFriend(user, friend);
         storage.addFriend(friend, user);
+    }
+
+    @Override
+    public void removeFriend(Long id, Long friendId) {
+        User user = getUserById(id);
+        User friend = getUserById(friendId);
+        storage.removeFriend(user, friend);
+        storage.removeFriend(friend, user);
+    }
+
+    @Override
+    public List<User> getFriends(Long id) {
+        User user = getUserById(id);
+        List<Long> friends = storage.getFriends(user);
+
+        return friends.stream()
+                .map(this::getUserById)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getCommonFriends(Long id, Long otherId) {
+        User user = getUserById(id);
+        User other = getUserById(otherId);
+        List<Long> friends = storage.getFriends(user);
+        List<Long> otherFriends = storage.getFriends(other);
+
+        return friends.stream()
+                .filter(otherFriends::contains)
+                .map(this::getUserById)
+                .collect(Collectors.toList());
     }
 
     private void changeNameToLogin(User user) {

@@ -31,7 +31,7 @@ public class User {
     @Pattern(regexp = "^\\S{5,20}$", message = "Login must contain at least 5 and no more than 20 characters")
     private String login;
 
-    @Size(min = 3, max = 30, message = "Name must contain at least 3 and no more than 30 characters")
+    @Size(max = 30, message = "Name must contain at least 3 and no more than 30 characters")
     private String name;
 
     @NotNull(message = "Birthday cannot be null")
@@ -40,7 +40,11 @@ public class User {
 
     private final Set<Long> friends = new HashSet<>();
 
-    public void addFriend(Long userId) {
-        friends.add(userId);
+    public void addFriend(Long id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(Long id) {
+        friends.remove(id);
     }
 }
