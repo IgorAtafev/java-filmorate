@@ -14,7 +14,7 @@ public interface UserService {
 
     /**
      * Returns user by id.
-     * If user not found throws NotFoundException
+     * If the user is not found throws NotFoundException
      * @param id
      * @return user by id
      */
@@ -36,6 +36,7 @@ public interface UserService {
 
     /**
      * Adds the user with id = friendId as a friend to the user with id = userId
+     * If the user or friend is not found throws NotFoundException
      * @param userId
      * @param friendId
      */

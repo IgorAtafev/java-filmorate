@@ -16,7 +16,7 @@ public interface UserStorage {
     /**
      * Returns a user by id
      * @param id
-     * @return user
+     * @return user or null if there was no one
      */
     Optional<User> getUserById(Long id);
 
