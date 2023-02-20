@@ -49,4 +49,12 @@ public interface FilmService {
      * @param userId
      */
     void removeLike(Long id, Long userId);
+
+    /**
+     * Returns a list of popular films by number of likes
+     * The number of films is set by the parameter count
+     * @param count
+     * @return list of popular films
+     */
+    List<Film> getPopular(int count);
 }

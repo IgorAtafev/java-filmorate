@@ -60,13 +60,11 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
-        log.info("Request received GET /users{}/friends", id);
         return service.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
-        log.info("Request received GET /users{}/friends/common/{}", id, otherId);
         return service.getCommonFriends(id, otherId);
     }
 }

@@ -9,8 +9,9 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +68,21 @@ public class FilmServiceImpl implements FilmService {
         storage.removeLike(film, user);
     }
 
+    @Override
+    public List<Film> getPopular(int count) {
+        Comparator<Film> comparator = getComparator();
+        return storage.getFilms().stream()
+                .sorted(comparator)
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
     private boolean isIdValueNull(Film film) {
         return film.getId() == null;
+    }
+
+    private Comparator<Film> getComparator() {
+        Comparator<Film> comparator = Comparator.comparing(film -> film.getLikes().size());
+        return comparator.reversed();
     }
 }
