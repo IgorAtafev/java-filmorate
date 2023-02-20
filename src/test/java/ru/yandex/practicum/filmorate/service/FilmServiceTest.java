@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
 import ru.yandex.practicum.filmorate.service.user.UserService;
@@ -53,6 +54,36 @@ class FilmServiceTest {
     }
 
     @Test
+    void getFilmById_shouldReturnFilmById() {
+        Film film1 = initFilm();
+        filmService.createFilm(film1);
+
+        Film film2 = filmService.getFilmById(film1.getId());
+        assertEquals(film1, film2);
+    }
+
+    @Test
+    void getFilmById_shouldThrowAnException_ifFilmDoesNotExist() {
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.getFilmById(0L)
+        );
+        assertEquals("Film width id 0 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.getFilmById(-1L)
+        );
+        assertEquals("Film width id -1 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.getFilmById(999L)
+        );
+        assertEquals("Film width id 999 does not exist", exception.getMessage());
+    }
+
+    @Test
     void createFilm_shouldCreateAFilm() {
         Film film = initFilm();
         filmService.createFilm(film);
@@ -64,7 +95,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void createFilm_shouldThrowAnException_ifTheFilmIdIsNotEmpty() {
+    void createFilm_shouldThrowAnException_ifFilmIdIsNotEmpty() {
         Film film = initFilm();
         film.setId(1L);
 
@@ -72,7 +103,7 @@ class FilmServiceTest {
                 ValidationException.class,
                 () -> filmService.createFilm(film)
         );
-        assertEquals("The movie must have an empty ID when created", exception.getMessage());
+        assertEquals("The film must have an empty ID when created", exception.getMessage());
     }
 
     @Test
@@ -94,17 +125,17 @@ class FilmServiceTest {
     }
 
     @Test
-    void updateFilm_shouldThrowAnException_ifTheFilmIdIsEmpty() {
+    void updateFilm_shouldThrowAnException_ifFilmIdIsEmpty() {
         Film film = initFilm();
         ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> filmService.updateFilm(film)
         );
-        assertEquals("The movie must not have an empty ID when updating", exception.getMessage());
+        assertEquals("The film must not have an empty ID when updating", exception.getMessage());
     }
 
     @Test
-    void updateFilm_shouldThrowAnException_ifTheFilmDoesNotExist() {
+    void updateFilm_shouldThrowAnException_ifFilmDoesNotExist() {
         Film film1 = initFilm();
         filmService.createFilm(film1);
         Film film2 = initFilm();
@@ -121,7 +152,112 @@ class FilmServiceTest {
                 NotFoundException.class,
                 () -> filmService.updateFilm(film3)
         );
-        assertEquals("This movie does not exist", exception.getMessage());
+        assertEquals("Film width id 999 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void addLike_shouldAddTheUserLikeToAFilm() {
+        Film film = initFilm();
+        filmService.createFilm(film);
+        User user = initUser();
+        userService.createUser(user);
+
+        filmService.addLike(film.getId(), user.getId());
+
+        List<Long> expected = List.of(user.getId());
+        List<Long> actual = film.getLikes();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void addLike_shouldThrowAnException_ifUserOrFilmDoesNotExist() {
+        Film film = initFilm();
+        filmService.createFilm(film);
+        User user = initUser();
+        userService.createUser(user);
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.addLike(film.getId(), 999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.addLike(-1L, user.getId())
+        );
+        assertEquals("Film width id -1 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void removeLike_shouldRemoveTheUserLikeToAFilm() {
+        Film film = initFilm();
+        filmService.createFilm(film);
+        User user1 = initUser();
+        userService.createUser(user1);
+        User user2 = initUser();
+        userService.createUser(user2);
+
+        filmService.addLike(film.getId(), user1.getId());
+        filmService.addLike(film.getId(), user2.getId());
+
+        filmService.removeLike(film.getId(), user1.getId());
+
+        List<Long> expected = List.of(user2.getId());
+        List<Long> actual = film.getLikes();
+
+        assertEquals(expected, actual);
+
+        filmService.removeLike(film.getId(), user2.getId());
+
+        assertTrue(film.getLikes().isEmpty());
+    }
+
+    @Test
+    void removeLike_shouldThrowAnException_ifUserOrFilmDoesNotExist() {
+        Film film = initFilm();
+        filmService.createFilm(film);
+        User user = initUser();
+        userService.createUser(user);
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.removeLike(film.getId(), 999L)
+        );
+        assertEquals("User width id 999 does not exist", exception.getMessage());
+
+        exception = assertThrows(
+                NotFoundException.class,
+                () -> filmService.removeLike(-1L, user.getId())
+        );
+        assertEquals("Film width id -1 does not exist", exception.getMessage());
+    }
+
+    @Test
+    void getPopular_shouldReturnEmptyListOfPopularFilms() {
+        assertTrue(filmService.getPopular(10).isEmpty());
+    }
+
+    @Test
+    void getPopular_shouldReturnListOfPopularFilmsByNumberOfLikes() {
+        Film film1 = initFilm();
+        filmService.createFilm(film1);
+        Film film2 = initFilm();
+        filmService.createFilm(film2);
+        User user1 = initUser();
+        userService.createUser(user1);
+        User user2 = initUser();
+        userService.createUser(user2);
+
+        filmService.addLike(film1.getId(), user1.getId());
+        filmService.addLike(film2.getId(), user2.getId());
+        filmService.addLike(film2.getId(), user1.getId());
+
+        List<Film> expected = List.of(film2);
+        List<Film> actual = filmService.getPopular(1);
+
+        assertEquals(expected, actual);
     }
 
     private Film initFilm() {
@@ -131,5 +267,14 @@ class FilmServiceTest {
         film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
         return film;
+    }
+
+    private User initUser() {
+        User user = new User();
+        user.setEmail("mail@mail.ru");
+        user.setLogin("dolore");
+        user.setName("Nick Name");
+        user.setBirthday(LocalDate.of(1946, 8, 20));
+        return user;
     }
 }

@@ -131,7 +131,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addFriend_shouldResponseWithBadRequest_IfTheUserAddsHimselfAsAFriend() throws Exception {
+    void addFriend_shouldResponseWithBadRequest_ifUserAddsHimselfAsAFriend() throws Exception {
         doThrow(ValidationException.class).when(service).addFriend(1L, 1L);
 
         mockMvc.perform(put("/users/{id}/friends/{friendId}", 1, 1))

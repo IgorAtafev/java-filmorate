@@ -103,7 +103,7 @@ class UserServiceTest {
     }
 
     @Test
-    void createUser_shouldThrowAnException_ifTheUserIdIsNotEmpty() {
+    void createUser_shouldThrowAnException_ifUserIdIsNotEmpty() {
         User user = initUser();
         user.setId(1L);
 
@@ -153,7 +153,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUser_shouldThrowAnException_ifTheUserIdIsEmpty() {
+    void updateUser_shouldThrowAnException_ifUserIdIsEmpty() {
         User user = initUser();
         ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -163,7 +163,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUser_shouldThrowAnException_ifTheUserDoesNotExist() {
+    void updateUser_shouldThrowAnException_ifUserDoesNotExist() {
         User user1 = initUser();
         userService.createUser(user1);
         User user2 = initUser();
@@ -192,19 +192,19 @@ class UserServiceTest {
 
         userService.addFriend(user1.getId(), user2.getId());
 
-        List<User> expected = List.of(user2);
-        List<User> actual = userService.getFriends(user1.getId());
+        List<Long> expected = List.of(user2.getId());
+        List<Long> actual = user1.getFriends();
 
         assertEquals(expected, actual);
 
-        expected = List.of(user1);
-        actual = userService.getFriends(user2.getId());
+        expected = List.of(user1.getId());
+        actual = user2.getFriends();
 
         assertEquals(expected, actual);
     }
 
     @Test
-    void addFriend_shouldThrowAnException_ifTheUserDoesNotExist() {
+    void addFriend_shouldThrowAnException_ifUserDoesNotExist() {
         User user = initUser();
         userService.createUser(user);
 
@@ -222,7 +222,7 @@ class UserServiceTest {
     }
 
     @Test
-    void addFriend_shouldThrowAnException_IfTheUserAddsHimselfAsAFriend() {
+    void addFriend_shouldThrowAnException_ifUserAddsHimselfAsAFriend() {
         User user = initUser();
         userService.createUser(user);
 
@@ -239,16 +239,24 @@ class UserServiceTest {
         userService.createUser(user1);
         User user2 = initUser();
         userService.createUser(user2);
+        User user3 = initUser();
+        userService.createUser(user3);
+
         userService.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user1.getId(), user3.getId());
 
         userService.removeFriend(user1.getId(), user2.getId());
 
-        assertTrue(userService.getFriends(user1.getId()).isEmpty());
-        assertTrue(userService.getFriends(user2.getId()).isEmpty());
+        List<Long> expected = List.of(user3.getId());
+        List<Long> actual = user1.getFriends();
+
+        assertEquals(expected, actual);
+
+        assertTrue(user2.getFriends().isEmpty());
     }
 
     @Test
-    void removeFriend_shouldThrowAnException_ifTheUserDoesNotExist() {
+    void removeFriend_shouldThrowAnException_ifUserDoesNotExist() {
         User user = initUser();
         userService.createUser(user);
 
@@ -293,7 +301,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getFriends_shouldThrowAnException_ifTheUserDoesNotExist() {
+    void getFriends_shouldThrowAnException_ifUserDoesNotExist() {
         User user = initUser();
         userService.createUser(user);
 
@@ -334,7 +342,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getCommonFriends_shouldThrowAnException_ifTheUserDoesNotExist() {
+    void getCommonFriends_shouldThrowAnException_ifUserDoesNotExist() {
         User user = initUser();
         userService.createUser(user);
 
