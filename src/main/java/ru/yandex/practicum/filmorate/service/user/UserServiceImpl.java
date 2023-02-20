@@ -69,6 +69,7 @@ public class UserServiceImpl implements UserService {
     public void removeFriend(Long id, Long friendId) {
         User user = getUserById(id);
         User friend = getUserById(friendId);
+
         storage.removeFriend(user, friend);
         storage.removeFriend(friend, user);
     }

@@ -13,6 +13,14 @@ public interface FilmService {
     List<Film> getFilms();
 
     /**
+     * Returns film by id.
+     * If the film is not found throws NotFoundException
+     * @param id
+     * @return film by id
+     */
+    Film getFilmById(Long id);
+
+    /**
      * Creates a new film
      * @param film
      * @return new film
@@ -25,4 +33,20 @@ public interface FilmService {
      * @return updated film
      */
     Film updateFilm(Film film);
+
+    /**
+     * Adds a user like to a film
+     * If the user or film is not found throws NotFoundException
+     * @param id
+     * @param userId
+     */
+    void addLike(Long id, Long userId);
+
+    /**
+     * Removes a user like to a film
+     * If the user or film is not found throws NotFoundException
+     * @param id
+     * @param userId
+     */
+    void removeLike(Long id, Long userId);
 }

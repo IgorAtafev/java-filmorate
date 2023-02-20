@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,5 +37,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         films.put(film.getId(), film);
         return film;
+    }
+
+    @Override
+    public void addLike(Film film, User user) {
+        film.addLike(user.getId());
+    }
+
+    @Override
+    public void removeLike(Film film, User user) {
+        film.removeLike(user.getId());
     }
 }
