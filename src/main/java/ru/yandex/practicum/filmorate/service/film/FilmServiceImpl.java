@@ -70,7 +70,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getPopular(int count) {
-        Comparator<Film> comparator = getComparator();
+        Comparator<Film> comparator = Comparator.comparing(film -> film.getLikes().size());
+        comparator = comparator.reversed();
+
         return storage.getFilms().stream()
                 .sorted(comparator)
                 .limit(count)
@@ -79,10 +81,5 @@ public class FilmServiceImpl implements FilmService {
 
     private boolean isIdValueNull(Film film) {
         return film.getId() == null;
-    }
-
-    private Comparator<Film> getComparator() {
-        Comparator<Film> comparator = Comparator.comparing(film -> film.getLikes().size());
-        return comparator.reversed();
     }
 }
