@@ -36,7 +36,7 @@ public interface FilmService {
 
     /**
      * Adds a user like to a film
-     * If the user or film is not found throws NotFoundException
+     * If the film or user is not found throws NotFoundException
      * @param id
      * @param userId
      */
@@ -44,7 +44,7 @@ public interface FilmService {
 
     /**
      * Removes a user like to a film
-     * If the user or film is not found throws NotFoundException
+     * If the film or user is not found throws NotFoundException
      * @param id
      * @param userId
      */
