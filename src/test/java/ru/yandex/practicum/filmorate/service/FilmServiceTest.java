@@ -4,8 +4,12 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
@@ -19,28 +23,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FilmServiceTest {
 
-    private final FilmStorage storage = new InMemoryFilmStorage();
-    private final FilmService service = new FilmServiceImpl(storage);
+    private final UserStorage userStorage = new InMemoryUserStorage();
+    private final UserService userService = new UserServiceImpl(userStorage);
+
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final FilmService filmService = new FilmServiceImpl(filmStorage, userService);
 
     @Test
     void getFilms_shouldCheckForNull() {
-        assertNotNull(service.getFilms());
+        assertNotNull(filmService.getFilms());
     }
 
     @Test
     void getFilms_shouldReturnEmptyListOfFilms() {
-        assertTrue(service.getFilms().isEmpty());
+        assertTrue(filmService.getFilms().isEmpty());
     }
 
     @Test
     void getFilms_shouldReturnListOfFilms() {
         Film film1 = initFilm();
-        service.createFilm(film1);
+        filmService.createFilm(film1);
         Film film2 = initFilm();
-        service.createFilm(film2);
+        filmService.createFilm(film2);
 
         List<Film> expected = List.of(film1, film2);
-        List<Film> actual = service.getFilms();
+        List<Film> actual = filmService.getFilms();
 
         assertEquals(expected, actual);
     }
@@ -48,10 +55,10 @@ class FilmServiceTest {
     @Test
     void createFilm_shouldCreateAFilm() {
         Film film = initFilm();
-        service.createFilm(film);
+        filmService.createFilm(film);
 
         List<Film> expected = List.of(film);
-        List<Film> actual = service.getFilms();
+        List<Film> actual = filmService.getFilms();
 
         assertEquals(expected, actual);
     }
@@ -63,7 +70,7 @@ class FilmServiceTest {
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.createFilm(film)
+                () -> filmService.createFilm(film)
         );
         assertEquals("The movie must have an empty ID when created", exception.getMessage());
     }
@@ -71,17 +78,17 @@ class FilmServiceTest {
     @Test
     void updateFilm_shouldUpdateTheFilm() {
         Film film = initFilm();
-        service.createFilm(film);
+        filmService.createFilm(film);
         film.setId(1L);
         film.setName("Film Updated");
         film.setDescription("New film update decriptio");
         film.setReleaseDate(LocalDate.of(1989, 4, 17));
         film.setDuration(190);
 
-        service.updateFilm(film);
+        filmService.updateFilm(film);
 
         List<Film> expected = List.of(film);
-        List<Film> actual = service.getFilms();
+        List<Film> actual = filmService.getFilms();
 
         assertEquals(expected, actual);
     }
@@ -91,7 +98,7 @@ class FilmServiceTest {
         Film film = initFilm();
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.updateFilm(film)
+                () -> filmService.updateFilm(film)
         );
         assertEquals("The movie must not have an empty ID when updating", exception.getMessage());
     }
@@ -99,9 +106,9 @@ class FilmServiceTest {
     @Test
     void updateFilm_shouldThrowAnException_ifTheFilmDoesNotExist() {
         Film film1 = initFilm();
-        service.createFilm(film1);
+        filmService.createFilm(film1);
         Film film2 = initFilm();
-        service.createFilm(film2);
+        filmService.createFilm(film2);
 
         Film film3 = new Film();
         film3.setId(999L);
@@ -112,7 +119,7 @@ class FilmServiceTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.updateFilm(film3)
+                () -> filmService.updateFilm(film3)
         );
         assertEquals("This movie does not exist", exception.getMessage());
     }

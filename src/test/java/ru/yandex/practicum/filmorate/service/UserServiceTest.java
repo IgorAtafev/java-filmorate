@@ -19,28 +19,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserServiceTest {
 
-    private final UserStorage storage = new InMemoryUserStorage();
-    private final UserService service = new UserServiceImpl(storage);
+    private final UserStorage userStorage = new InMemoryUserStorage();
+    private final UserService userService = new UserServiceImpl(userStorage);
 
     @Test
     void getUsers_shouldCheckForNull() {
-        assertNotNull(service.getUsers());
+        assertNotNull(userService.getUsers());
     }
 
     @Test
     void getUsers_shouldReturnEmptyListOfUsers() {
-        assertTrue(service.getUsers().isEmpty());
+        assertTrue(userService.getUsers().isEmpty());
     }
 
     @Test
     void getUsers_shouldReturnListOfUsers() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
+        userService.createUser(user2);
 
         List<User> expected = List.of(user1, user2);
-        List<User> actual = service.getUsers();
+        List<User> actual = userService.getUsers();
 
         assertEquals(expected, actual);
     }
@@ -48,9 +48,9 @@ class UserServiceTest {
     @Test
     void getUserById_shouldReturnUserById() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
 
-        User user2 = service.getUserById(user1.getId());
+        User user2 = userService.getUserById(user1.getId());
         assertEquals(user1, user2);
     }
 
@@ -58,19 +58,19 @@ class UserServiceTest {
     void getUserById_shouldThrowAnException_ifUserDoesNotExist() {
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getUserById(0L)
+                () -> userService.getUserById(0L)
         );
         assertEquals("User width id 0 does not exist", exception.getMessage());
 
         exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getUserById(-1L)
+                () -> userService.getUserById(-1L)
         );
         assertEquals("User width id -1 does not exist", exception.getMessage());
 
         exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getUserById(999L)
+                () -> userService.getUserById(999L)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
     }
@@ -78,10 +78,10 @@ class UserServiceTest {
     @Test
     void createUser_shouldCreateAUser() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
 
         List<User> expected = List.of(user);
-        List<User> actual = service.getUsers();
+        List<User> actual = userService.getUsers();
 
         assertEquals(expected, actual);
     }
@@ -90,7 +90,7 @@ class UserServiceTest {
     void createUser_shouldChangeNameToLogin_ifNameIsNull() {
         User user = initUser();
         user.setName(null);
-        user = service.createUser(user);
+        user = userService.createUser(user);
         assertEquals(user.getName(), user.getLogin());
     }
 
@@ -98,7 +98,7 @@ class UserServiceTest {
     void createUser_shouldChangeNameToLogin_ifNameIsNotNullAndEmpty() {
         User user = initUser();
         user.setName("");
-        user = service.createUser(user);
+        user = userService.createUser(user);
         assertEquals(user.getName(), user.getLogin());
     }
 
@@ -109,7 +109,7 @@ class UserServiceTest {
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.createUser(user)
+                () -> userService.createUser(user)
         );
         assertEquals("The user must have an empty ID when created", exception.getMessage());
     }
@@ -117,17 +117,17 @@ class UserServiceTest {
     @Test
     void updateUser_shouldUpdateTheUser() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
         user.setId(1L);
         user.setEmail("mail@yandex.ru");
         user.setLogin("doloreUpdate");
         user.setName("est adipisicing");
         user.setBirthday(LocalDate.of(1976, 9, 20));
 
-        service.updateUser(user);
+        userService.updateUser(user);
 
         List<User> expected = List.of(user);
-        List<User> actual = service.getUsers();
+        List<User> actual = userService.getUsers();
 
         assertEquals(expected, actual);
     }
@@ -135,20 +135,20 @@ class UserServiceTest {
     @Test
     void updateUser_shouldChangeNameToLogin_ifNameIsNull() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
         user.setName(null);
 
-        user = service.updateUser(user);
+        user = userService.updateUser(user);
         assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
     void updateUser_shouldChangeNameToLogin_ifNameIsNotNullAndEmpty() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
         user.setName("");
 
-        user = service.updateUser(user);
+        user = userService.updateUser(user);
         assertEquals(user.getName(), user.getLogin());
     }
 
@@ -157,7 +157,7 @@ class UserServiceTest {
         User user = initUser();
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.updateUser(user)
+                () -> userService.updateUser(user)
         );
         assertEquals("The user must not have an empty ID when updating", exception.getMessage());
     }
@@ -165,9 +165,9 @@ class UserServiceTest {
     @Test
     void updateUser_shouldThrowAnException_ifTheUserDoesNotExist() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
+        userService.createUser(user2);
 
         User user3 = new User();
         user3.setId(999L);
@@ -178,7 +178,7 @@ class UserServiceTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.updateUser(user3)
+                () -> userService.updateUser(user3)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
     }
@@ -186,19 +186,19 @@ class UserServiceTest {
     @Test
     void addFriend_shouldAddTheUserAsAFriend() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
+        userService.createUser(user2);
 
-        service.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user1.getId(), user2.getId());
 
         List<User> expected = List.of(user2);
-        List<User> actual = service.getFriends(user1.getId());
+        List<User> actual = userService.getFriends(user1.getId());
 
         assertEquals(expected, actual);
 
         expected = List.of(user1);
-        actual = service.getFriends(user2.getId());
+        actual = userService.getFriends(user2.getId());
 
         assertEquals(expected, actual);
     }
@@ -206,17 +206,17 @@ class UserServiceTest {
     @Test
     void addFriend_shouldThrowAnException_ifTheUserDoesNotExist() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.addFriend(user.getId(), 999L)
+                () -> userService.addFriend(user.getId(), 999L)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
 
         exception = assertThrows(
                 NotFoundException.class,
-                () -> service.addFriend(-1L, user.getId())
+                () -> userService.addFriend(-1L, user.getId())
         );
         assertEquals("User width id -1 does not exist", exception.getMessage());
     }
@@ -224,11 +224,11 @@ class UserServiceTest {
     @Test
     void addFriend_shouldThrowAnException_IfTheUserAddsHimselfAsAFriend() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.addFriend(user.getId(), user.getId())
+                () -> userService.addFriend(user.getId(), user.getId())
         );
         assertEquals("The user cannot add himself as a friend", exception.getMessage());
     }
@@ -236,31 +236,31 @@ class UserServiceTest {
     @Test
     void removeFriend_shouldRemoveTheUserFromFriends() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
-        service.addFriend(user1.getId(), user2.getId());
+        userService.createUser(user2);
+        userService.addFriend(user1.getId(), user2.getId());
 
-        service.removeFriend(user1.getId(), user2.getId());
+        userService.removeFriend(user1.getId(), user2.getId());
 
-        assertTrue(service.getFriends(user1.getId()).isEmpty());
-        assertTrue(service.getFriends(user2.getId()).isEmpty());
+        assertTrue(userService.getFriends(user1.getId()).isEmpty());
+        assertTrue(userService.getFriends(user2.getId()).isEmpty());
     }
 
     @Test
     void removeFriend_shouldThrowAnException_ifTheUserDoesNotExist() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.removeFriend(user.getId(), 999L)
+                () -> userService.removeFriend(user.getId(), 999L)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
 
         exception = assertThrows(
                 NotFoundException.class,
-                () -> service.addFriend(-1L, user.getId())
+                () -> userService.addFriend(-1L, user.getId())
         );
         assertEquals("User width id -1 does not exist", exception.getMessage());
     }
@@ -268,26 +268,26 @@ class UserServiceTest {
     @Test
     void getFriends_shouldReturnEmptyListOfFriendsOfUser() {
         User user = initUser();
-        service.createUser(user);
-        assertTrue(service.getFriends(user.getId()).isEmpty());
+        userService.createUser(user);
+        assertTrue(userService.getFriends(user.getId()).isEmpty());
     }
 
     @Test
     void getFriends_shouldReturnListOfFriendsOfUser() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
+        userService.createUser(user2);
 
-        service.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user1.getId(), user2.getId());
 
         List<User> expected = List.of(user2);
-        List<User> actual = service.getFriends(user1.getId());
+        List<User> actual = userService.getFriends(user1.getId());
 
         assertEquals(expected, actual);
 
         expected = List.of(user1);
-        actual = service.getFriends(user2.getId());
+        actual = userService.getFriends(user2.getId());
 
         assertEquals(expected, actual);
     }
@@ -295,11 +295,11 @@ class UserServiceTest {
     @Test
     void getFriends_shouldThrowAnException_ifTheUserDoesNotExist() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getFriends(999L)
+                () -> userService.getFriends(999L)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
     }
@@ -307,28 +307,28 @@ class UserServiceTest {
     @Test
     void getCommonFriends_shouldReturnEmptyListOfCommonFriendsOfUsers() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
+        userService.createUser(user2);
 
-        assertTrue(service.getCommonFriends(user1.getId(), user2.getId()).isEmpty());
+        assertTrue(userService.getCommonFriends(user1.getId(), user2.getId()).isEmpty());
     }
 
     @Test
     void getCommonFriends_shouldReturnListOfCommonFriendsOfUsers() {
         User user1 = initUser();
-        service.createUser(user1);
+        userService.createUser(user1);
         User user2 = initUser();
-        service.createUser(user2);
+        userService.createUser(user2);
         User user3 = initUser();
-        service.createUser(user3);
+        userService.createUser(user3);
 
-        service.addFriend(user1.getId(), user2.getId());
-        service.addFriend(user1.getId(), user3.getId());
-        service.addFriend(user2.getId(), user3.getId());
+        userService.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user1.getId(), user3.getId());
+        userService.addFriend(user2.getId(), user3.getId());
 
         List<User> expected = List.of(user3);
-        List<User> actual = service.getCommonFriends(user1.getId(), user2.getId());
+        List<User> actual = userService.getCommonFriends(user1.getId(), user2.getId());
 
         assertEquals(expected, actual);
     }
@@ -336,17 +336,17 @@ class UserServiceTest {
     @Test
     void getCommonFriends_shouldThrowAnException_ifTheUserDoesNotExist() {
         User user = initUser();
-        service.createUser(user);
+        userService.createUser(user);
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getCommonFriends(user.getId(), 999L)
+                () -> userService.getCommonFriends(user.getId(), 999L)
         );
         assertEquals("User width id 999 does not exist", exception.getMessage());
 
         exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getCommonFriends(-1L, user.getId())
+                () -> userService.getCommonFriends(-1L, user.getId())
         );
         assertEquals("User width id -1 does not exist", exception.getMessage());
     }

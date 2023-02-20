@@ -65,6 +65,7 @@ class UserControllerTest {
         User user1 = initUser();
         User user2 = initUser();
         List<User> expected = List.of(user1, user2);
+
         when(service.getUsers()).thenReturn(expected);
 
         mockMvc.perform(get("/users"))
@@ -75,6 +76,7 @@ class UserControllerTest {
     @Test
     void getUserById_shouldReturnUserById() throws Exception {
         User user = initUser();
+
         when(service.getUserById(1L)).thenReturn(user);
 
         mockMvc.perform(get("/users/{id}", 1))
@@ -163,6 +165,7 @@ class UserControllerTest {
         User user1 = initUser();
         User user2 = initUser();
         List<User> expected = List.of(user1, user2);
+
         when(service.getFriends(1L)).thenReturn(expected);
 
         mockMvc.perform(get("/users/{id}/friends", 1))
@@ -191,6 +194,7 @@ class UserControllerTest {
         User user1 = initUser();
         User user2 = initUser();
         List<User> expected = List.of(user1, user2);
+
         when(service.getCommonFriends(1L, 2L)).thenReturn(expected);
 
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", 1, 2))
