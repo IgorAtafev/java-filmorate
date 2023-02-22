@@ -69,11 +69,8 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getPopular(int count) {
-        Comparator<Film> comparator = Comparator.comparing(film -> film.getLikes().size());
-        comparator = comparator.reversed();
-
         return storage.getFilms().stream()
-                .sorted(comparator)
+                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
                 .limit(count)
                 .collect(Collectors.toList());
     }

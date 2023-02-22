@@ -77,9 +77,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getFriends(Long id) {
         User user = getUserById(id);
-        List<Long> friends = storage.getFriends(user);
+        List<Long> friendIds = storage.getFriends(user);
 
-        return friends.stream()
+        return friendIds.stream()
                 .map(this::getUserById)
                 .collect(Collectors.toList());
     }
@@ -88,11 +88,11 @@ public class UserServiceImpl implements UserService {
     public List<User> getCommonFriends(Long id, Long otherId) {
         User user = getUserById(id);
         User other = getUserById(otherId);
-        List<Long> friends = storage.getFriends(user);
-        List<Long> otherFriends = storage.getFriends(other);
+        List<Long> friendIds = storage.getFriends(user);
+        List<Long> otherFriendIds = storage.getFriends(other);
 
-        return friends.stream()
-                .filter(otherFriends::contains)
+        return friendIds.stream()
+                .filter(otherFriendIds::contains)
                 .map(this::getUserById)
                 .collect(Collectors.toList());
     }
