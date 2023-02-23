@@ -129,7 +129,7 @@ class FilmControllerTest {
         when(service.updateFilm(film)).thenReturn(film);
 
         mockMvc.perform(put("/films").contentType("application/json").content(json))
-              .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest
@@ -138,7 +138,7 @@ class FilmControllerTest {
         String json = objectMapper.writeValueAsString(film);
 
         mockMvc.perform(put("/films").contentType("application/json").content(json))
-              .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
 
         verify(service, never()).updateFilm(film);
     }
