@@ -22,7 +22,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -64,31 +68,34 @@ class FilmControllerTest {
         Film film1 = initFilm();
         Film film2 = initFilm();
         List<Film> expected = List.of(film1, film2);
+        String json = objectMapper.writeValueAsString(expected);
 
         when(service.getFilms()).thenReturn(expected);
 
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+                .andExpect(content().json(json));
     }
 
     @Test
     void getFilmById_shouldReturnFilmById() throws Exception {
+        Long filmId = 1L;
         Film film = initFilm();
+        String json = objectMapper.writeValueAsString(film);
 
-        when(service.getFilmById(1L)).thenReturn(film);
+        when(service.getFilmById(filmId)).thenReturn(film);
 
-        mockMvc.perform(get("/films/{id}", 1))
+        mockMvc.perform(get("/films/{id}", filmId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(film)));
+                .andExpect(content().json(json));
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentFilm")
-    void getFilmById_shouldResponseWithNotFound_ifFilmDoesNotExist(Long id) throws Exception {
-        when(service.getFilmById(id)).thenThrow(NotFoundException.class);
+    @MethodSource("provideNonExistentIds")
+    void getFilmById_shouldResponseWithNotFound_ifFilmDoesNotExist(Long filmId) throws Exception {
+        when(service.getFilmById(filmId)).thenThrow(NotFoundException.class);
 
-        mockMvc.perform(get("/films/{id}", id))
+        mockMvc.perform(get("/films/{id}", filmId))
                 .andExpect(status().isNotFound());
     }
 
@@ -97,9 +104,9 @@ class FilmControllerTest {
         Film film = initFilm();
         String json = objectMapper.writeValueAsString(film);
 
+        when(service.createFilm(film)).thenReturn(film);
+
         mockMvc.perform(post("/films").contentType("application/json").content(json))
-                .andExpect(status().isOk());
-        mockMvc.perform(put("/films").contentType("application/json").content(json))
                 .andExpect(status().isOk());
     }
 
@@ -110,37 +117,73 @@ class FilmControllerTest {
 
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isBadRequest());
+
+        verify(service, never()).createFilm(film);
+    }
+
+    @Test
+    void updateFilm_shouldResponseWithOk() throws Exception {
+        Film film = initFilm();
+        String json = objectMapper.writeValueAsString(film);
+
+        when(service.updateFilm(film)).thenReturn(film);
+
         mockMvc.perform(put("/films").contentType("application/json").content(json))
-                .andExpect(status().isBadRequest());
+              .andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidFilms")
+    void updateFilm_shouldResponseWithBadRequest_ifFilmIsInvalid(Film film) throws Exception {
+        String json = objectMapper.writeValueAsString(film);
+
+        mockMvc.perform(put("/films").contentType("application/json").content(json))
+              .andExpect(status().isBadRequest());
+
+        verify(service, never()).updateFilm(film);
     }
 
     @Test
     void addLike_shouldResponseWithOk() throws Exception {
-        mockMvc.perform(put("/films/{id}/like/{userId}", 1, 2))
+        Long filmId = 1L;
+        Long userId = 1L;
+
+        doNothing().when(service).addLike(filmId, userId);
+
+        mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isOk());
+
+        verify(service, times(1)).addLike(filmId, userId);
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentFilm")
-    void addLike_shouldResponseWithNotFound_ifUserOrFilmDoesNotExist(Long id, Long userId) throws Exception {
-        doThrow(NotFoundException.class).when(service).addLike(id, userId);
+    @MethodSource("provideNonExistentIds")
+    void addLike_shouldResponseWithNotFound_ifUserOrFilmDoesNotExist(Long filmId, Long userId) throws Exception {
+        doThrow(NotFoundException.class).when(service).addLike(filmId, userId);
 
-        mockMvc.perform(put("/films/{id}/like/{userId}", id, userId))
+        mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void removeLike_shouldResponseWithOk() throws Exception {
-        mockMvc.perform(delete("/films/{id}/like/{userId}", 1, 2))
+        Long filmId = 1L;
+        Long userId = 1L;
+
+        doNothing().when(service).removeLike(filmId, userId);
+
+        mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isOk());
+
+        verify(service, times(1)).removeLike(filmId, userId);
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentFilm")
-    void removeLike_shouldResponseWithNotFound_ifUserOrFilmDoesNotExist(Long id, Long userId) throws Exception {
-        doThrow(NotFoundException.class).when(service).removeLike(id, userId);
+    @MethodSource("provideNonExistentIds")
+    void removeLike_shouldResponseWithNotFound_ifUserOrFilmDoesNotExist(Long filmId, Long userId) throws Exception {
+        doThrow(NotFoundException.class).when(service).removeLike(filmId, userId);
 
-        mockMvc.perform(delete("/films/{id}/like/{userId}", id, userId))
+        mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isNotFound());
     }
 
@@ -156,12 +199,13 @@ class FilmControllerTest {
         Film film1 = initFilm();
         Film film2 = initFilm();
         List<Film> expected = List.of(film1, film2);
+        String json = objectMapper.writeValueAsString(expected);
 
         when(service.getPopular(2)).thenReturn(expected);
 
         mockMvc.perform(get("/films/popular?count={count}", 2))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+                .andExpect(content().json(json));
     }
 
     private static Stream<Arguments> provideInvalidFilms() {
@@ -179,7 +223,7 @@ class FilmControllerTest {
         );
     }
 
-    private static Stream<Arguments> provideNonExistentFilm() {
+    private static Stream<Arguments> provideNonExistentIds() {
         return Stream.of(
                 Arguments.of(-1L, -1L),
                 Arguments.of(0L, 0L),
