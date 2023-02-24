@@ -68,6 +68,7 @@ class UserControllerTest {
     void getUsers_shouldReturnListOfUsers() throws Exception {
         User user1 = initUser();
         User user2 = initUser();
+
         List<User> expected = List.of(user1, user2);
         String json = objectMapper.writeValueAsString(expected);
 
@@ -211,6 +212,7 @@ class UserControllerTest {
         Long userId = 1L;
         User user1 = initUser();
         User user2 = initUser();
+
         List<User> expected = List.of(user1, user2);
         String json = objectMapper.writeValueAsString(expected);
 
@@ -243,6 +245,7 @@ class UserControllerTest {
         Long userOtherId = 2L;
         User user1 = initUser();
         User user2 = initUser();
+
         List<User> expected = List.of(user1, user2);
         String json = objectMapper.writeValueAsString(expected);
 

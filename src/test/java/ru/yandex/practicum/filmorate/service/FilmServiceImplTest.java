@@ -52,6 +52,7 @@ class FilmServiceImplTest {
     void getFilms_shouldReturnListOfFilms() {
         Film film1 = initFilm();
         Film film2 = initFilm();
+
         List<Film> expected = List.of(film1, film2);
 
         when(filmStorage.getFilms()).thenReturn(expected);
@@ -273,7 +274,6 @@ class FilmServiceImplTest {
 
     private static Stream<Arguments> provideNonExistentIds() {
         return Stream.of(
-                Arguments.of(-1L),
                 Arguments.of(-1L),
                 Arguments.of(0L),
                 Arguments.of(999L)

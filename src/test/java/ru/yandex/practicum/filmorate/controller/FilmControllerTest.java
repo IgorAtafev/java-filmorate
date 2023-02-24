@@ -67,6 +67,7 @@ class FilmControllerTest {
     void getFilms_shouldReturnListOfFilms() throws Exception {
         Film film1 = initFilm();
         Film film2 = initFilm();
+
         List<Film> expected = List.of(film1, film2);
         String json = objectMapper.writeValueAsString(expected);
 
@@ -198,6 +199,7 @@ class FilmControllerTest {
     void getPopular_shouldReturnListOfPopularFilmsByNumberOfLikes() throws Exception {
         Film film1 = initFilm();
         Film film2 = initFilm();
+
         List<Film> expected = List.of(film1, film2);
         String json = objectMapper.writeValueAsString(expected);
 
