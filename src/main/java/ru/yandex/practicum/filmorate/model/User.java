@@ -12,6 +12,10 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,7 +23,7 @@ import java.time.LocalDate;
 @ToString
 public class User {
 
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Email must be valid")
@@ -29,10 +33,24 @@ public class User {
     @Pattern(regexp = "^\\S{5,20}$", message = "Login must contain at least 5 and no more than 20 characters")
     private String login;
 
-    @Size(min = 3, max = 30, message = "Name must contain at least 3 and no more than 30 characters")
+    @Size(max = 30, message = "Name must contain at least 3 and no more than 30 characters")
     private String name;
 
     @NotNull(message = "Birthday cannot be null")
     @PastOrPresent(message = "Birthday cannot be in the future")
     private LocalDate birthday;
+
+    private final Set<Long> friends = new HashSet<>();
+
+    public Collection<Long> getFriends() {
+        return Collections.unmodifiableSet(friends);
+    }
+
+    public void addFriend(Long id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(Long id) {
+        friends.remove(id);
+    }
 }

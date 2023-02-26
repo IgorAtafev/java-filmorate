@@ -1,50 +1,82 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.validator.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    private int nextId = 0;
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmStorage storage;
+    private final UserService userService;
 
     @Override
     public List<Film> getFilms() {
-        return new ArrayList<>(films.values());
+        return storage.getFilms();
+    }
+
+    @Override
+    public Film getFilmById(Long id) {
+        return storage.getFilmById(id).orElseThrow(
+                () -> new NotFoundException(String.format("Film width id %d does not exist", id))
+        );
     }
 
     @Override
     public Film createFilm(Film film) {
         if (!isIdValueNull(film)) {
-            throw new ValidationException("The movie must have an empty ID when created");
+            throw new ValidationException("The film must have an empty ID when created");
         }
 
-        film.setId(++nextId);
-        films.put(film.getId(), film);
-
-        return film;
+        return storage.createFilm(film);
     }
 
     @Override
     public Film updateFilm(Film film) {
         if (isIdValueNull(film)) {
-            throw new ValidationException("The movie must not have an empty ID when updating");
+            throw new ValidationException("The film must not have an empty ID when updating");
         }
 
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException("This movie does not exist");
-        }
+        /**
+         * Checks if a film exists by id
+         * If the film is not found throws NotFoundException
+         */
+        getFilmById(film.getId());
 
-        films.put(film.getId(), film);
+        return storage.updateFilm(film);
+    }
 
-        return film;
+    @Override
+    public void addLike(Long id, Long userId) {
+        Film film = getFilmById(id);
+        User user = userService.getUserById(userId);
+
+        storage.addLike(film, user);
+    }
+
+    @Override
+    public void removeLike(Long id, Long userId) {
+        Film film = getFilmById(id);
+        User user = userService.getUserById(userId);
+
+        storage.removeLike(film, user);
+    }
+
+    @Override
+    public List<Film> getPopular(int count) {
+        return storage.getFilms().stream()
+                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     private boolean isIdValueNull(Film film) {

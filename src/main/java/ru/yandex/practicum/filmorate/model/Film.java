@@ -11,6 +11,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,7 +22,7 @@ import java.time.LocalDate;
 @ToString
 public class Film {
 
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Name cannot be empty")
     @Size(min = 3, max = 50, message = "Name must contain at least 3 and no more than 50 characters")
@@ -34,4 +38,18 @@ public class Film {
 
     @Positive(message = "Duration must be positive")
     private int duration;
+
+    private final Set<Long> likes = new HashSet<>();
+
+    public Collection<Long> getLikes() {
+        return Collections.unmodifiableSet(likes);
+    }
+
+    public void addLike(Long id) {
+        likes.add(id);
+    }
+
+    public void removeLike(Long id) {
+        likes.remove(id);
+    }
 }

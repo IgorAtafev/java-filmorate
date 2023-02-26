@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,13 +16,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
+import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -44,7 +53,9 @@ class UserControllerTest {
 
     @BeforeEach
     void setMockMvc() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ErrorHandler())
+                .build();
     }
 
     @Test
@@ -58,12 +69,37 @@ class UserControllerTest {
     void getUsers_shouldReturnListOfUsers() throws Exception {
         User user1 = initUser();
         User user2 = initUser();
+
         List<User> expected = List.of(user1, user2);
+        String json = objectMapper.writeValueAsString(expected);
+
         when(service.getUsers()).thenReturn(expected);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+                .andExpect(content().json(json));
+    }
+
+    @Test
+    void getUserById_shouldReturnUserById() throws Exception {
+        Long userId = 1L;
+        User user = initUser();
+        String json = objectMapper.writeValueAsString(user);
+
+        when(service.getUserById(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/users/{id}", userId))
+                .andExpect(status().isOk())
+                .andExpect(content().json(json));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void getUserById_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        when(service.getUserById(userId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}", userId))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -71,9 +107,9 @@ class UserControllerTest {
         User user = initUser();
         String json = objectMapper.writeValueAsString(user);
 
+        when(service.createUser(user)).thenReturn(user);
+
         mockMvc.perform(post("/users").contentType("application/json").content(json))
-                .andExpect(status().isOk());
-        mockMvc.perform(put("/users").contentType("application/json").content(json))
                 .andExpect(status().isOk());
     }
 
@@ -84,8 +120,189 @@ class UserControllerTest {
 
         mockMvc.perform(post("/users").contentType("application/json").content(json))
                 .andExpect(status().isBadRequest());
+
+        verify(service, never()).createUser(user);
+    }
+
+    @Test
+    void updateUser_shouldResponseWithOk() throws Exception {
+        User user = initUser();
+        String json = objectMapper.writeValueAsString(user);
+
+        when(service.updateUser(user)).thenReturn(user);
+
+        mockMvc.perform(put("/users").contentType("application/json").content(json))
+                .andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidUsers")
+    void updateUser_shouldResponseWithBadRequest_ifUserIsInvalid(User user) throws Exception {
+        String json = objectMapper.writeValueAsString(user);
+
         mockMvc.perform(put("/users").contentType("application/json").content(json))
                 .andExpect(status().isBadRequest());
+
+        verify(service, never()).updateUser(user);
+    }
+
+    @Test
+    void addFriend_shouldResponseWithOk() throws Exception {
+        Long userId = 1L;
+        Long friendId = 2L;
+
+        doNothing().when(service).addFriend(userId, friendId);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isOk());
+
+        verify(service, times(1)).addFriend(userId, friendId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addFriend_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long friendId = 1L;
+
+        doThrow(NotFoundException.class).when(service).addFriend(userId, friendId);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addFriend_shouldResponseWithNotFound_ifFriendDoesNotExist(Long friendId) throws Exception {
+        Long userId = 1L;
+
+        doThrow(NotFoundException.class).when(service).addFriend(userId, friendId);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void addFriend_shouldResponseWithBadRequest_ifUserAddsHimselfAsAFriend() throws Exception {
+        Long userId = 1L;
+        Long friendId = 1L;
+
+        doThrow(ValidationException.class).when(service).addFriend(userId, friendId);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void removeFriend_shouldResponseWithOk() throws Exception {
+        Long userId = 1L;
+        Long friendId = 2L;
+
+        doNothing().when(service).removeFriend(userId, friendId);
+
+        mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isOk());
+
+        verify(service, times(1)).removeFriend(userId, friendId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeFriend_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long friendId = 1L;
+
+        doThrow(NotFoundException.class).when(service).removeFriend(userId, friendId);
+
+        mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeFriend_shouldResponseWithNotFound_ifFriendDoesNotExist(Long friendId) throws Exception {
+        Long userId = 1L;
+
+        doThrow(NotFoundException.class).when(service).removeFriend(userId, friendId);
+
+        mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getFriends_shouldReturnEmptyListOfFriendsOfUser() throws Exception {
+        mockMvc.perform(get("/users/{id}/friends", 1))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+    }
+
+    @Test
+    void getFriends_shouldReturnListOfFriendsOfUser() throws Exception {
+        Long userId = 1L;
+        User user1 = initUser();
+        User user2 = initUser();
+
+        List<User> expected = List.of(user1, user2);
+        String json = objectMapper.writeValueAsString(expected);
+
+        when(service.getFriends(userId)).thenReturn(expected);
+
+        mockMvc.perform(get("/users/{id}/friends", userId))
+                .andExpect(status().isOk())
+                .andExpect(content().json(json));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void getFriends_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        when(service.getFriends(userId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}/friends", userId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getCommonFriends_shouldReturnEmptyListOfCommonFriendsOfUsers() throws Exception {
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", 1, 2))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+    }
+
+    @Test
+    void getCommonFriends_shouldReturnListOfCommonFriendsOfUsers() throws Exception {
+        Long userId = 1L;
+        Long userOtherId = 2L;
+        User user1 = initUser();
+        User user2 = initUser();
+
+        List<User> expected = List.of(user1, user2);
+        String json = objectMapper.writeValueAsString(expected);
+
+        when(service.getCommonFriends(userId, userOtherId)).thenReturn(expected);
+
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
+                .andExpect(status().isOk())
+                .andExpect(content().json(json));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void getCommonFriends_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long userOtherId = 1L;
+
+        when(service.getCommonFriends(userId, userOtherId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void getCommonFriends_shouldResponseWithNotFound_ifUserOtherDoesNotExist(Long userOtherId) throws Exception {
+        Long userId = 1L;
+
+        when(service.getCommonFriends(userId, userOtherId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
+                .andExpect(status().isNotFound());
     }
 
     private static Stream<Arguments> provideInvalidUsers() {
@@ -98,7 +315,6 @@ class UserControllerTest {
                 Arguments.of(initUser(user -> user.setLogin("logi"))),
                 Arguments.of(initUser(user -> user.setLogin("logi".repeat(5) + "i"))),
                 Arguments.of(initUser(user -> user.setLogin("dolore ullamco"))),
-                Arguments.of(initUser(user -> user.setName("do"))),
                 Arguments.of(initUser(user -> user.setName("dolore".repeat(5) + "d"))),
                 Arguments.of(initUser(user -> user.setBirthday(null))),
                 Arguments.of(initUser(user -> user.setBirthday(LocalDate.parse("2200-01-01"))))

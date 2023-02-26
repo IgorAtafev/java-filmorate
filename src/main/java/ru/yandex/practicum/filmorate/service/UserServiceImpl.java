@@ -1,23 +1,33 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private int nextId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserStorage storage;
 
     @Override
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return storage.getUsers();
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return storage.getUserById(id).orElseThrow(
+                () -> new NotFoundException(String.format("User width id %d does not exist", id))
+        );
     }
 
     @Override
@@ -27,10 +37,8 @@ public class UserServiceImpl implements UserService {
         }
 
         changeNameToLogin(user);
-        user.setId(++nextId);
-        users.put(user.getId(), user);
 
-        return user;
+        return storage.createUser(user);
     }
 
     @Override
@@ -39,14 +47,60 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("The user must not have an empty ID when updating");
         }
 
-        if (!users.containsKey(user.getId())) {
-            throw new ValidationException("This user does not exist");
-        }
+        /**
+         * Checks if a user exists by id
+         * If the user is not found throws NotFoundException
+         */
+        getUserById(user.getId());
 
         changeNameToLogin(user);
-        users.put(user.getId(), user);
 
-        return user;
+        return storage.updateUser(user);
+    }
+
+    @Override
+    public void addFriend(Long id, Long friendId) {
+        User user = getUserById(id);
+        User friend = getUserById(friendId);
+
+        if (Objects.equals(id, friendId)) {
+            throw new ValidationException("The user cannot add himself as a friend");
+        }
+
+        storage.addFriend(user, friend);
+        storage.addFriend(friend, user);
+    }
+
+    @Override
+    public void removeFriend(Long id, Long friendId) {
+        User user = getUserById(id);
+        User friend = getUserById(friendId);
+
+        storage.removeFriend(user, friend);
+        storage.removeFriend(friend, user);
+    }
+
+    @Override
+    public List<User> getFriends(Long id) {
+        User user = getUserById(id);
+        Collection<Long> friendIds = storage.getFriends(user);
+
+        return friendIds.stream()
+                .map(this::getUserById)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getCommonFriends(Long id, Long otherId) {
+        User user = getUserById(id);
+        User other = getUserById(otherId);
+        Collection<Long> friendIds = storage.getFriends(user);
+        Collection<Long> otherFriendIds = storage.getFriends(other);
+
+        return friendIds.stream()
+                .filter(otherFriendIds::contains)
+                .map(this::getUserById)
+                .collect(Collectors.toList());
     }
 
     private void changeNameToLogin(User user) {
