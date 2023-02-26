@@ -46,6 +46,10 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("The film must not have an empty ID when updating");
         }
 
+        /**
+         * Checks if a film exists by id
+         * If the film is not found throws NotFoundException
+         */
         getFilmById(film.getId());
 
         return storage.updateFilm(film);

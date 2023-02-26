@@ -47,7 +47,12 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("The user must not have an empty ID when updating");
         }
 
+        /**
+         * Checks if a user exists by id
+         * If the user is not found throws NotFoundException
+         */
         getUserById(user.getId());
+
         changeNameToLogin(user);
 
         return storage.updateUser(user);
