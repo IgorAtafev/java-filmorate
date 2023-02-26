@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<Long> getFriends(User user) {
+    public Collection<Long> getFriends(User user) {
         return user.getFriends();
     }
 }

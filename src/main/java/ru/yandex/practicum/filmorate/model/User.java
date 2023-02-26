@@ -12,8 +12,9 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -41,8 +42,8 @@ public class User {
 
     private final Set<Long> friends = new HashSet<>();
 
-    public List<Long> getFriends() {
-        return List.copyOf(friends);
+    public Collection<Long> getFriends() {
+        return Collections.unmodifiableSet(friends);
     }
 
     public void addFriend(Long id) {

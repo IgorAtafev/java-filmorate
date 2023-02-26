@@ -11,8 +11,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -40,8 +41,8 @@ public class Film {
 
     private final Set<Long> likes = new HashSet<>();
 
-    public List<Long> getLikes() {
-        return List.copyOf(likes);
+    public Collection<Long> getLikes() {
+        return Collections.unmodifiableSet(likes);
     }
 
     public void addLike(Long id) {

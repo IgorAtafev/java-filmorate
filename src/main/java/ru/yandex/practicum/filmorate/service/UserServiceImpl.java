@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getFriends(Long id) {
         User user = getUserById(id);
-        List<Long> friendIds = storage.getFriends(user);
+        Collection<Long> friendIds = storage.getFriends(user);
 
         return friendIds.stream()
                 .map(this::getUserById)
@@ -88,8 +89,8 @@ public class UserServiceImpl implements UserService {
     public List<User> getCommonFriends(Long id, Long otherId) {
         User user = getUserById(id);
         User other = getUserById(otherId);
-        List<Long> friendIds = storage.getFriends(user);
-        List<Long> otherFriendIds = storage.getFriends(other);
+        Collection<Long> friendIds = storage.getFriends(user);
+        Collection<Long> otherFriendIds = storage.getFriends(other);
 
         return friendIds.stream()
                 .filter(otherFriendIds::contains)
