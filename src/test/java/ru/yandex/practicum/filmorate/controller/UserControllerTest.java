@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -93,7 +94,7 @@ class UserControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentUser")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getUserById_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
         when(service.getUserById(userId)).thenThrow(NotFoundException.class);
 
@@ -159,8 +160,21 @@ class UserControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentUser")
-    void addFriend_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId, Long friendId) throws Exception {
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addFriend_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long friendId = 1L;
+
+        doThrow(NotFoundException.class).when(service).addFriend(userId, friendId);
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addFriend_shouldResponseWithNotFound_ifFriendDoesNotExist(Long friendId) throws Exception {
+        Long userId = 1L;
+
         doThrow(NotFoundException.class).when(service).addFriend(userId, friendId);
 
         mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
@@ -192,8 +206,21 @@ class UserControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentUser")
-    void removeFriend_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId, Long friendId) throws Exception {
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeFriend_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long friendId = 1L;
+
+        doThrow(NotFoundException.class).when(service).removeFriend(userId, friendId);
+
+        mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeFriend_shouldResponseWithNotFound_ifFriendDoesNotExist(Long friendId) throws Exception {
+        Long userId = 1L;
+
         doThrow(NotFoundException.class).when(service).removeFriend(userId, friendId);
 
         mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
@@ -224,7 +251,7 @@ class UserControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentUser")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getFriends_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
         when(service.getFriends(userId)).thenThrow(NotFoundException.class);
 
@@ -257,8 +284,21 @@ class UserControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentUser")
-    void getCommonFriends_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId, Long userOtherId) throws Exception {
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void getCommonFriends_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long userOtherId = 1L;
+
+        when(service.getCommonFriends(userId, userOtherId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void getCommonFriends_shouldResponseWithNotFound_ifUserOtherDoesNotExist(Long userOtherId) throws Exception {
+        Long userId = 1L;
+
         when(service.getCommonFriends(userId, userOtherId)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
@@ -278,14 +318,6 @@ class UserControllerTest {
                 Arguments.of(initUser(user -> user.setName("dolore".repeat(5) + "d"))),
                 Arguments.of(initUser(user -> user.setBirthday(null))),
                 Arguments.of(initUser(user -> user.setBirthday(LocalDate.parse("2200-01-01"))))
-        );
-    }
-
-    private static Stream<Arguments> provideNonExistentUser() {
-        return Stream.of(
-                Arguments.of(-1L, -1L),
-                Arguments.of(0L, 0L),
-                Arguments.of(999L, 999L)
         );
     }
 

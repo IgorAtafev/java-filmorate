@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,7 +93,7 @@ class FilmControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getFilmById_shouldResponseWithNotFound_ifFilmDoesNotExist(Long filmId) throws Exception {
         when(service.getFilmById(filmId)).thenThrow(NotFoundException.class);
 
@@ -158,8 +159,21 @@ class FilmControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
-    void addLike_shouldResponseWithNotFound_ifUserOrFilmDoesNotExist(Long filmId, Long userId) throws Exception {
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addLike_shouldResponseWithNotFound_ifFilmDoesNotExist(Long filmId) throws Exception {
+        Long userId = 1L;
+
+        doThrow(NotFoundException.class).when(service).addLike(filmId, userId);
+
+        mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addLike_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long filmId = 1L;
+
         doThrow(NotFoundException.class).when(service).addLike(filmId, userId);
 
         mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
@@ -180,8 +194,21 @@ class FilmControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
-    void removeLike_shouldResponseWithNotFound_ifUserOrFilmDoesNotExist(Long filmId, Long userId) throws Exception {
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeLike_shouldResponseWithNotFound_ifFilmDoesNotExist(Long filmId) throws Exception {
+        Long userId = 1L;
+
+        doThrow(NotFoundException.class).when(service).removeLike(filmId, userId);
+
+        mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeLike_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
+        Long filmId = 1L;
+
         doThrow(NotFoundException.class).when(service).removeLike(filmId, userId);
 
         mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
@@ -222,14 +249,6 @@ class FilmControllerTest {
                 Arguments.of(initFilm(film -> film.setReleaseDate(LocalDate.parse("1000-01-01")))),
                 Arguments.of(initFilm(film -> film.setDuration(0))),
                 Arguments.of(initFilm(film -> film.setDuration(-100)))
-        );
-    }
-
-    private static Stream<Arguments> provideNonExistentIds() {
-        return Stream.of(
-                Arguments.of(-1L, -1L),
-                Arguments.of(0L, 0L),
-                Arguments.of(999L, 999L)
         );
     }
 

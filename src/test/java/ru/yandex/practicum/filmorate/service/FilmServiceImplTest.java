@@ -3,8 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,7 +69,7 @@ class FilmServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getFilmById_shouldThrowAnException_ifFilmDoesNotExist(Long filmId) {
         when(filmStorage.getFilmById(filmId)).thenThrow(NotFoundException.class);
 
@@ -129,7 +127,7 @@ class FilmServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void updateFilm_shouldThrowAnException_ifFilmDoesNotExist(Long filmId) {
         Film film = initFilm();
         film.setId(filmId);
@@ -161,7 +159,7 @@ class FilmServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void addLike_shouldThrowAnException_ifFilmDoesNotExist(Long filmId) {
         Long userId = 1L;
         Film film = initFilm();
@@ -178,7 +176,7 @@ class FilmServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void addLike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long filmId = 1L;
         Film film = initFilm();
@@ -212,7 +210,7 @@ class FilmServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void removeLike_shouldThrowAnException_ifFilmDoesNotExist(Long filmId) {
         Long userId = 1L;
         Film film = initFilm();
@@ -229,7 +227,7 @@ class FilmServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void removeLike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long filmId = 1L;
         Film film = initFilm();
@@ -270,14 +268,6 @@ class FilmServiceImplTest {
         when(filmStorage.getFilms()).thenReturn(List.of(film1, film2, film3));
 
         assertEquals(expected, filmService.getPopular(1));
-    }
-
-    private static Stream<Arguments> provideNonExistentIds() {
-        return Stream.of(
-                Arguments.of(-1L),
-                Arguments.of(0L),
-                Arguments.of(999L)
-        );
     }
 
     private Film initFilm() {

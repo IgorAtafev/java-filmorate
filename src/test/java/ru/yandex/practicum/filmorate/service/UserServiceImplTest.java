@@ -3,8 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,7 +16,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -67,7 +65,7 @@ class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getUserById_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         when(userStorage.getUserById(userId)).thenThrow(NotFoundException.class);
 
@@ -179,7 +177,7 @@ class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void updateUser_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         User user = initUser();
         user.setId(userId);
@@ -215,7 +213,7 @@ class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void addFriend_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long friendId = 2L;
         User user = initUser();
@@ -270,7 +268,7 @@ class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void removeFriend_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long friendId = 2L;
         User user = initUser();
@@ -317,7 +315,7 @@ class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getFriends_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         User user = initUser();
 
@@ -384,7 +382,7 @@ class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNonExistentIds")
+    @ValueSource(longs = {-1L, 0L, 999L})
     void getCommonFriends_shouldThrowAnException_ifUserDoesNotExist(Long userId1) {
         Long userId2 = 2L;
         User user = initUser();
@@ -397,14 +395,6 @@ class UserServiceImplTest {
         );
 
         verify(userStorage, never()).getFriends(user);
-    }
-
-    private static Stream<Arguments> provideNonExistentIds() {
-        return Stream.of(
-                Arguments.of(-1L),
-                Arguments.of(0L),
-                Arguments.of(999L)
-        );
     }
 
     private User initUser() {
