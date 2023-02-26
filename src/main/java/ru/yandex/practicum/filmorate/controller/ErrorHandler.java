@@ -22,21 +22,21 @@ public class ErrorHandler {
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final Exception e) {
-        log.info("Exception '{}': '{}'", e.getClass().getSimpleName(), e.getMessage());
+        log.info(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.info("Exception '{}': '{}'", e.getClass().getSimpleName(), e.getMessage());
+        log.info(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
-        log.info("Exception '{}': '{}'", e.getClass().getSimpleName(), e.getMessage());
+        log.info(e.getMessage(), e);
         return new ErrorResponse("An unexpected error has occurred");
     }
 
