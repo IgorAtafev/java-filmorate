@@ -57,3 +57,10 @@ FROM user
 WHERE id = 1;
 ```
 
+**Друзья пользователя**
+```roomsql
+SELECT t1.* 
+FROM user t1
+INNER JOIN user_friends t2 ON t2.friend_id = t1.id
+WHERE t2.user_id = 1;
+```
