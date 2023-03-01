@@ -1,5 +1,6 @@
 # Репозиторий для проекта Filmorate
 
+<a href="Ревью от MSmirnov2407 для IgorAtafev.txt">Ревью от MSmirnov2407 для IgorAtafev</a>
 ### Диаграмма БД
 
 <img src="db_scheme.png">  
