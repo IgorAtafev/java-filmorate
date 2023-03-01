@@ -101,10 +101,10 @@ WHERE t2.user_id = 1 AND t3.user_id = 2;
 **10 наиболее популярных фильмов по количеству лайков**
 ```roomsql
 SELECT t1.*,
-       COUNT(t2.user_id) count_likes
+       COUNT(t2.user_id) count_of_likes
 FROM film t1
 INNER JOIN film_likes t2 ON t2.film_id = t1.id
 GROUP BY t2.user_id
-ORDER BY count_likes DESC
+ORDER BY count_of_likes DESC
 LIMIT 10;
 ```
