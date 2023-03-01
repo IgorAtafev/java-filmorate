@@ -1,6 +1,8 @@
 # java-filmorate
-Репозиторий для проекта Filmorate.  
-  
+## Репозиторий для проекта Filmorate.  
+
+### Схема БД
+
 <img src="db_scheme.png">  
   
 ------  
