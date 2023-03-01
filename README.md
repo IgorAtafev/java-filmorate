@@ -103,7 +103,7 @@ SELECT t1.*,
        COUNT(t2.user_id) count_of_likes
 FROM film t1
 INNER JOIN film_likes t2 ON t2.film_id = t1.id
-GROUP BY t2.user_id
+GROUP BY t2.film_id
 ORDER BY count_of_likes DESC
 LIMIT 10;
 ```
