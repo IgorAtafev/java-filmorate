@@ -68,3 +68,12 @@ FROM user t1
 INNER JOIN user_friends t2 ON t2.friend_id = t1.id
 WHERE t2.user_id = 1;
 ```
+
+**Общие друзья пользователей**
+```roomsql
+SELECT t1.* 
+FROM user t1
+INNER JOIN user_friends t2 ON t2.friend_id = t1.id
+INNER JOIN user_friends t3 ON t3.friend_id = t2.friend_id
+WHERE t2.user_id = 1 AND t3.user_id = 2;
+```
