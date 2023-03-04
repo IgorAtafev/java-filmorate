@@ -64,45 +64,65 @@
 ### Примеры запросов  
 **Все фильмы**
 ```roomsql
-SELECT * 
+SELECT *
 FROM film;
 ```
 
 **Фильм по id**
 ```roomsql
-SELECT * 
+SELECT *
 FROM film
 WHERE id = 1;
 ```
 
 **Все пользователи**
 ```roomsql
-SELECT * 
+SELECT *
 FROM user;
 ```
 
 **Пользователь по id**
 ```roomsql
-SELECT * 
+SELECT *
 FROM user
 WHERE id = 1;
 ```
 
-**Друзья пользователя**
+**Друзья пользователя (вариант с JOIN)**
 ```roomsql
-SELECT t1.* 
+SELECT t1.*
 FROM user t1
 INNER JOIN user_friends t2 ON t2.friend_id = t1.id
 WHERE t2.user_id = 1;
 ```
 
-**Общие друзья пользователей**
+**Друзья пользователя (вариант с подзапросом)**
 ```roomsql
-SELECT t1.* 
+SELECT *
+FROM user
+WHERE id IN (SELECT friend_id
+			 FROM user_friends
+			 WHERE user_id = 1);
+```
+
+**Общие друзья пользователей (вариант с JOIN)**
+```roomsql
+SELECT t1.*
 FROM user t1
 INNER JOIN user_friends t2 ON t2.friend_id = t1.id
 INNER JOIN user_friends t3 ON t3.friend_id = t2.friend_id
 WHERE t2.user_id = 1 AND t3.user_id = 2;
+```
+
+**Общие друзья пользователей (вариант с подзапросом)**
+```roomsql
+SELECT *
+FROM user
+WHERE id IN (SELECT friend_id
+				FROM user_friends
+				WHERE user_id = 1 AND friend_id IN (SELECT friend_id
+												   FROM user_friends
+												   WHERE user_id = 2));
 ```
 
 **10 наиболее популярных фильмов по количеству лайков**
