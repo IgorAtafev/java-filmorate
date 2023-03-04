@@ -101,8 +101,8 @@ WHERE t2.user_id = 1;
 SELECT *
 FROM user
 WHERE id IN (SELECT friend_id
-			 FROM user_friends
-			 WHERE user_id = 1);
+             FROM user_friends
+             WHERE user_id = 1);
 ```
 
 **Общие друзья пользователей (вариант с JOIN)**
@@ -119,10 +119,10 @@ WHERE t2.user_id = 1 AND t3.user_id = 2;
 SELECT *
 FROM user
 WHERE id IN (SELECT friend_id
-				FROM user_friends
-				WHERE user_id = 1 AND friend_id IN (SELECT friend_id
-												   FROM user_friends
-												   WHERE user_id = 2));
+             FROM user_friends
+             WHERE user_id = 1 AND friend_id IN (SELECT friend_id
+                                                 FROM user_friends
+                                                 WHERE user_id = 2));
 ```
 
 **10 наиболее популярных фильмов по количеству лайков**
