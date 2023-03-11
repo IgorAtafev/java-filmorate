@@ -4,7 +4,7 @@
 
 ### Диаграмма БД
 
-<img src="filmorate.png">  
+<img src="schema.png">  
   
 ------ 
 ### Описание БД
