@@ -1,64 +1,59 @@
-package ru.yandex.practicum.filmorate.storage.impl;
+package ru.yandex.practicum.filmorate.storage;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
-@Primary
-@RequiredArgsConstructor
-public class UserDbStorage implements UserStorage {
+public class InMemoryUserStorage implements UserStorage {
 
-    private final JdbcTemplate jdbcTemplate;
+    private long nextId = 0;
+    private final Map<Long, User> users = new HashMap<>();
 
     @Override
     public List<User> getUsers() {
-        return null;
+        return new ArrayList<>(users.values());
     }
 
     @Override
     public Optional<User> getUserById(Long id) {
-        return Optional.empty();
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public User createUser(User user) {
-        String sqlQuery = "INSERT INTO users (email, login, name, birth_day) " +
-                "VALUES (?, ?, ?, ?)";
-
-        jdbcTemplate.update(sqlQuery,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday());
-
+        user.setId(++nextId);
+        users.put(user.getId(), user);
         return user;
     }
 
     @Override
     public User updateUser(User user) {
-        return null;
+        users.put(user.getId(), user);
+        return user;
     }
 
     @Override
     public void addFriend(User user, User friend) {
-
+        user.addFriend(friend.getId());
+        friend.addFriend(user.getId());
     }
 
     @Override
     public void removeFriend(User user, User friend) {
-
+        user.removeFriend(friend.getId());
+        friend.removeFriend(user.getId());
     }
 
     @Override
     public Collection<Long> getFriends(User user) {
-        return null;
+        return user.getFriends();
     }
 }
