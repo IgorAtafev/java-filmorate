@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -106,7 +108,7 @@ class FilmControllerTest {
         Film film = initFilm();
         String json = objectMapper.writeValueAsString(film);
 
-        when(service.createFilm(film)).thenReturn(film);
+        lenient().when(service.createFilm(film)).thenReturn(film);
 
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isOk());
@@ -128,7 +130,7 @@ class FilmControllerTest {
         Film film = initFilm();
         String json = objectMapper.writeValueAsString(film);
 
-        when(service.updateFilm(film)).thenReturn(film);
+        lenient().when(service.updateFilm(film)).thenReturn(film);
 
         mockMvc.perform(put("/films").contentType("application/json").content(json))
                 .andExpect(status().isOk());
@@ -241,8 +243,7 @@ class FilmControllerTest {
         return Stream.of(
                 Arguments.of(initFilm(film -> film.setName(null))),
                 Arguments.of(initFilm(film -> film.setName(""))),
-                Arguments.of(initFilm(film -> film.setName("ni"))),
-                Arguments.of(initFilm(film -> film.setName("nisi eiusm".repeat(5) + "o"))),
+                Arguments.of(initFilm(film -> film.setName("nisi eiusm".repeat(10) + "o"))),
                 Arguments.of(initFilm(film -> film.setDescription(null))),
                 Arguments.of(initFilm(film -> film.setDescription("long strin".repeat(20) + "g"))),
                 Arguments.of(initFilm(film -> film.setReleaseDate(null))),
@@ -264,6 +265,7 @@ class FilmControllerTest {
         film.setDescription("adipisicing");
         film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "Комедия"));
         return film;
     }
 }

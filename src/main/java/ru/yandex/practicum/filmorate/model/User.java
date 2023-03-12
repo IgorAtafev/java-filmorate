@@ -30,10 +30,10 @@ public class User {
     private String email;
 
     @NotNull(message = "Login cannot be null")
-    @Pattern(regexp = "^\\S{5,20}$", message = "Login must contain at least 5 and no more than 20 characters")
+    @Pattern(regexp = "^\\S{5,50}$", message = "Login must contain at least 5 and no more than 50 characters")
     private String login;
 
-    @Size(max = 30, message = "Name must contain at least 3 and no more than 30 characters")
+    @Size(max = 50, message = "Name must be no more than 50 characters")
     private String name;
 
     @NotNull(message = "Birthday cannot be null")

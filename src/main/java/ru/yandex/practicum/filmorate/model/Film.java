@@ -25,7 +25,7 @@ public class Film {
     private Long id;
 
     @NotBlank(message = "Name cannot be empty")
-    @Size(min = 3, max = 50, message = "Name must contain at least 3 and no more than 50 characters")
+    @Size(max = 100, message = "Name must be no more than 100 characters")
     private String name;
 
     @NotNull(message = "Description cannot be null")
@@ -38,6 +38,11 @@ public class Film {
 
     @Positive(message = "Duration must be positive")
     private int duration;
+
+    @NotNull
+    private Mpa mpa;
+
+    private final Set<Genre> genres = new HashSet<>();
 
     private final Set<Long> likes = new HashSet<>();
 

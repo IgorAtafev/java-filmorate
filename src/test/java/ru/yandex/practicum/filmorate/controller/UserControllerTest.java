@@ -313,9 +313,9 @@ class UserControllerTest {
                 Arguments.of(initUser(user -> user.setLogin(null))),
                 Arguments.of(initUser(user -> user.setLogin(""))),
                 Arguments.of(initUser(user -> user.setLogin("logi"))),
-                Arguments.of(initUser(user -> user.setLogin("logi".repeat(5) + "i"))),
+                Arguments.of(initUser(user -> user.setLogin("login".repeat(10) + "n"))),
                 Arguments.of(initUser(user -> user.setLogin("dolore ullamco"))),
-                Arguments.of(initUser(user -> user.setName("dolore".repeat(5) + "d"))),
+                Arguments.of(initUser(user -> user.setName("dolor".repeat(10) + "e"))),
                 Arguments.of(initUser(user -> user.setBirthday(null))),
                 Arguments.of(initUser(user -> user.setBirthday(LocalDate.parse("2200-01-01"))))
         );
