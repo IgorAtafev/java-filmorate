@@ -272,19 +272,23 @@ class FilmServiceImplTest {
 
     private Film initFilm() {
         Film film = new Film();
+
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
         film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+
         return film;
     }
 
     private User initUser() {
         User user = new User();
+
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946, 8, 20));
+
         return user;
     }
 }

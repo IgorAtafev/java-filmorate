@@ -2,19 +2,17 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private long nextId = 0;
     private final Map<Long, User> users = new HashMap<>();
 
     @Override
@@ -29,7 +27,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        user.setId(++nextId);
         users.put(user.getId(), user);
         return user;
     }
@@ -43,17 +40,29 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void addFriend(User user, User friend) {
         user.addFriend(friend.getId());
-        friend.addFriend(user.getId());
     }
 
     @Override
     public void removeFriend(User user, User friend) {
         user.removeFriend(friend.getId());
-        friend.removeFriend(user.getId());
     }
 
     @Override
-    public Collection<Long> getFriends(User user) {
-        return user.getFriends();
+    public List<User> getFriends(User user) {
+        return user.getFriends().stream()
+                .map(this::getUserById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getCommonFriends(User user, User other) {
+        return user.getFriends().stream()
+                .filter(other.getFriends()::contains)
+                .map(this::getUserById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 }

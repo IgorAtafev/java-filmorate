@@ -323,16 +323,20 @@ class UserControllerTest {
 
     private static User initUser(Consumer<User> consumer) {
         User user = initUser();
+
         consumer.accept(user);
+
         return user;
     }
 
     private static User initUser() {
         User user = new User();
+
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946, 8, 20));
+
         return user;
     }
 }

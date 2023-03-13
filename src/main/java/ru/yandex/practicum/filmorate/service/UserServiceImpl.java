@@ -3,21 +3,20 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserStorage storage;
+
+    private long nextId = 0;
 
     @Override
     public List<User> getUsers() {
@@ -39,6 +38,7 @@ public class UserServiceImpl implements UserService {
 
         changeNameToLogin(user);
 
+        user.setId(++nextId);
         return storage.createUser(user);
     }
 
@@ -55,7 +55,6 @@ public class UserServiceImpl implements UserService {
         getUserById(user.getId());
 
         changeNameToLogin(user);
-
         return storage.updateUser(user);
     }
 
@@ -69,7 +68,6 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.addFriend(user, friend);
-        storage.addFriend(friend, user);
     }
 
     @Override
@@ -78,30 +76,21 @@ public class UserServiceImpl implements UserService {
         User friend = getUserById(friendId);
 
         storage.removeFriend(user, friend);
-        storage.removeFriend(friend, user);
     }
 
     @Override
     public List<User> getFriends(Long id) {
         User user = getUserById(id);
-        Collection<Long> friendIds = storage.getFriends(user);
 
-        return friendIds.stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        return storage.getFriends(user);
     }
 
     @Override
     public List<User> getCommonFriends(Long id, Long otherId) {
         User user = getUserById(id);
         User other = getUserById(otherId);
-        Collection<Long> friendIds = storage.getFriends(user);
-        Collection<Long> otherFriendIds = storage.getFriends(other);
 
-        return friendIds.stream()
-                .filter(otherFriendIds::contains)
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        return storage.getCommonFriends(user, other);
     }
 
     private void changeNameToLogin(User user) {

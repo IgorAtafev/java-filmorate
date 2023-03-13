@@ -204,12 +204,10 @@ class UserServiceImplTest {
         when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
         when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
         doNothing().when(userStorage).addFriend(user, friend);
-        doNothing().when(userStorage).addFriend(friend, user);
 
         userService.addFriend(userId, friendId);
 
         verify(userStorage, times(1)).addFriend(user, friend);
-        verify(userStorage, times(1)).addFriend(friend, user);
     }
 
     @ParameterizedTest
@@ -259,12 +257,10 @@ class UserServiceImplTest {
         when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
         when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
         doNothing().when(userStorage).removeFriend(user, friend);
-        doNothing().when(userStorage).removeFriend(friend, user);
 
         userService.removeFriend(userId, friendId);
 
         verify(userStorage, times(1)).removeFriend(user, friend);
-        verify(userStorage, times(1)).removeFriend(friend, user);
     }
 
     @ParameterizedTest
@@ -298,8 +294,6 @@ class UserServiceImplTest {
     @Test
     void getFriends_shouldReturnListOfFriendsOfUser() {
         Long userId = 1L;
-        Long friendId1 = 2L;
-        Long friendId2 = 3L;
         User user = initUser();
         User friend1 = initUser();
         User friend2 = initUser();
@@ -307,9 +301,7 @@ class UserServiceImplTest {
         List<User> expected = List.of(friend1, friend2);
 
         when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.getUserById(friendId1)).thenReturn(Optional.of(friend1));
-        when(userStorage.getUserById(friendId2)).thenReturn(Optional.of(friend2));
-        when(userStorage.getFriends(user)).thenReturn(List.of(friendId1, friendId2));
+        when(userStorage.getFriends(user)).thenReturn(List.of(friend1, friend2));
 
         assertEquals(expected, userService.getFriends(userId));
     }
@@ -333,27 +325,12 @@ class UserServiceImplTest {
     void getCommonFriends_shouldReturnEmptyListOfCommonFriendsOfUsers() {
         Long userId1 = 1L;
         User user1 = initUser();
-        user1.setId(userId1);
         Long userId2 = 2L;
         User user2 = initUser();
-        user2.setId(userId2);
-        Long userId3 = 3L;
-        User user3 = initUser();
-        user3.setId(userId3);
 
         when(userStorage.getUserById(userId1)).thenReturn(Optional.of(user1));
         when(userStorage.getUserById(userId2)).thenReturn(Optional.of(user2));
-
-        when(userStorage.getFriends(user1)).thenReturn(Collections.emptyList());
-        when(userStorage.getFriends(user2)).thenReturn(Collections.emptyList());
-
-        assertTrue(userService.getCommonFriends(userId1, userId2).isEmpty());
-
-        when(userStorage.getFriends(user1)).thenReturn(List.of(userId2));
-
-        assertTrue(userService.getCommonFriends(userId1, userId2).isEmpty());
-
-        when(userStorage.getFriends(user2)).thenReturn(List.of(userId3));
+        when(userStorage.getCommonFriends(user1, user2)).thenReturn(Collections.emptyList());
 
         assertTrue(userService.getCommonFriends(userId1, userId2).isEmpty());
     }
@@ -362,21 +339,15 @@ class UserServiceImplTest {
     void getCommonFriends_shouldReturnListOfCommonFriendsOfUsers() {
         Long userId1 = 1L;
         User user1 = initUser();
-        user1.setId(userId1);
         Long userId2 = 2L;
         User user2 = initUser();
-        user2.setId(userId2);
-        Long userId3 = 3L;
         User user3 = initUser();
-        user3.setId(userId3);
 
         List<User> expected = List.of(user3);
 
         when(userStorage.getUserById(userId1)).thenReturn(Optional.of(user1));
         when(userStorage.getUserById(userId2)).thenReturn(Optional.of(user2));
-        when(userStorage.getUserById(userId3)).thenReturn(Optional.of(user3));
-        when(userStorage.getFriends(user1)).thenReturn(List.of(userId3));
-        when(userStorage.getFriends(user2)).thenReturn(List.of(userId3));
+        when(userStorage.getCommonFriends(user1, user2)).thenReturn(List.of(user3));
 
         assertEquals(expected, userService.getCommonFriends(userId1, userId2));
     }
@@ -399,10 +370,12 @@ class UserServiceImplTest {
 
     private User initUser() {
         User user = new User();
+
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946, 8, 20));
+
         return user;
     }
 }

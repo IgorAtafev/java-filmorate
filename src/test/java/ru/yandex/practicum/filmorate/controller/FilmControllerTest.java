@@ -255,17 +255,21 @@ class FilmControllerTest {
 
     private static Film initFilm(Consumer<Film> consumer) {
         Film film = initFilm();
+
         consumer.accept(film);
+
         return film;
     }
 
     private static Film initFilm() {
         Film film = new Film();
+
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
         film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
         film.setMpa(new Mpa(1, "Комедия"));
+
         return film;
     }
 }
