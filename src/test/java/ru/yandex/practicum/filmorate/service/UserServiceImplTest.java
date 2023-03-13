@@ -356,7 +356,8 @@ class UserServiceImplTest {
     @ValueSource(longs = {-1L, 0L, 999L})
     void getCommonFriends_shouldThrowAnException_ifUserDoesNotExist(Long userId1) {
         Long userId2 = 2L;
-        User user = initUser();
+        User user1 = initUser();
+        User user2 = initUser();
 
         when(userStorage.getUserById(userId1)).thenThrow(NotFoundException.class);
 
@@ -365,7 +366,7 @@ class UserServiceImplTest {
                 () -> userService.getCommonFriends(userId1, userId2)
         );
 
-        verify(userStorage, never()).getFriends(user);
+        verify(userStorage, never()).getCommonFriends(user1, user2);
     }
 
     private User initUser() {
