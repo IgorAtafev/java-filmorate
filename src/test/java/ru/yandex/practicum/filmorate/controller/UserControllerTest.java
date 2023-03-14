@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -63,6 +62,8 @@ class UserControllerTest {
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getUsers();
     }
 
     @Test
@@ -78,6 +79,8 @@ class UserControllerTest {
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getUsers();
     }
 
     @Test
@@ -86,11 +89,13 @@ class UserControllerTest {
         User user = initUser();
         String json = objectMapper.writeValueAsString(user);
 
-        when(service.getUserById(1L)).thenReturn(user);
+        when(service.getUserById(userId)).thenReturn(user);
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getUserById(userId);
     }
 
     @ParameterizedTest
@@ -100,6 +105,8 @@ class UserControllerTest {
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getUserById(userId);
     }
 
     @Test
@@ -111,6 +118,8 @@ class UserControllerTest {
 
         mockMvc.perform(post("/users").contentType("application/json").content(json))
                 .andExpect(status().isOk());
+
+        verify(service, times(1)).createUser(user);
     }
 
     @ParameterizedTest
@@ -133,6 +142,8 @@ class UserControllerTest {
 
         mockMvc.perform(put("/users").contentType("application/json").content(json))
                 .andExpect(status().isOk());
+
+        verify(service, times(1)).updateUser(user);
     }
 
     @ParameterizedTest
@@ -151,8 +162,6 @@ class UserControllerTest {
         Long userId = 1L;
         Long friendId = 2L;
 
-        doNothing().when(service).addFriend(userId, friendId);
-
         mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isOk());
 
@@ -168,6 +177,8 @@ class UserControllerTest {
 
         mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).addFriend(userId, friendId);
     }
 
     @ParameterizedTest
@@ -179,6 +190,8 @@ class UserControllerTest {
 
         mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).addFriend(userId, friendId);
     }
 
     @Test
@@ -190,14 +203,14 @@ class UserControllerTest {
 
         mockMvc.perform(put("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isBadRequest());
+
+        verify(service, times(1)).addFriend(userId, friendId);
     }
 
     @Test
     void removeFriend_shouldResponseWithOk() throws Exception {
         Long userId = 1L;
         Long friendId = 2L;
-
-        doNothing().when(service).removeFriend(userId, friendId);
 
         mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isOk());
@@ -214,6 +227,8 @@ class UserControllerTest {
 
         mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).removeFriend(userId, friendId);
     }
 
     @ParameterizedTest
@@ -225,13 +240,19 @@ class UserControllerTest {
 
         mockMvc.perform(delete("/users/{id}/friends/{friendId}", userId, friendId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).removeFriend(userId, friendId);
     }
 
     @Test
     void getFriends_shouldReturnEmptyListOfFriendsOfUser() throws Exception {
+        Long userId = 1L;
+
         mockMvc.perform(get("/users/{id}/friends", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getFriends(userId);
     }
 
     @Test
@@ -248,6 +269,8 @@ class UserControllerTest {
         mockMvc.perform(get("/users/{id}/friends", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getFriends(userId);
     }
 
     @ParameterizedTest
@@ -257,13 +280,20 @@ class UserControllerTest {
 
         mockMvc.perform(get("/users/{id}/friends", userId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getFriends(userId);
     }
 
     @Test
     void getCommonFriends_shouldReturnEmptyListOfCommonFriendsOfUsers() throws Exception {
+        Long userId = 1L;
+        Long userOtherId = 2L;
+
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", 1, 2))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getCommonFriends(userId, userOtherId);
     }
 
     @Test
@@ -281,6 +311,8 @@ class UserControllerTest {
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getCommonFriends(userId, userOtherId);
     }
 
     @ParameterizedTest
@@ -292,6 +324,8 @@ class UserControllerTest {
 
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getCommonFriends(userId, userOtherId);
     }
 
     @ParameterizedTest
@@ -303,6 +337,8 @@ class UserControllerTest {
 
         mockMvc.perform(get("/users/{id}/friends/common/{otherId}", userId, userOtherId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getCommonFriends(userId, userOtherId);
     }
 
     private static Stream<Arguments> provideInvalidUsers() {

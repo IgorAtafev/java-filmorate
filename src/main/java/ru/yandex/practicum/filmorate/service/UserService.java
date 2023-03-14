@@ -13,7 +13,7 @@ public interface UserService {
     List<User> getUsers();
 
     /**
-     * Returns user by id.
+     * Returns user by id
      * If the user is not found throws NotFoundException
      * @param id
      * @return user by id

@@ -268,7 +268,7 @@ class FilmControllerTest {
         film.setDescription("adipisicing");
         film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
-        film.setMpa(new Mpa(1, "Комедия"));
+        film.setMpa(new Mpa());
 
         return film;
     }

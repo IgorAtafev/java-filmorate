@@ -20,7 +20,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,6 +39,8 @@ class UserServiceImplTest {
         when(userStorage.getUsers()).thenReturn(Collections.emptyList());
 
         assertTrue(userService.getUsers().isEmpty());
+
+        verify(userStorage, times(1)).getUsers();
     }
 
     @Test
@@ -52,6 +53,8 @@ class UserServiceImplTest {
         when(userStorage.getUsers()).thenReturn(expected);
 
         assertEquals(expected, userService.getUsers());
+
+        verify(userStorage, times(1)).getUsers();
     }
 
     @Test
@@ -62,6 +65,8 @@ class UserServiceImplTest {
         when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
 
         assertEquals(user, userService.getUserById(userId));
+
+        verify(userStorage, times(1)).getUserById(userId);
     }
 
     @ParameterizedTest
@@ -73,6 +78,8 @@ class UserServiceImplTest {
                 NotFoundException.class,
                 () -> userService.getUserById(userId)
         );
+
+        verify(userStorage, times(1)).getUserById(userId);
     }
 
     @Test
@@ -82,6 +89,8 @@ class UserServiceImplTest {
         when(userStorage.createUser(user)).thenReturn(user);
 
         assertEquals(user, userService.createUser(user));
+
+        verify(userStorage, times(1)).createUser(user);
     }
 
     @Test
@@ -94,6 +103,8 @@ class UserServiceImplTest {
         user = userService.createUser(user);
 
         assertEquals(user.getName(), user.getLogin());
+
+        verify(userStorage, times(1)).createUser(user);
     }
 
     @Test
@@ -106,6 +117,8 @@ class UserServiceImplTest {
         user = userService.createUser(user);
 
         assertEquals(user.getName(), user.getLogin());
+
+        verify(userStorage, times(1)).createUser(user);
     }
 
     @Test
@@ -132,6 +145,9 @@ class UserServiceImplTest {
         when(userStorage.updateUser(user)).thenReturn(user);
 
         assertEquals(user, userService.updateUser(user));
+
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).updateUser(user);
     }
 
     @Test
@@ -147,6 +163,9 @@ class UserServiceImplTest {
         user = userService.updateUser(user);
 
         assertEquals(user.getName(), user.getLogin());
+
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).updateUser(user);
     }
 
     @Test
@@ -162,6 +181,9 @@ class UserServiceImplTest {
         user = userService.updateUser(user);
 
         assertEquals(user.getName(), user.getLogin());
+
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).updateUser(user);
     }
 
     @Test
@@ -189,6 +211,7 @@ class UserServiceImplTest {
                 () -> userService.updateUser(user)
         );
 
+        verify(userStorage, times(1)).getUserById(userId);
         verify(userStorage, never()).updateUser(user);
     }
 
@@ -203,10 +226,11 @@ class UserServiceImplTest {
 
         when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
         when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
-        doNothing().when(userStorage).addFriend(user, friend);
 
         userService.addFriend(userId, friendId);
 
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).getUserById(friendId);
         verify(userStorage, times(1)).addFriend(user, friend);
     }
 
@@ -224,6 +248,8 @@ class UserServiceImplTest {
                 () -> userService.addFriend(userId, friendId)
         );
 
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, never()).getUserById(friendId);
         verify(userStorage, never()).addFriend(user, friend);
     }
 
@@ -242,6 +268,7 @@ class UserServiceImplTest {
                 () -> userService.addFriend(userId, friendId)
         );
 
+        verify(userStorage, times(2)).getUserById(userId);
         verify(userStorage, never()).addFriend(user, friend);
     }
 
@@ -256,10 +283,11 @@ class UserServiceImplTest {
 
         when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
         when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
-        doNothing().when(userStorage).removeFriend(user, friend);
 
         userService.removeFriend(userId, friendId);
 
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).getUserById(friendId);
         verify(userStorage, times(1)).removeFriend(user, friend);
     }
 
@@ -277,6 +305,8 @@ class UserServiceImplTest {
                 () -> userService.removeFriend(userId, friendId)
         );
 
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, never()).getUserById(friendId);
         verify(userStorage, never()).removeFriend(user, friend);
     }
 
@@ -289,6 +319,9 @@ class UserServiceImplTest {
         when(userStorage.getFriends(user)).thenReturn(Collections.emptyList());
 
         assertTrue(userService.getFriends(userId).isEmpty());
+
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).getFriends(user);
     }
 
     @Test
@@ -304,6 +337,9 @@ class UserServiceImplTest {
         when(userStorage.getFriends(user)).thenReturn(List.of(friend1, friend2));
 
         assertEquals(expected, userService.getFriends(userId));
+
+        verify(userStorage, times(1)).getUserById(userId);
+        verify(userStorage, times(1)).getFriends(user);
     }
 
     @ParameterizedTest
@@ -318,6 +354,7 @@ class UserServiceImplTest {
                 () -> userService.getFriends(userId)
         );
 
+        verify(userStorage, times(1)).getUserById(userId);
         verify(userStorage, never()).getFriends(user);
     }
 
@@ -333,6 +370,10 @@ class UserServiceImplTest {
         when(userStorage.getCommonFriends(user1, user2)).thenReturn(Collections.emptyList());
 
         assertTrue(userService.getCommonFriends(userId1, userId2).isEmpty());
+
+        verify(userStorage, times(1)).getUserById(userId1);
+        verify(userStorage, times(1)).getUserById(userId2);
+        verify(userStorage, times(1)).getCommonFriends(user1, user2);
     }
 
     @Test
@@ -350,6 +391,10 @@ class UserServiceImplTest {
         when(userStorage.getCommonFriends(user1, user2)).thenReturn(List.of(user3));
 
         assertEquals(expected, userService.getCommonFriends(userId1, userId2));
+
+        verify(userStorage, times(1)).getUserById(userId1);
+        verify(userStorage, times(1)).getUserById(userId2);
+        verify(userStorage, times(1)).getCommonFriends(user1, user2);
     }
 
     @ParameterizedTest
@@ -366,6 +411,8 @@ class UserServiceImplTest {
                 () -> userService.getCommonFriends(userId1, userId2)
         );
 
+        verify(userStorage, times(1)).getUserById(userId1);
+        verify(userStorage, never()).getUserById(userId2);
         verify(userStorage, never()).getCommonFriends(user1, user2);
     }
 

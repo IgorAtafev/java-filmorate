@@ -13,7 +13,7 @@ public interface FilmService {
     List<Film> getFilms();
 
     /**
-     * Returns film by id.
+     * Returns film by id
      * If the film is not found throws NotFoundException
      * @param id
      * @return film by id
