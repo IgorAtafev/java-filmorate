@@ -29,18 +29,18 @@ import static org.mockito.Mockito.when;
 class UserServiceImplTest {
 
     @Mock
-    private UserStorage userStorage;
+    private UserStorage storage;
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserServiceImpl service;
 
     @Test
     void getUsers_shouldReturnEmptyListOfUsers() {
-        when(userStorage.getUsers()).thenReturn(Collections.emptyList());
+        when(storage.getUsers()).thenReturn(Collections.emptyList());
 
-        assertTrue(userService.getUsers().isEmpty());
+        assertTrue(service.getUsers().isEmpty());
 
-        verify(userStorage, times(1)).getUsers();
+        verify(storage, times(1)).getUsers();
     }
 
     @Test
@@ -50,11 +50,11 @@ class UserServiceImplTest {
 
         List<User> expected = List.of(user1, user2);
 
-        when(userStorage.getUsers()).thenReturn(expected);
+        when(storage.getUsers()).thenReturn(expected);
 
-        assertEquals(expected, userService.getUsers());
+        assertEquals(expected, service.getUsers());
 
-        verify(userStorage, times(1)).getUsers();
+        verify(storage, times(1)).getUsers();
     }
 
     @Test
@@ -62,35 +62,35 @@ class UserServiceImplTest {
         Long userId = 1L;
         User user = initUser();
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
 
-        assertEquals(user, userService.getUserById(userId));
+        assertEquals(user, service.getUserById(userId));
 
-        verify(userStorage, times(1)).getUserById(userId);
+        verify(storage, times(1)).getUserById(userId);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void getUserById_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
-        when(userStorage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> userService.getUserById(userId)
+                () -> service.getUserById(userId)
         );
 
-        verify(userStorage, times(1)).getUserById(userId);
+        verify(storage, times(1)).getUserById(userId);
     }
 
     @Test
     void createUser_shouldCreateAUser() {
         User user = initUser();
 
-        when(userStorage.createUser(user)).thenReturn(user);
+        when(storage.createUser(user)).thenReturn(user);
 
-        assertEquals(user, userService.createUser(user));
+        assertEquals(user, service.createUser(user));
 
-        verify(userStorage, times(1)).createUser(user);
+        verify(storage, times(1)).createUser(user);
     }
 
     @Test
@@ -98,13 +98,13 @@ class UserServiceImplTest {
         User user = initUser();
         user.setName(null);
 
-        when(userStorage.createUser(user)).thenReturn(user);
+        when(storage.createUser(user)).thenReturn(user);
 
-        user = userService.createUser(user);
+        user = service.createUser(user);
 
         assertEquals(user.getName(), user.getLogin());
 
-        verify(userStorage, times(1)).createUser(user);
+        verify(storage, times(1)).createUser(user);
     }
 
     @Test
@@ -112,13 +112,13 @@ class UserServiceImplTest {
         User user = initUser();
         user.setName("");
 
-        when(userStorage.createUser(user)).thenReturn(user);
+        when(storage.createUser(user)).thenReturn(user);
 
-        user = userService.createUser(user);
+        user = service.createUser(user);
 
         assertEquals(user.getName(), user.getLogin());
 
-        verify(userStorage, times(1)).createUser(user);
+        verify(storage, times(1)).createUser(user);
     }
 
     @Test
@@ -129,10 +129,10 @@ class UserServiceImplTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> userService.createUser(user)
+                () -> service.createUser(user)
         );
 
-        verify(userStorage, never()).createUser(user);
+        verify(storage, never()).createUser(user);
     }
 
     @Test
@@ -141,13 +141,13 @@ class UserServiceImplTest {
         User user = initUser();
         user.setId(userId);
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.updateUser(user)).thenReturn(user);
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.updateUser(user)).thenReturn(user);
 
-        assertEquals(user, userService.updateUser(user));
+        assertEquals(user, service.updateUser(user));
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).updateUser(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).updateUser(user);
     }
 
     @Test
@@ -157,15 +157,15 @@ class UserServiceImplTest {
         user.setId(userId);
         user.setName(null);
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.updateUser(user)).thenReturn(user);
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.updateUser(user)).thenReturn(user);
 
-        user = userService.updateUser(user);
+        user = service.updateUser(user);
 
         assertEquals(user.getName(), user.getLogin());
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).updateUser(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).updateUser(user);
     }
 
     @Test
@@ -175,15 +175,15 @@ class UserServiceImplTest {
         user.setId(userId);
         user.setName("");
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.updateUser(user)).thenReturn(user);
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.updateUser(user)).thenReturn(user);
 
-        user = userService.updateUser(user);
+        user = service.updateUser(user);
 
         assertEquals(user.getName(), user.getLogin());
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).updateUser(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).updateUser(user);
     }
 
     @Test
@@ -192,10 +192,10 @@ class UserServiceImplTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> userService.updateUser(user)
+                () -> service.updateUser(user)
         );
 
-        verify(userStorage, never()).updateUser(user);
+        verify(storage, never()).updateUser(user);
     }
 
     @ParameterizedTest
@@ -204,15 +204,15 @@ class UserServiceImplTest {
         User user = initUser();
         user.setId(userId);
 
-        when(userStorage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> userService.updateUser(user)
+                () -> service.updateUser(user)
         );
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, never()).updateUser(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, never()).updateUser(user);
     }
 
     @Test
@@ -224,14 +224,14 @@ class UserServiceImplTest {
         User friend = initUser();
         friend.setId(friendId);
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
 
-        userService.addFriend(userId, friendId);
+        service.addFriend(userId, friendId);
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).getUserById(friendId);
-        verify(userStorage, times(1)).addFriend(user, friend);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).getUserById(friendId);
+        verify(storage, times(1)).addFriend(user, friend);
     }
 
     @ParameterizedTest
@@ -241,16 +241,16 @@ class UserServiceImplTest {
         User user = initUser();
         User friend = initUser();
 
-        when(userStorage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> userService.addFriend(userId, friendId)
+                () -> service.addFriend(userId, friendId)
         );
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, never()).getUserById(friendId);
-        verify(userStorage, never()).addFriend(user, friend);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, never()).getUserById(friendId);
+        verify(storage, never()).addFriend(user, friend);
     }
 
     @Test
@@ -260,16 +260,16 @@ class UserServiceImplTest {
         User user = initUser();
         User friend = initUser();
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
 
         assertThrows(
                 ValidationException.class,
-                () -> userService.addFriend(userId, friendId)
+                () -> service.addFriend(userId, friendId)
         );
 
-        verify(userStorage, times(2)).getUserById(userId);
-        verify(userStorage, never()).addFriend(user, friend);
+        verify(storage, times(2)).getUserById(userId);
+        verify(storage, never()).addFriend(user, friend);
     }
 
     @Test
@@ -281,14 +281,14 @@ class UserServiceImplTest {
         User friend = initUser();
         friend.setId(friendId);
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.getUserById(friendId)).thenReturn(Optional.of(friend));
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
 
-        userService.removeFriend(userId, friendId);
+        service.removeFriend(userId, friendId);
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).getUserById(friendId);
-        verify(userStorage, times(1)).removeFriend(user, friend);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).getUserById(friendId);
+        verify(storage, times(1)).removeFriend(user, friend);
     }
 
     @ParameterizedTest
@@ -298,16 +298,16 @@ class UserServiceImplTest {
         User user = initUser();
         User friend = initUser();
 
-        when(userStorage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> userService.removeFriend(userId, friendId)
+                () -> service.removeFriend(userId, friendId)
         );
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, never()).getUserById(friendId);
-        verify(userStorage, never()).removeFriend(user, friend);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, never()).getUserById(friendId);
+        verify(storage, never()).removeFriend(user, friend);
     }
 
     @Test
@@ -315,13 +315,13 @@ class UserServiceImplTest {
         Long userId = 1L;
         User user = initUser();
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.getFriends(user)).thenReturn(Collections.emptyList());
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.getFriends(user)).thenReturn(Collections.emptyList());
 
-        assertTrue(userService.getFriends(userId).isEmpty());
+        assertTrue(service.getFriends(userId).isEmpty());
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).getFriends(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).getFriends(user);
     }
 
     @Test
@@ -333,13 +333,13 @@ class UserServiceImplTest {
 
         List<User> expected = List.of(friend1, friend2);
 
-        when(userStorage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(userStorage.getFriends(user)).thenReturn(List.of(friend1, friend2));
+        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.getFriends(user)).thenReturn(List.of(friend1, friend2));
 
-        assertEquals(expected, userService.getFriends(userId));
+        assertEquals(expected, service.getFriends(userId));
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, times(1)).getFriends(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).getFriends(user);
     }
 
     @ParameterizedTest
@@ -347,15 +347,15 @@ class UserServiceImplTest {
     void getFriends_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         User user = initUser();
 
-        when(userStorage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> userService.getFriends(userId)
+                () -> service.getFriends(userId)
         );
 
-        verify(userStorage, times(1)).getUserById(userId);
-        verify(userStorage, never()).getFriends(user);
+        verify(storage, times(1)).getUserById(userId);
+        verify(storage, never()).getFriends(user);
     }
 
     @Test
@@ -365,15 +365,15 @@ class UserServiceImplTest {
         Long userId2 = 2L;
         User user2 = initUser();
 
-        when(userStorage.getUserById(userId1)).thenReturn(Optional.of(user1));
-        when(userStorage.getUserById(userId2)).thenReturn(Optional.of(user2));
-        when(userStorage.getCommonFriends(user1, user2)).thenReturn(Collections.emptyList());
+        when(storage.getUserById(userId1)).thenReturn(Optional.of(user1));
+        when(storage.getUserById(userId2)).thenReturn(Optional.of(user2));
+        when(storage.getCommonFriends(user1, user2)).thenReturn(Collections.emptyList());
 
-        assertTrue(userService.getCommonFriends(userId1, userId2).isEmpty());
+        assertTrue(service.getCommonFriends(userId1, userId2).isEmpty());
 
-        verify(userStorage, times(1)).getUserById(userId1);
-        verify(userStorage, times(1)).getUserById(userId2);
-        verify(userStorage, times(1)).getCommonFriends(user1, user2);
+        verify(storage, times(1)).getUserById(userId1);
+        verify(storage, times(1)).getUserById(userId2);
+        verify(storage, times(1)).getCommonFriends(user1, user2);
     }
 
     @Test
@@ -386,15 +386,15 @@ class UserServiceImplTest {
 
         List<User> expected = List.of(user3);
 
-        when(userStorage.getUserById(userId1)).thenReturn(Optional.of(user1));
-        when(userStorage.getUserById(userId2)).thenReturn(Optional.of(user2));
-        when(userStorage.getCommonFriends(user1, user2)).thenReturn(List.of(user3));
+        when(storage.getUserById(userId1)).thenReturn(Optional.of(user1));
+        when(storage.getUserById(userId2)).thenReturn(Optional.of(user2));
+        when(storage.getCommonFriends(user1, user2)).thenReturn(List.of(user3));
 
-        assertEquals(expected, userService.getCommonFriends(userId1, userId2));
+        assertEquals(expected, service.getCommonFriends(userId1, userId2));
 
-        verify(userStorage, times(1)).getUserById(userId1);
-        verify(userStorage, times(1)).getUserById(userId2);
-        verify(userStorage, times(1)).getCommonFriends(user1, user2);
+        verify(storage, times(1)).getUserById(userId1);
+        verify(storage, times(1)).getUserById(userId2);
+        verify(storage, times(1)).getCommonFriends(user1, user2);
     }
 
     @ParameterizedTest
@@ -404,16 +404,16 @@ class UserServiceImplTest {
         User user1 = initUser();
         User user2 = initUser();
 
-        when(userStorage.getUserById(userId1)).thenThrow(NotFoundException.class);
+        when(storage.getUserById(userId1)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> userService.getCommonFriends(userId1, userId2)
+                () -> service.getCommonFriends(userId1, userId2)
         );
 
-        verify(userStorage, times(1)).getUserById(userId1);
-        verify(userStorage, never()).getUserById(userId2);
-        verify(userStorage, never()).getCommonFriends(user1, user2);
+        verify(storage, times(1)).getUserById(userId1);
+        verify(storage, never()).getUserById(userId2);
+        verify(storage, never()).getCommonFriends(user1, user2);
     }
 
     private User initUser() {

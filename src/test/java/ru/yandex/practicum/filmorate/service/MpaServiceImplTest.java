@@ -26,18 +26,18 @@ import static org.mockito.Mockito.when;
 class MpaServiceImplTest {
 
     @Mock
-    private MpaStorage mpaStorage;
+    private MpaStorage storage;
 
     @InjectMocks
-    private MpaServiceImpl mpaService;
+    private MpaServiceImpl service;
 
     @Test
     void getMpaRatings_shouldReturnEmptyListOfRatings() {
-        when(mpaStorage.getMpaRatings()).thenReturn(Collections.emptyList());
+        when(storage.getMpaRatings()).thenReturn(Collections.emptyList());
 
-        assertTrue(mpaService.getMpaRatings().isEmpty());
+        assertTrue(service.getMpaRatings().isEmpty());
 
-        verify(mpaStorage, times(1)).getMpaRatings();
+        verify(storage, times(1)).getMpaRatings();
     }
 
     @Test
@@ -47,11 +47,11 @@ class MpaServiceImplTest {
 
         List<Mpa> expected = List.of(rating1, rating2);
 
-        when(mpaStorage.getMpaRatings()).thenReturn(expected);
+        when(storage.getMpaRatings()).thenReturn(expected);
 
-        assertEquals(expected, mpaService.getMpaRatings());
+        assertEquals(expected, service.getMpaRatings());
 
-        verify(mpaStorage, times(1)).getMpaRatings();
+        verify(storage, times(1)).getMpaRatings();
     }
 
     @Test
@@ -59,24 +59,24 @@ class MpaServiceImplTest {
         Integer ratingId = 1;
         Mpa rating = initRating();
 
-        when(mpaStorage.getMpaRatingById(ratingId)).thenReturn(Optional.of(rating));
+        when(storage.getMpaRatingById(ratingId)).thenReturn(Optional.of(rating));
 
-        assertEquals(rating, mpaService.getMpaRatingById(ratingId));
+        assertEquals(rating, service.getMpaRatingById(ratingId));
 
-        verify(mpaStorage, times(1)).getMpaRatingById(ratingId);
+        verify(storage, times(1)).getMpaRatingById(ratingId);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {-1, 0, 999})
     void getMpaRatingById_shouldThrowAnException_ifRatingDoesNotExist(Integer ratingId) {
-        when(mpaStorage.getMpaRatingById(ratingId)).thenThrow(NotFoundException.class);
+        when(storage.getMpaRatingById(ratingId)).thenThrow(NotFoundException.class);
 
         assertThrows(
                 NotFoundException.class,
-                () -> mpaService.getMpaRatingById(ratingId)
+                () -> service.getMpaRatingById(ratingId)
         );
 
-        verify(mpaStorage, times(1)).getMpaRatingById(ratingId);
+        verify(storage, times(1)).getMpaRatingById(ratingId);
     }
 
     private Mpa initRating() {
