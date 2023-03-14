@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -15,6 +13,5 @@ public class Genre {
 
     private Integer id;
 
-    @NotBlank(message = "Genre cannot be empty")
     private String name;
 }

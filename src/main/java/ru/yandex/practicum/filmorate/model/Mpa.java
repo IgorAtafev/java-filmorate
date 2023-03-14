@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -15,6 +13,5 @@ public class Mpa {
 
     private Integer id;
 
-    @NotBlank(message = "MPA rating cannot be empty")
     private String name;
 }
