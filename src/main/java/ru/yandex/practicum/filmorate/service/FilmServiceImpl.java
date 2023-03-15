@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +16,8 @@ public class FilmServiceImpl implements FilmService {
 
     private final FilmStorage storage;
     private final UserService userService;
+
+    private long nextId = 0;
 
     @Override
     public List<Film> getFilms() {
@@ -37,6 +37,7 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("The film must have an empty ID when created");
         }
 
+        film.setId(++nextId);
         return storage.createFilm(film);
     }
 
@@ -73,10 +74,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getPopular(int count) {
-        return storage.getFilms().stream()
-                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return storage.getPopular(count);
     }
 
     private boolean isIdValueNull(Film film) {

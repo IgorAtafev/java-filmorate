@@ -5,15 +5,16 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private long nextId = 0;
     private final Map<Long, Film> films = new HashMap<>();
 
     @Override
@@ -28,7 +29,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        film.setId(++nextId);
         films.put(film.getId(), film);
         return film;
     }
@@ -47,5 +47,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void removeLike(Film film, User user) {
         film.removeLike(user.getId());
+    }
+
+    @Override
+    public List<Film> getPopular(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }
