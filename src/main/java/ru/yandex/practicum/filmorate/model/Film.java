@@ -42,9 +42,9 @@ public class Film {
     @NotNull
     private Mpa mpa;
 
-    private final Set<Genre> genres = new HashSet<>();
-
     private final Set<Long> likes = new HashSet<>();
+
+    private final Set<Genre> genres = new HashSet<>();
 
     public Collection<Long> getLikes() {
         return Collections.unmodifiableSet(likes);
@@ -56,5 +56,13 @@ public class Film {
 
     public void removeLike(Long id) {
         likes.remove(id);
+    }
+
+    public Collection<Genre> getGenres() {
+        return Collections.unmodifiableSet(genres);
+    }
+
+    public void addGenres(Collection<Genre> otherGenres) {
+        genres.addAll(otherGenres);
     }
 }

@@ -49,7 +49,7 @@ public class UserDbStorage implements UserStorage {
                 user.getName(),
                 user.getBirthday());
 
-        return user;
+        return getUserById(user.getId()).get();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class UserDbStorage implements UserStorage {
                 user.getBirthday(),
                 user.getId());
 
-        return user;
+        return getUserById(user.getId()).get();
     }
 
     @Override

@@ -16,6 +16,7 @@ public class FilmServiceImpl implements FilmService {
 
     private final FilmStorage storage;
     private final UserService userService;
+    private final MpaService mpaService;
 
     private long nextId = 0;
 
@@ -37,6 +38,12 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("The film must have an empty ID when created");
         }
 
+        /**
+         * Checks if a Mpa rating exists by id
+         * If Mpa rating is not found throws NotFoundException
+         */
+        mpaService.getMpaRatingById(film.getMpa().getId());
+
         film.setId(++nextId);
         return storage.createFilm(film);
     }
@@ -52,6 +59,12 @@ public class FilmServiceImpl implements FilmService {
          * If the film is not found throws NotFoundException
          */
         getFilmById(film.getId());
+
+        /**
+         * Checks if a Mpa rating exists by id
+         * If Mpa rating is not found throws NotFoundException
+         */
+        mpaService.getMpaRatingById(film.getMpa().getId());
 
         return storage.updateFilm(film);
     }
