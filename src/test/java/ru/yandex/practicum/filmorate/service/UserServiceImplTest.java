@@ -220,9 +220,7 @@ class UserServiceImplTest {
         Long userId = 1L;
         Long friendId = 2L;
         User user = initUser();
-        user.setId(userId);
         User friend = initUser();
-        friend.setId(friendId);
 
         when(storage.getUserById(userId)).thenReturn(Optional.of(user));
         when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
@@ -277,9 +275,7 @@ class UserServiceImplTest {
         Long userId = 1L;
         Long friendId = 2L;
         User user = initUser();
-        user.setId(userId);
         User friend = initUser();
-        friend.setId(friendId);
 
         when(storage.getUserById(userId)).thenReturn(Optional.of(user));
         when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));

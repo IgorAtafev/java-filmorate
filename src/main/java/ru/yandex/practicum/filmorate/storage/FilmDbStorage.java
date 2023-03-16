@@ -14,8 +14,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -60,7 +62,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa().getId());
 
-        addGenresByFilm(film);
+        addGenres(film);
 
         film = getFilmById(film.getId()).get();
 
@@ -81,8 +83,8 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId());
 
-        removeGenresByFilm(film);
-        addGenresByFilm(film);
+        removeGenres(film);
+        addGenres(film);
 
         film = getFilmById(film.getId()).get();
 
@@ -125,15 +127,22 @@ public class FilmDbStorage implements FilmStorage {
                 count);
     }
 
-    private void addGenresByFilm(Film film) {
+    private void addGenres(Film film) {
         if (film.getGenres() == null || film.getGenres().isEmpty()) {
+            return;
+        }
+
+        List<Integer> genreIds = film.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toList());
+        List<Genre> genres = getGenresByIds(genreIds);
+
+        if (genres.isEmpty()) {
             return;
         }
 
         String sqlQuery = "INSERT INTO film_genres (film_id, genre_id) " +
                 "VALUES (?, ?)";
-
-        List<Genre> genres = List.copyOf(film.getGenres());
 
         jdbcTemplate.batchUpdate(sqlQuery,
                 new BatchPreparedStatementSetter() {
@@ -150,7 +159,7 @@ public class FilmDbStorage implements FilmStorage {
                 });
     }
 
-    private void removeGenresByFilm(Film film) {
+    private void removeGenres(Film film) {
         String sqlQuery = "DELETE FROM film_genres " +
                 "WHERE film_id = ?";
 
@@ -166,6 +175,17 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery,
                 this::mapRowToGenre,
                 film.getId());
+    }
+
+    private List<Genre> getGenresByIds(List<Integer> ids) {
+        String sqlQuery = String.format("SELECT * " +
+                "FROM genres " +
+                "WHERE id IN (%s)",
+                String.join(", ", Collections.nCopies(ids.size(), "?")));
+
+        return jdbcTemplate.query(sqlQuery,
+                this::mapRowToGenre,
+                ids.toArray());
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
