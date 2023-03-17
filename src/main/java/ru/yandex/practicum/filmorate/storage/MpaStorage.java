@@ -19,4 +19,11 @@ public interface MpaStorage {
      * @return Mpa rating or null if there was no one
      */
     Optional<Mpa> getMpaRatingById(Integer id);
+
+    /**
+     * Checks for the existence of Mpa rating by id
+     * @param id
+     * @return true or false
+     */
+    boolean isMpaRatingExists(Integer id);
 }

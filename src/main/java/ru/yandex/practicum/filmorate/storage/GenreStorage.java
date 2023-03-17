@@ -19,4 +19,18 @@ public interface GenreStorage {
      * @return genre or null if there was no one
      */
     Optional<Genre> getGenreById(Integer id);
+
+    /**
+     * Returns a list of genres by id list
+     * @param ids
+     * @return list of genres by id list
+     */
+    List<Genre> getGenresByIds(List<Integer> ids);
+
+    /**
+     * Returns a list of genres by film id
+     * @param filmId
+     * @return list of genres by film id
+     */
+    List<Genre> getGenresByFilmId(Long filmId);
 }

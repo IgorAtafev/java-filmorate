@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -33,6 +34,15 @@ public class MpaDbStorage implements MpaStorage {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public boolean isMpaRatingExists(Integer id) {
+        String sqlQuery = "SELECT 1 FROM mpa WHERE id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
     }
 
     private Mpa mapRowToMpaRating(ResultSet resultSet, int rowNum) throws SQLException {

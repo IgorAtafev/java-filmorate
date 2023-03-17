@@ -3,8 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
@@ -14,80 +15,87 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    private final FilmStorage storage;
-    private final UserService userService;
-    private final MpaService mpaService;
+    private static final String FILM_DOES_NOT_EXIST = "Film width id %d does not exist";
+    private static final String MPA_RATING_DOES_NOT_EXIST = "Mpa rating width id %d does not exist";
+    private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
+    private static final String EMPTY_ID_ON_CREATION = "The film must have an empty ID when created";
+    private static final String NOT_EMPTY_ID_ON_UPDATE = "The film must not have an empty ID when updating";
 
-    private long nextId = 0;
+    private final FilmStorage filmStorage;
+    private final MpaStorage mpaStorage;
+    private final UserStorage userStorage;
 
     @Override
     public List<Film> getFilms() {
-        return storage.getFilms();
+        return filmStorage.getFilms();
     }
 
     @Override
     public Film getFilmById(Long id) {
-        return storage.getFilmById(id).orElseThrow(
-                () -> new NotFoundException(String.format("Film width id %d does not exist", id))
+        return filmStorage.getFilmById(id).orElseThrow(
+                () -> new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id))
         );
     }
 
     @Override
     public Film createFilm(Film film) {
         if (!isIdValueNull(film)) {
-            throw new ValidationException("The film must have an empty ID when created");
+            throw new ValidationException(EMPTY_ID_ON_CREATION);
         }
 
-        /**
-         * Checks if a Mpa rating exists by id
-         * If Mpa rating is not found throws NotFoundException
-         */
-        mpaService.getMpaRatingById(film.getMpa().getId());
+        if (!mpaStorage.isMpaRatingExists(film.getMpa().getId())) {
+            throw new NotFoundException(String.format(MPA_RATING_DOES_NOT_EXIST, film.getMpa().getId()));
+        }
 
-        film.setId(++nextId);
-        return storage.createFilm(film);
+        return filmStorage.createFilm(film);
     }
 
     @Override
     public Film updateFilm(Film film) {
         if (isIdValueNull(film)) {
-            throw new ValidationException("The film must not have an empty ID when updating");
+            throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
         }
 
-        /**
-         * Checks if a film exists by id
-         * If the film is not found throws NotFoundException
-         */
-        getFilmById(film.getId());
+        if (!filmStorage.isFilmExists(film.getId())) {
+            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, film.getId()));
+        }
 
-        /**
-         * Checks if a Mpa rating exists by id
-         * If Mpa rating is not found throws NotFoundException
-         */
-        mpaService.getMpaRatingById(film.getMpa().getId());
+        if (!mpaStorage.isMpaRatingExists(film.getMpa().getId())) {
+            throw new NotFoundException(String.format(MPA_RATING_DOES_NOT_EXIST, film.getMpa().getId()));
+        }
 
-        return storage.updateFilm(film);
+        return filmStorage.updateFilm(film);
     }
 
     @Override
     public void addLike(Long id, Long userId) {
-        Film film = getFilmById(id);
-        User user = userService.getUserById(userId);
+        if (!filmStorage.isFilmExists(id)) {
+            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+        }
 
-        storage.addLike(film, user);
+        if (!userStorage.isUserExists(userId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
+        }
+
+        filmStorage.addLike(id, userId);
     }
 
     @Override
     public void removeLike(Long id, Long userId) {
-        Film film = getFilmById(id);
-        User user = userService.getUserById(userId);
+        if (!filmStorage.isFilmExists(id)) {
+            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+        }
 
-        storage.removeLike(film, user);
+        if (!userStorage.isUserExists(userId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
+        }
+
+        filmStorage.removeLike(id, userId);
     }
 
     @Override
     public List<Film> getPopular(int count) {
-        return storage.getPopular(count);
+        return filmStorage.getPopular(count);
     }
 
     private boolean isIdValueNull(Film film) {

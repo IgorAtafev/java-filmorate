@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,26 @@ public class GenreDbStorage implements GenreStorage {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<Genre> getGenresByIds(List<Integer> ids) {
+        String sqlQuery = String.format("SELECT * " +
+                        "FROM genres " +
+                        "WHERE id IN (%s)",
+                String.join(", ", Collections.nCopies(ids.size(), "?")));
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, ids.toArray());
+    }
+
+    @Override
+    public List<Genre> getGenresByFilmId(Long filmId) {
+        String sqlQuery = "SELECT g.* " +
+                "FROM genres g " +
+                "INNER JOIN film_genres fg ON fg.genre_id = g.id " +
+                "WHERE fg.film_id = ?";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
     }
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {

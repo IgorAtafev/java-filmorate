@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,17 +36,17 @@ public interface FilmStorage {
 
     /**
      * Adds a user like to a film
-     * @param film
-     * @param user
+     * @param id
+     * @param userId
      */
-    void addLike(Film film, User user);
+    void addLike(Long id, Long userId);
 
     /**
      * Removes a user like to a film
-     * @param film
-     * @param user
+     * @param id
+     * @param userId
      */
-    void removeLike(Film film, User user);
+    void removeLike(Long id, Long userId);
 
     /**
      * Returns a list of popular films by number of likes
@@ -56,4 +55,11 @@ public interface FilmStorage {
      * @return list of popular films
      */
     List<Film> getPopular(int count);
+
+    /**
+     * Checks for the existence of Film by id
+     * @param id
+     * @return true or false
+     */
+    boolean isFilmExists(Long id);
 }

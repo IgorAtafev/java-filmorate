@@ -89,10 +89,10 @@ WHERE id = 1;
 
 **Друзья пользователя (вариант с JOIN)**
 ```roomsql
-SELECT t1.*
-FROM users t1
-INNER JOIN user_friends t2 ON t2.friend_id = t1.id
-WHERE t2.user_id = 1;
+SELECT u.*
+FROM users u
+INNER JOIN user_friends uf ON uf.friend_id = u.id
+WHERE uf.user_id = 1;
 ```
 
 **Друзья пользователя (вариант с подзапросом)**
@@ -106,11 +106,11 @@ WHERE id IN (SELECT friend_id
 
 **Общие друзья пользователей (вариант с JOIN)**
 ```roomsql
-SELECT t1.*
-FROM users t1
-INNER JOIN user_friends t2 ON t2.friend_id = t1.id
-INNER JOIN user_friends t3 ON t3.friend_id = t2.friend_id
-WHERE t2.user_id = 1 AND t3.user_id = 2;
+SELECT u.*
+FROM users u
+INNER JOIN user_friends uf ON uf.friend_id = u.id
+INNER JOIN user_friends ufc ON ufc.friend_id = uf.friend_id
+WHERE uf.user_id = 1 AND ufc.user_id = 2;
 ```
 
 **Общие друзья пользователей (вариант с подзапросом)**
@@ -126,11 +126,11 @@ WHERE id IN (SELECT friend_id
 
 **10 наиболее популярных фильмов по количеству лайков**
 ```roomsql
-SELECT t1.*,
-       COUNT(t2.user_id) count_of_likes
-FROM films t1
-LEFT JOIN film_likes t2 ON t2.film_id = t1.id
-GROUP BY t1.id
+SELECT f.*,
+       COUNT(fl.user_id) count_of_likes
+FROM films f
+LEFT JOIN film_likes fl ON fl.film_id = f.id
+GROUP BY f.id
 ORDER BY count_of_likes DESC
 LIMIT 10;
 ```

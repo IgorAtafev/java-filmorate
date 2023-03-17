@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,17 +44,27 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        String sqlQuery = "INSERT INTO users (id, email, login, name, birth_day) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO users (email, login, name, birth_day) " +
+                "VALUES (?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlQuery,
-                user.getId(),
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday());
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
-        return getUserById(user.getId()).get();
+        jdbcTemplate.update(conn -> {
+                    PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+
+                    ps.setString(1, user.getEmail());
+                    ps.setString(2, user.getLogin());
+                    ps.setString(3, user.getName());
+                    ps.setDate(4, Date.valueOf(user.getBirthday()));
+
+                    return ps;
+                }, generatedKeyHolder);
+
+        Long id = generatedKeyHolder.getKey().longValue();
+
+        user.setId(id);
+
+        return user;
     }
 
     @Override
@@ -58,60 +73,56 @@ public class UserDbStorage implements UserStorage {
                 "SET email = ?, login = ?, name = ?, birth_day = ? " +
                 "WHERE id = ?";
 
-        jdbcTemplate.update(sqlQuery,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday(),
-                user.getId());
+        jdbcTemplate.update(sqlQuery, user.getEmail(), user.getLogin(),
+                user.getName(), user.getBirthday(), user.getId());
 
-        return getUserById(user.getId()).get();
+        return user;
     }
 
     @Override
-    public void addFriend(User user, User friend) {
+    public void addFriend(Long id, Long friendId) {
         String sqlQuery = "INSERT INTO user_friends (user_id, friend_id) " +
                 "VALUES (?, ?)";
 
-        jdbcTemplate.update(sqlQuery,
-                user.getId(),
-                friend.getId());
+        jdbcTemplate.update(sqlQuery, id, friendId);
     }
 
     @Override
-    public void removeFriend(User user, User friend) {
+    public void removeFriend(Long id, Long friendId) {
         String sqlQuery = "DELETE FROM user_friends " +
                 "WHERE user_id = ? AND friend_id = ?";
 
-        jdbcTemplate.update(sqlQuery,
-                user.getId(),
-                friend.getId());
+        jdbcTemplate.update(sqlQuery, id, friendId);
     }
 
     @Override
-    public List<User> getFriends(User user) {
-        String sqlQuery = "SELECT t1.* " +
-                "FROM users t1 " +
-                "INNER JOIN user_friends t2 ON t2.friend_id = t1.id " +
-                "WHERE t2.user_id = ?";
+    public List<User> getFriends(Long id) {
+        String sqlQuery = "SELECT u.* " +
+                "FROM users u " +
+                "INNER JOIN user_friends uf ON uf.friend_id = u.id " +
+                "WHERE uf.user_id = ?";
 
-        return jdbcTemplate.query(sqlQuery,
-                this::mapRowToUser,
-                user.getId());
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
     }
 
     @Override
-    public List<User> getCommonFriends(User user, User other) {
-        String sqlQuery = "SELECT t1.* " +
-                "FROM users t1 " +
-                "INNER JOIN user_friends t2 ON t2.friend_id = t1.id " +
-                "INNER JOIN user_friends t3 ON t3.friend_id = t2.friend_id " +
-                "WHERE t2.user_id = ? AND t3.user_id = ?";
+    public List<User> getCommonFriends(Long id, Long otherId) {
+        String sqlQuery = "SELECT u.* " +
+                "FROM users u " +
+                "INNER JOIN user_friends uf ON uf.friend_id = u.id " +
+                "INNER JOIN user_friends ufc ON ufc.friend_id = uf.friend_id " +
+                "WHERE uf.user_id = ? AND ufc.user_id = ?";
 
-        return jdbcTemplate.query(sqlQuery,
-                this::mapRowToUser,
-                user.getId(),
-                other.getId());
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, otherId);
+    }
+
+    @Override
+    public boolean isUserExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM users WHERE id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

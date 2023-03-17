@@ -141,12 +141,12 @@ class UserServiceImplTest {
         User user = initUser();
         user.setId(userId);
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.isUserExists(userId)).thenReturn(true);
         when(storage.updateUser(user)).thenReturn(user);
 
         assertEquals(user, service.updateUser(user));
 
-        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).isUserExists(userId);
         verify(storage, times(1)).updateUser(user);
     }
 
@@ -157,14 +157,14 @@ class UserServiceImplTest {
         user.setId(userId);
         user.setName(null);
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.isUserExists(userId)).thenReturn(true);
         when(storage.updateUser(user)).thenReturn(user);
 
         user = service.updateUser(user);
 
         assertEquals(user.getName(), user.getLogin());
 
-        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).isUserExists(userId);
         verify(storage, times(1)).updateUser(user);
     }
 
@@ -175,14 +175,14 @@ class UserServiceImplTest {
         user.setId(userId);
         user.setName("");
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
+        when(storage.isUserExists(userId)).thenReturn(true);
         when(storage.updateUser(user)).thenReturn(user);
 
         user = service.updateUser(user);
 
         assertEquals(user.getName(), user.getLogin());
 
-        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).isUserExists(userId);
         verify(storage, times(1)).updateUser(user);
     }
 
@@ -204,14 +204,14 @@ class UserServiceImplTest {
         User user = initUser();
         user.setId(userId);
 
-        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.isUserExists(userId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> service.updateUser(user)
         );
 
-        verify(storage, times(1)).getUserById(userId);
+        verify(storage, times(1)).isUserExists(userId);
         verify(storage, never()).updateUser(user);
     }
 
@@ -219,197 +219,177 @@ class UserServiceImplTest {
     void addFriend_shouldAddTheUserAsAFriend() {
         Long userId = 1L;
         Long friendId = 2L;
-        User user = initUser();
-        User friend = initUser();
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
+        when(storage.isUserExists(userId)).thenReturn(true);
+        when(storage.isUserExists(friendId)).thenReturn(true);
 
         service.addFriend(userId, friendId);
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, times(1)).getUserById(friendId);
-        verify(storage, times(1)).addFriend(user, friend);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, times(1)).isUserExists(friendId);
+        verify(storage, times(1)).addFriend(userId, friendId);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void addFriend_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long friendId = 2L;
-        User user = initUser();
-        User friend = initUser();
 
-        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.isUserExists(userId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> service.addFriend(userId, friendId)
         );
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, never()).getUserById(friendId);
-        verify(storage, never()).addFriend(user, friend);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, never()).isUserExists(friendId);
+        verify(storage, never()).addFriend(userId, friendId);
     }
 
     @Test
     void addFriend_shouldThrowAnException_ifUserAddsHimselfAsAFriend() {
         Long userId = 1L;
         Long friendId = 1L;
-        User user = initUser();
-        User friend = initUser();
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
+        when(storage.isUserExists(userId)).thenReturn(true);
+        when(storage.isUserExists(userId)).thenReturn(true);
 
         assertThrows(
                 ValidationException.class,
                 () -> service.addFriend(userId, friendId)
         );
 
-        verify(storage, times(2)).getUserById(userId);
-        verify(storage, never()).addFriend(user, friend);
+        verify(storage, times(2)).isUserExists(userId);
+        verify(storage, never()).addFriend(userId, friendId);
     }
 
     @Test
     void removeFriend_shouldRemoveTheUserFromFriends() {
         Long userId = 1L;
         Long friendId = 2L;
-        User user = initUser();
-        User friend = initUser();
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(storage.getUserById(friendId)).thenReturn(Optional.of(friend));
+        when(storage.isUserExists(userId)).thenReturn(true);
+        when(storage.isUserExists(friendId)).thenReturn(true);
 
         service.removeFriend(userId, friendId);
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, times(1)).getUserById(friendId);
-        verify(storage, times(1)).removeFriend(user, friend);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, times(1)).isUserExists(friendId);
+        verify(storage, times(1)).removeFriend(userId, friendId);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void removeFriend_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long friendId = 2L;
-        User user = initUser();
-        User friend = initUser();
 
-        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.isUserExists(userId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> service.removeFriend(userId, friendId)
         );
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, never()).getUserById(friendId);
-        verify(storage, never()).removeFriend(user, friend);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, never()).isUserExists(friendId);
+        verify(storage, never()).removeFriend(userId, friendId);
     }
 
     @Test
     void getFriends_shouldReturnEmptyListOfFriendsOfUser() {
         Long userId = 1L;
-        User user = initUser();
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(storage.getFriends(user)).thenReturn(Collections.emptyList());
+        when(storage.isUserExists(userId)).thenReturn(true);
+        when(storage.getFriends(userId)).thenReturn(Collections.emptyList());
 
         assertTrue(service.getFriends(userId).isEmpty());
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, times(1)).getFriends(user);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, times(1)).getFriends(userId);
     }
 
     @Test
     void getFriends_shouldReturnListOfFriendsOfUser() {
         Long userId = 1L;
-        User user = initUser();
         User friend1 = initUser();
         User friend2 = initUser();
 
         List<User> expected = List.of(friend1, friend2);
 
-        when(storage.getUserById(userId)).thenReturn(Optional.of(user));
-        when(storage.getFriends(user)).thenReturn(List.of(friend1, friend2));
+        when(storage.isUserExists(userId)).thenReturn(true);
+        when(storage.getFriends(userId)).thenReturn(List.of(friend1, friend2));
 
         assertEquals(expected, service.getFriends(userId));
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, times(1)).getFriends(user);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, times(1)).getFriends(userId);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void getFriends_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
-        User user = initUser();
-
-        when(storage.getUserById(userId)).thenThrow(NotFoundException.class);
+        when(storage.isUserExists(userId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> service.getFriends(userId)
         );
 
-        verify(storage, times(1)).getUserById(userId);
-        verify(storage, never()).getFriends(user);
+        verify(storage, times(1)).isUserExists(userId);
+        verify(storage, never()).getFriends(userId);
     }
 
     @Test
     void getCommonFriends_shouldReturnEmptyListOfCommonFriendsOfUsers() {
         Long userId1 = 1L;
-        User user1 = initUser();
         Long userId2 = 2L;
-        User user2 = initUser();
 
-        when(storage.getUserById(userId1)).thenReturn(Optional.of(user1));
-        when(storage.getUserById(userId2)).thenReturn(Optional.of(user2));
-        when(storage.getCommonFriends(user1, user2)).thenReturn(Collections.emptyList());
+        when(storage.isUserExists(userId1)).thenReturn(true);
+        when(storage.isUserExists(userId2)).thenReturn(true);
+        when(storage.getCommonFriends(userId1, userId2)).thenReturn(Collections.emptyList());
 
         assertTrue(service.getCommonFriends(userId1, userId2).isEmpty());
 
-        verify(storage, times(1)).getUserById(userId1);
-        verify(storage, times(1)).getUserById(userId2);
-        verify(storage, times(1)).getCommonFriends(user1, user2);
+        verify(storage, times(1)).isUserExists(userId1);
+        verify(storage, times(1)).isUserExists(userId2);
+        verify(storage, times(1)).getCommonFriends(userId1, userId2);
     }
 
     @Test
     void getCommonFriends_shouldReturnListOfCommonFriendsOfUsers() {
         Long userId1 = 1L;
-        User user1 = initUser();
         Long userId2 = 2L;
-        User user2 = initUser();
         User user3 = initUser();
 
         List<User> expected = List.of(user3);
 
-        when(storage.getUserById(userId1)).thenReturn(Optional.of(user1));
-        when(storage.getUserById(userId2)).thenReturn(Optional.of(user2));
-        when(storage.getCommonFriends(user1, user2)).thenReturn(List.of(user3));
+        when(storage.isUserExists(userId1)).thenReturn(true);
+        when(storage.isUserExists(userId2)).thenReturn(true);
+        when(storage.getCommonFriends(userId1, userId2)).thenReturn(List.of(user3));
 
         assertEquals(expected, service.getCommonFriends(userId1, userId2));
 
-        verify(storage, times(1)).getUserById(userId1);
-        verify(storage, times(1)).getUserById(userId2);
-        verify(storage, times(1)).getCommonFriends(user1, user2);
+        verify(storage, times(1)).isUserExists(userId1);
+        verify(storage, times(1)).isUserExists(userId2);
+        verify(storage, times(1)).getCommonFriends(userId1, userId2);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void getCommonFriends_shouldThrowAnException_ifUserDoesNotExist(Long userId1) {
         Long userId2 = 2L;
-        User user1 = initUser();
-        User user2 = initUser();
 
-        when(storage.getUserById(userId1)).thenThrow(NotFoundException.class);
+        when(storage.isUserExists(userId1)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> service.getCommonFriends(userId1, userId2)
         );
 
-        verify(storage, times(1)).getUserById(userId1);
-        verify(storage, never()).getUserById(userId2);
-        verify(storage, never()).getCommonFriends(user1, user2);
+        verify(storage, times(1)).isUserExists(userId1);
+        verify(storage, never()).isUserExists(userId2);
+        verify(storage, never()).getCommonFriends(userId1, userId2);
     }
 
     private User initUser() {

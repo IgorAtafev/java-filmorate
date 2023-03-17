@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -44,6 +46,7 @@ public class Film {
 
     private final Set<Long> likes = new HashSet<>();
 
+    @JsonDeserialize(as = LinkedHashSet.class)
     private final Set<Genre> genres = new HashSet<>();
 
     public Collection<Long> getLikes() {
@@ -62,7 +65,7 @@ public class Film {
         return Collections.unmodifiableSet(genres);
     }
 
-    public void addGenres(Collection<Genre> otherGenres) {
+    public void addGenres(Long id, Collection<Genre> otherGenres) {
         genres.addAll(otherGenres);
     }
 }
