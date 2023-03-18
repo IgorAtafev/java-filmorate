@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
         }
 
-        if (!storage.isUserExists(user.getId())) {
+        if (!storage.userExists(user.getId())) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, user.getId()));
         }
 
@@ -61,11 +61,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend(Long id, Long friendId) {
-        if (!storage.isUserExists(id)) {
+        if (!storage.userExists(id)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
         }
 
-        if (!storage.isUserExists(friendId)) {
+        if (!storage.userExists(friendId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, friendId));
         }
 
@@ -78,11 +78,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeFriend(Long id, Long friendId) {
-        if (!storage.isUserExists(id)) {
+        if (!storage.userExists(id)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
         }
 
-        if (!storage.isUserExists(friendId)) {
+        if (!storage.userExists(friendId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, friendId));
         }
 
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getFriends(Long id) {
-        if (!storage.isUserExists(id)) {
+        if (!storage.userExists(id)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
         }
 
@@ -100,11 +100,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getCommonFriends(Long id, Long otherId) {
-        if (!storage.isUserExists(id)) {
+        if (!storage.userExists(id)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
         }
 
-        if (!storage.isUserExists(otherId)) {
+        if (!storage.userExists(otherId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, otherId));
         }
 

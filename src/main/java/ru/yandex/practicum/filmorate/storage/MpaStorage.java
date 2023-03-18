@@ -25,5 +25,5 @@ public interface MpaStorage {
      * @param id
      * @return true or false
      */
-    boolean isMpaRatingExists(Integer id);
+    boolean mpaRatingExists(Integer id);
 }

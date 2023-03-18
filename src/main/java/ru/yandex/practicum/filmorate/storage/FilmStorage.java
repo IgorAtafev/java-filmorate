@@ -61,5 +61,5 @@ public interface FilmStorage {
      * @param id
      * @return true or false
      */
-    boolean isFilmExists(Long id);
+    boolean filmExists(Long id);
 }

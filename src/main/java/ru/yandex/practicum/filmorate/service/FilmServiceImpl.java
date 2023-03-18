@@ -43,7 +43,7 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException(EMPTY_ID_ON_CREATION);
         }
 
-        if (!mpaStorage.isMpaRatingExists(film.getMpa().getId())) {
+        if (!mpaStorage.mpaRatingExists(film.getMpa().getId())) {
             throw new NotFoundException(String.format(MPA_RATING_DOES_NOT_EXIST, film.getMpa().getId()));
         }
 
@@ -56,11 +56,11 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
         }
 
-        if (!filmStorage.isFilmExists(film.getId())) {
+        if (!filmStorage.filmExists(film.getId())) {
             throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, film.getId()));
         }
 
-        if (!mpaStorage.isMpaRatingExists(film.getMpa().getId())) {
+        if (!mpaStorage.mpaRatingExists(film.getMpa().getId())) {
             throw new NotFoundException(String.format(MPA_RATING_DOES_NOT_EXIST, film.getMpa().getId()));
         }
 
@@ -69,11 +69,11 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(Long id, Long userId) {
-        if (!filmStorage.isFilmExists(id)) {
+        if (!filmStorage.filmExists(id)) {
             throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
         }
 
-        if (!userStorage.isUserExists(userId)) {
+        if (!userStorage.userExists(userId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
 
@@ -82,11 +82,11 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void removeLike(Long id, Long userId) {
-        if (!filmStorage.isFilmExists(id)) {
+        if (!filmStorage.filmExists(id)) {
             throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
         }
 
-        if (!userStorage.isUserExists(userId)) {
+        if (!userStorage.userExists(userId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
 

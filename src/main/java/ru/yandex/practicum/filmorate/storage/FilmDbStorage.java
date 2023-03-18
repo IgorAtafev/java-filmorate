@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,7 +22,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@Primary
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
@@ -127,7 +125,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public boolean isFilmExists(Long id) {
+    public boolean filmExists(Long id) {
         String sqlQuery = "SELECT 1 FROM films WHERE id = ?";
 
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);

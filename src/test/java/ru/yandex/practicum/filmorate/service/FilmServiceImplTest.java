@@ -98,12 +98,12 @@ class FilmServiceImplTest {
         Film film = initFilm();
         film.getMpa().setId(mpaId);
 
-        when(mpaStorage.isMpaRatingExists(mpaId)).thenReturn(true);
+        when(mpaStorage.mpaRatingExists(mpaId)).thenReturn(true);
         when(filmStorage.createFilm(film)).thenReturn(film);
 
         assertEquals(film, filmService.createFilm(film));
 
-        verify(mpaStorage, times(1)).isMpaRatingExists(mpaId);
+        verify(mpaStorage, times(1)).mpaRatingExists(mpaId);
         verify(filmStorage, times(1)).createFilm(film);
     }
 
@@ -127,14 +127,14 @@ class FilmServiceImplTest {
         Film film = initFilm();
         film.getMpa().setId(mpaId);
 
-        when(mpaStorage.isMpaRatingExists(mpaId)).thenReturn(false);
+        when(mpaStorage.mpaRatingExists(mpaId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.createFilm(film)
         );
 
-        verify(mpaStorage, times(1)).isMpaRatingExists(mpaId);
+        verify(mpaStorage, times(1)).mpaRatingExists(mpaId);
         verify(filmStorage, never()).createFilm(film);
     }
 
@@ -146,14 +146,14 @@ class FilmServiceImplTest {
         film.setId(filmId);
         film.getMpa().setId(mpaId);
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(true);
-        when(mpaStorage.isMpaRatingExists(mpaId)).thenReturn(true);
+        when(filmStorage.filmExists(filmId)).thenReturn(true);
+        when(mpaStorage.mpaRatingExists(mpaId)).thenReturn(true);
         when(filmStorage.updateFilm(film)).thenReturn(film);
 
         assertEquals(film, filmService.updateFilm(film));
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(mpaStorage, times(1)).isMpaRatingExists(mpaId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(mpaStorage, times(1)).mpaRatingExists(mpaId);
         verify(filmStorage, times(1)).updateFilm(film);
     }
 
@@ -176,15 +176,15 @@ class FilmServiceImplTest {
         Film film = initFilm();
         film.setId(filmId);
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(false);
+        when(filmStorage.filmExists(filmId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.updateFilm(film)
         );
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(mpaStorage, never()).isMpaRatingExists(mpaId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(mpaStorage, never()).mpaRatingExists(mpaId);
         verify(filmStorage, never()).updateFilm(film);
     }
 
@@ -196,16 +196,16 @@ class FilmServiceImplTest {
         film.setId(filmId);
         film.getMpa().setId(mpaId);
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(true);
-        when(mpaStorage.isMpaRatingExists(mpaId)).thenReturn(false);
+        when(filmStorage.filmExists(filmId)).thenReturn(true);
+        when(mpaStorage.mpaRatingExists(mpaId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.updateFilm(film)
         );
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(mpaStorage, times(1)).isMpaRatingExists(mpaId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(mpaStorage, times(1)).mpaRatingExists(mpaId);
         verify(filmStorage, never()).updateFilm(film);
     }
 
@@ -214,13 +214,13 @@ class FilmServiceImplTest {
         Long filmId = 1L;
         Long userId = 1L;
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(true);
-        when(userStorage.isUserExists(userId)).thenReturn(true);
+        when(filmStorage.filmExists(filmId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
 
         filmService.addLike(filmId, userId);
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(userStorage, times(1)).isUserExists(userId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(userStorage, times(1)).userExists(userId);
         verify(filmStorage, times(1)).addLike(filmId, userId);
     }
 
@@ -229,15 +229,15 @@ class FilmServiceImplTest {
     void addLike_shouldThrowAnException_ifFilmDoesNotExist(Long filmId) {
         Long userId = 1L;
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(false);
+        when(filmStorage.filmExists(filmId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.addLike(filmId, userId)
         );
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(userStorage, never()).isUserExists(userId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(userStorage, never()).userExists(userId);
         verify(filmStorage, never()).addLike(filmId, userId);
     }
 
@@ -246,16 +246,16 @@ class FilmServiceImplTest {
     void addLike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long filmId = 1L;
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(true);
-        when(userStorage.isUserExists(userId)).thenReturn(false);
+        when(filmStorage.filmExists(filmId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.addLike(filmId, userId)
         );
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(userStorage, times(1)).isUserExists(userId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(userStorage, times(1)).userExists(userId);
         verify(filmStorage, never()).addLike(filmId, userId);
     }
 
@@ -264,13 +264,13 @@ class FilmServiceImplTest {
         Long filmId = 1L;
         Long userId = 1L;
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(true);
-        when(userStorage.isUserExists(userId)).thenReturn(true);
+        when(filmStorage.filmExists(filmId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
 
         filmService.removeLike(filmId, userId);
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(userStorage, times(1)).isUserExists(userId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(userStorage, times(1)).userExists(userId);
         verify(filmStorage, times(1)).removeLike(filmId, userId);
     }
 
@@ -279,15 +279,15 @@ class FilmServiceImplTest {
     void removeLike_shouldThrowAnException_ifFilmDoesNotExist(Long filmId) {
         Long userId = 1L;
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(false);
+        when(filmStorage.filmExists(filmId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.removeLike(filmId, userId)
         );
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(userStorage, never()).isUserExists(userId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(userStorage, never()).userExists(userId);
         verify(filmStorage, never()).removeLike(filmId, userId);
     }
 
@@ -296,16 +296,16 @@ class FilmServiceImplTest {
     void removeLike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
         Long filmId = 1L;
 
-        when(filmStorage.isFilmExists(filmId)).thenReturn(true);
-        when(userStorage.isUserExists(userId)).thenReturn(false);
+        when(filmStorage.filmExists(filmId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(false);
 
         assertThrows(
                 NotFoundException.class,
                 () -> filmService.removeLike(filmId, userId)
         );
 
-        verify(filmStorage, times(1)).isFilmExists(filmId);
-        verify(userStorage, times(1)).isUserExists(userId);
+        verify(filmStorage, times(1)).filmExists(filmId);
+        verify(userStorage, times(1)).userExists(userId);
         verify(filmStorage, never()).removeLike(filmId, userId);
     }
 

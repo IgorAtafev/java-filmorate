@@ -68,5 +68,5 @@ public interface UserStorage {
      * @param id
      * @return true or false
      */
-    boolean isUserExists(Long id);
+    boolean userExists(Long id);
 }

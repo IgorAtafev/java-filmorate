@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Primary
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
@@ -117,7 +115,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean isUserExists(Long id) {
+    public boolean userExists(Long id) {
         String sqlQuery = "SELECT 1 FROM users WHERE id = ?";
 
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
