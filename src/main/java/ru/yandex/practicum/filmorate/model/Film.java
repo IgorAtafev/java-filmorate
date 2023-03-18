@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -25,7 +27,7 @@ public class Film {
     private Long id;
 
     @NotBlank(message = "Name cannot be empty")
-    @Size(min = 3, max = 50, message = "Name must contain at least 3 and no more than 50 characters")
+    @Size(max = 100, message = "Name must be no more than 100 characters")
     private String name;
 
     @NotNull(message = "Description cannot be null")
@@ -39,7 +41,13 @@ public class Film {
     @Positive(message = "Duration must be positive")
     private int duration;
 
+    @NotNull
+    private Mpa mpa;
+
     private final Set<Long> likes = new HashSet<>();
+
+    @JsonDeserialize(as = LinkedHashSet.class)
+    private final Set<Genre> genres = new HashSet<>();
 
     public Collection<Long> getLikes() {
         return Collections.unmodifiableSet(likes);
@@ -51,5 +59,13 @@ public class Film {
 
     public void removeLike(Long id) {
         likes.remove(id);
+    }
+
+    public Collection<Genre> getGenres() {
+        return Collections.unmodifiableSet(genres);
+    }
+
+    public void addGenres(Long id, Collection<Genre> otherGenres) {
+        genres.addAll(otherGenres);
     }
 }

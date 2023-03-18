@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -62,6 +62,8 @@ class FilmControllerTest {
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getFilms();
     }
 
     @Test
@@ -77,6 +79,8 @@ class FilmControllerTest {
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getFilms();
     }
 
     @Test
@@ -90,6 +94,8 @@ class FilmControllerTest {
         mockMvc.perform(get("/films/{id}", filmId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getFilmById(filmId);
     }
 
     @ParameterizedTest
@@ -99,6 +105,8 @@ class FilmControllerTest {
 
         mockMvc.perform(get("/films/{id}", filmId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getFilmById(filmId);
     }
 
     @Test
@@ -110,6 +118,8 @@ class FilmControllerTest {
 
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isOk());
+
+        verify(service, times(1)).createFilm(film);
     }
 
     @ParameterizedTest
@@ -132,6 +142,8 @@ class FilmControllerTest {
 
         mockMvc.perform(put("/films").contentType("application/json").content(json))
                 .andExpect(status().isOk());
+
+        verify(service, times(1)).updateFilm(film);
     }
 
     @ParameterizedTest
@@ -150,8 +162,6 @@ class FilmControllerTest {
         Long filmId = 1L;
         Long userId = 1L;
 
-        doNothing().when(service).addLike(filmId, userId);
-
         mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isOk());
 
@@ -167,6 +177,8 @@ class FilmControllerTest {
 
         mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).addLike(filmId, userId);
     }
 
     @ParameterizedTest
@@ -178,14 +190,14 @@ class FilmControllerTest {
 
         mockMvc.perform(put("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).addLike(filmId, userId);
     }
 
     @Test
     void removeLike_shouldResponseWithOk() throws Exception {
         Long filmId = 1L;
         Long userId = 1L;
-
-        doNothing().when(service).removeLike(filmId, userId);
 
         mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isOk());
@@ -202,6 +214,8 @@ class FilmControllerTest {
 
         mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).removeLike(filmId, userId);
     }
 
     @ParameterizedTest
@@ -213,6 +227,8 @@ class FilmControllerTest {
 
         mockMvc.perform(delete("/films/{id}/like/{userId}", filmId, userId))
                 .andExpect(status().isNotFound());
+
+        verify(service, times(1)).removeLike(filmId, userId);
     }
 
     @Test
@@ -220,50 +236,60 @@ class FilmControllerTest {
         mockMvc.perform(get("/films/popular"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getPopular(10);
     }
 
     @Test
     void getPopular_shouldReturnListOfPopularFilmsByNumberOfLikes() throws Exception {
+        int count = 2;
         Film film1 = initFilm();
         Film film2 = initFilm();
 
         List<Film> expected = List.of(film1, film2);
         String json = objectMapper.writeValueAsString(expected);
 
-        when(service.getPopular(2)).thenReturn(expected);
+        when(service.getPopular(count)).thenReturn(expected);
 
-        mockMvc.perform(get("/films/popular?count={count}", 2))
+        mockMvc.perform(get("/films/popular?count={count}", count))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
+
+        verify(service, times(1)).getPopular(count);
     }
 
     private static Stream<Arguments> provideInvalidFilms() {
         return Stream.of(
                 Arguments.of(initFilm(film -> film.setName(null))),
                 Arguments.of(initFilm(film -> film.setName(""))),
-                Arguments.of(initFilm(film -> film.setName("ni"))),
-                Arguments.of(initFilm(film -> film.setName("nisi eiusm".repeat(5) + "o"))),
+                Arguments.of(initFilm(film -> film.setName("nisi eiusm".repeat(10) + "o"))),
                 Arguments.of(initFilm(film -> film.setDescription(null))),
                 Arguments.of(initFilm(film -> film.setDescription("long strin".repeat(20) + "g"))),
                 Arguments.of(initFilm(film -> film.setReleaseDate(null))),
                 Arguments.of(initFilm(film -> film.setReleaseDate(LocalDate.parse("1000-01-01")))),
                 Arguments.of(initFilm(film -> film.setDuration(0))),
-                Arguments.of(initFilm(film -> film.setDuration(-100)))
+                Arguments.of(initFilm(film -> film.setDuration(-100))),
+                Arguments.of(initFilm(film -> film.setMpa(null)))
         );
     }
 
     private static Film initFilm(Consumer<Film> consumer) {
         Film film = initFilm();
+
         consumer.accept(film);
+
         return film;
     }
 
     private static Film initFilm() {
         Film film = new Film();
+
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
         film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa());
+
         return film;
     }
 }

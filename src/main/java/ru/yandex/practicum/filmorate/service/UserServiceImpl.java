@@ -7,14 +7,17 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
+    private static final String EMPTY_ID_ON_CREATION = "The user must have an empty ID when created";
+    private static final String NOT_EMPTY_ID_ON_UPDATE = "The user must not have an empty ID when updating";
+    private static final String USER_CANNOT_ADD_HIMSELF_AS_FRIEND = "The user cannot add himself as a friend";
 
     private final UserStorage storage;
 
@@ -26,14 +29,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return storage.getUserById(id).orElseThrow(
-                () -> new NotFoundException(String.format("User width id %d does not exist", id))
+                () -> new NotFoundException(String.format(USER_DOES_NOT_EXIST, id))
         );
     }
 
     @Override
     public User createUser(User user) {
         if (!isIdValueNull(user)) {
-            throw new ValidationException("The user must have an empty ID when created");
+            throw new ValidationException(EMPTY_ID_ON_CREATION);
         }
 
         changeNameToLogin(user);
@@ -44,14 +47,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user) {
         if (isIdValueNull(user)) {
-            throw new ValidationException("The user must not have an empty ID when updating");
+            throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
         }
 
-        /**
-         * Checks if a user exists by id
-         * If the user is not found throws NotFoundException
-         */
-        getUserById(user.getId());
+        if (!storage.userExists(user.getId())) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, user.getId()));
+        }
 
         changeNameToLogin(user);
 
@@ -60,47 +61,54 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend(Long id, Long friendId) {
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
-
-        if (Objects.equals(id, friendId)) {
-            throw new ValidationException("The user cannot add himself as a friend");
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
         }
 
-        storage.addFriend(user, friend);
-        storage.addFriend(friend, user);
+        if (!storage.userExists(friendId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, friendId));
+        }
+
+        if (Objects.equals(id, friendId)) {
+            throw new ValidationException(USER_CANNOT_ADD_HIMSELF_AS_FRIEND);
+        }
+
+        storage.addFriend(id, friendId);
     }
 
     @Override
     public void removeFriend(Long id, Long friendId) {
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
 
-        storage.removeFriend(user, friend);
-        storage.removeFriend(friend, user);
+        if (!storage.userExists(friendId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, friendId));
+        }
+
+        storage.removeFriend(id, friendId);
     }
 
     @Override
     public List<User> getFriends(Long id) {
-        User user = getUserById(id);
-        Collection<Long> friendIds = storage.getFriends(user);
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
 
-        return friendIds.stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        return storage.getFriends(id);
     }
 
     @Override
     public List<User> getCommonFriends(Long id, Long otherId) {
-        User user = getUserById(id);
-        User other = getUserById(otherId);
-        Collection<Long> friendIds = storage.getFriends(user);
-        Collection<Long> otherFriendIds = storage.getFriends(other);
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
 
-        return friendIds.stream()
-                .filter(otherFriendIds::contains)
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        if (!storage.userExists(otherId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, otherId));
+        }
+
+        return storage.getCommonFriends(id, otherId);
     }
 
     private void changeNameToLogin(User user) {
