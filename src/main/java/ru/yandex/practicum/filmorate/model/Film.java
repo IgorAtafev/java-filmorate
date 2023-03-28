@@ -65,7 +65,7 @@ public class Film {
         return Collections.unmodifiableSet(genres);
     }
 
-    public void addGenres(Long id, Collection<Genre> otherGenres) {
+    public void addGenres(Collection<Genre> otherGenres) {
         genres.addAll(otherGenres);
     }
 }

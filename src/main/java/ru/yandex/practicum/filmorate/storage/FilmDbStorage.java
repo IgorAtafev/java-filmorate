@@ -186,7 +186,7 @@ public class FilmDbStorage implements FilmStorage {
         mpa.setName(resultSet.getString("mpa_name"));
         film.setMpa(mpa);
 
-        film.addGenres(film.getId(), genreStorage.getGenresByFilmId(film.getId()));
+        film.addGenres(genreStorage.getGenresByFilmId(film.getId()));
 
         return film;
     }
