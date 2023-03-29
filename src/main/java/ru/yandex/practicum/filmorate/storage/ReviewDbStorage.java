@@ -74,7 +74,7 @@ public class ReviewDbStorage implements ReviewStorage {
             return ps;
         }, generatedKeyHolder);
 
-        review.setReviewId(generatedKeyHolder.getKey().longValue());
+        review.setId(generatedKeyHolder.getKey().longValue());
 
         return review;
     }
@@ -85,9 +85,9 @@ public class ReviewDbStorage implements ReviewStorage {
                 "SET content = ?, is_positive = ? " +
                 "WHERE id = ?";
 
-        jdbcTemplate.update(sqlQuery, review.getContent(), review.getPositive(), review.getReviewId());
+        jdbcTemplate.update(sqlQuery, review.getContent(), review.getPositive(), review.getId());
 
-        return getReviewById(review.getReviewId()).get();
+        return getReviewById(review.getId()).get();
     }
 
     @Override
@@ -159,7 +159,7 @@ public class ReviewDbStorage implements ReviewStorage {
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
         Review review = new Review();
 
-        review.setReviewId(resultSet.getLong("id"));
+        review.setId(resultSet.getLong("id"));
         review.setContent(resultSet.getString("content"));
         review.setPositive(resultSet.getBoolean("is_positive"));
         review.setFilmId(resultSet.getLong("film_id"));

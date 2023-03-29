@@ -64,8 +64,8 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
         }
 
-        if (!reviewStorage.reviewExists(review.getReviewId())) {
-            throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, review.getReviewId()));
+        if (!reviewStorage.reviewExists(review.getId())) {
+            throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, review.getId()));
         }
 
         return reviewStorage.updateReview(review);
@@ -107,6 +107,6 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private boolean isIdValueNull(Review review) {
-        return review.getReviewId() == null;
+        return review.getId() == null;
     }
 }
