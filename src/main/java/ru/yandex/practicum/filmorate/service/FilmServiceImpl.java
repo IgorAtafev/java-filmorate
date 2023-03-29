@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -20,10 +21,12 @@ public class FilmServiceImpl implements FilmService {
     private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
     private static final String EMPTY_ID_ON_CREATION = "The film must have an empty ID when created";
     private static final String NOT_EMPTY_ID_ON_UPDATE = "The film must not have an empty ID when updating";
+    private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d  does not exist";
 
     private final FilmStorage filmStorage;
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
+    final private DirectorStorage directorStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -96,6 +99,14 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getPopular(int count) {
         return filmStorage.getPopular(count);
+    }
+
+    @Override
+    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
+        if (!directorStorage.directorExists(directorId)) {
+            throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));
+        }
+        return filmStorage.getFilmsForDirector(directorId, sortBy);
     }
 
     private boolean isIdValueNull(Film film) {

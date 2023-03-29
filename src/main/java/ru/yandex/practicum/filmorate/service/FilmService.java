@@ -57,4 +57,12 @@ public interface FilmService {
      * @return list of popular films
      */
     List<Film> getPopular(int count);
+
+    /**
+     * Returns a list of films for director, sorted by likes or year
+     * @param directorId director's id
+     * @param sortBy sorted type (likes or year)
+     * @return list of films
+     */
+    List<Film> getFilmsForDirector(Long directorId, String sortBy);
 }
