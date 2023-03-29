@@ -147,8 +147,8 @@ public class FilmDbStorage implements FilmStorage {
                     "ORDER BY EXTRACT(YEAR FROM f.release_date)");
         } else {
             sqlQuery = String.format(sqlTemplate, "LEFT JOIN film_likes fl ON fl.film_id =f.id \n" +
-                    "WHERE fd.director_ID = ? \n"+
-                    "GROUP BY f.id \n"+
+                    "WHERE fd.director_ID = ? \n" +
+                    "GROUP BY f.id \n" +
                     "ORDER BY COUNT(f.id)");
         }
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
