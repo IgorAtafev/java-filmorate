@@ -26,7 +26,7 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
-    final private DirectorStorage directorStorage;
+    private final DirectorStorage directorStorage;
 
     @Override
     public List<Film> getFilms() {
