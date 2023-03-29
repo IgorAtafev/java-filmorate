@@ -89,7 +89,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void addLike(Long id, Long userId) {
+    public void addLike(Long id, Long userId, boolean isUseful) {
         if (!reviewStorage.reviewExists(id)) {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
         }
@@ -98,11 +98,11 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
 
-        reviewStorage.addLike(id, userId);
+        reviewStorage.addLike(id, userId, isUseful);
     }
 
     @Override
-    public void removeLike(Long id, Long userId) {
+    public void removeLike(Long id, Long userId, boolean isUseful) {
         if (!reviewStorage.reviewExists(id)) {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
         }
@@ -111,33 +111,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
 
-        reviewStorage.removeLike(id, userId);
-    }
-
-    @Override
-    public void addDisLike(Long id, Long userId) {
-        if (!reviewStorage.reviewExists(id)) {
-            throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
-        }
-
-        if (!userStorage.userExists(userId)) {
-            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
-        }
-
-        reviewStorage.addDisLike(id, userId);
-    }
-
-    @Override
-    public void removeDisLike(Long id, Long userId) {
-        if (!reviewStorage.reviewExists(id)) {
-            throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
-        }
-
-        if (!userStorage.userExists(userId)) {
-            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
-        }
-
-        reviewStorage.removeDisLike(id, userId);
+        reviewStorage.removeLike(id, userId, isUseful);
     }
 
     private boolean isIdValueNull(Review review) {

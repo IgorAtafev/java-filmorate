@@ -17,7 +17,7 @@ public class Review {
     private Long reviewId;
 
     @NotNull(message = "Content cannot be null")
-    @Pattern(regexp = "^\\S{2,200}$", message = "Content must contain at least 2 and no more than 200 characters")
+    @Pattern(regexp = "^\\S{2,500}$", message = "Content must contain at least 2 and no more than 500 characters")
     private String content;
 
     @NotNull(message = "Review type cannot be null")

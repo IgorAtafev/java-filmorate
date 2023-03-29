@@ -48,30 +48,16 @@ public interface ReviewService {
      * If the review or user is not found throws NotFoundException
      * @param id
      * @param userId
+     * @param isUseful
      */
-    void addLike(Long id, Long userId);
+    void addLike(Long id, Long userId, boolean isUseful);
 
     /**
      * Removes a user like to a review
      * If the review or user is not found throws NotFoundException
      * @param id
      * @param userId
+     * @param isUseful
      */
-    void removeLike(Long id, Long userId);
-
-    /**
-     * Adds a user dislike to a review
-     * If the review or user is not found throws NotFoundException
-     * @param id
-     * @param userId
-     */
-    void addDisLike(Long id, Long userId);
-
-    /**
-     * Removes a user dislike to a review
-     * If the review or user is not found throws NotFoundException
-     * @param id
-     * @param userId
-     */
-    void removeDisLike(Long id, Long userId);
+    void removeLike(Long id, Long userId, boolean isUseful);
 }
