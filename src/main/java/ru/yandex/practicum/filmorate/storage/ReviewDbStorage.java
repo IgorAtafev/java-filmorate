@@ -25,6 +25,7 @@ public class ReviewDbStorage implements ReviewStorage {
     public List<Review> getReviews(int count) {
         String sqlQuery = "SELECT * " +
                 "FROM reviews " +
+                "ORDER BY useful DESC " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
@@ -35,6 +36,7 @@ public class ReviewDbStorage implements ReviewStorage {
         String sqlQuery = "SELECT * " +
                 "FROM reviews " +
                 "WHERE film_id = ? " +
+                "ORDER BY useful DESC " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, filmId, count);
@@ -65,7 +67,7 @@ public class ReviewDbStorage implements ReviewStorage {
             PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
 
             ps.setString(1, review.getContent());
-            ps.setBoolean(2, review.isPositive());
+            ps.setBoolean(2, review.getPositive());
             ps.setLong(3, review.getFilmId());
             ps.setLong(4, review.getUserId());
 
@@ -80,24 +82,23 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review updateReview(Review review) {
         String sqlQuery = "UPDATE reviews " +
-                "SET content = ?, is_positive = ?, film_id = ?, user_id = ? " +
+                "SET content = ?, is_positive = ? " +
                 "WHERE id = ?";
 
-        jdbcTemplate.update(sqlQuery, review.getContent(), review.isPositive(), review.getFilmId(),
-                review.getUserId(), review.getReviewId());
+        jdbcTemplate.update(sqlQuery, review.getContent(), review.getPositive(), review.getReviewId());
 
-        return review;
+        return getReviewById(review.getReviewId()).get();
     }
 
     @Override
     public void removeReviewById(Long id) {
-        String sqlQuery = "DELETE FROM reviews " +
-                "WHERE id = ?";
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE review_id = ?";
 
         jdbcTemplate.update(sqlQuery, id);
 
-        sqlQuery = "DELETE FROM review_likes " +
-                "WHERE review_id = ?";
+        sqlQuery = "DELETE FROM reviews " +
+                "WHERE id = ?";
 
         jdbcTemplate.update(sqlQuery, id);
     }

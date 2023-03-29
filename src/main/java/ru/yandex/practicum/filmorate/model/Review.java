@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -17,11 +18,12 @@ public class Review {
     private Long reviewId;
 
     @NotNull(message = "Content cannot be null")
-    @Pattern(regexp = "^\\S{2,500}$", message = "Content must contain at least 2 and no more than 500 characters")
+    @Size(min = 2, max = 500, message = "Content must contain at least 2 and no more than 500 characters")
     private String content;
 
     @NotNull(message = "Review type cannot be null")
-    private boolean isPositive;
+    @JsonProperty("isPositive")
+    private Boolean positive;
 
     @NotNull(message = "Film id cannot be null")
     private Long filmId;

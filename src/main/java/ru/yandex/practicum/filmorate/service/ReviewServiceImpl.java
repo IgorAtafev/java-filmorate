@@ -68,14 +68,6 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, review.getReviewId()));
         }
 
-        if (!filmStorage.filmExists(review.getFilmId())) {
-            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, review.getFilmId()));
-        }
-
-        if (!userStorage.userExists(review.getUserId())) {
-            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, review.getUserId()));
-        }
-
         return reviewStorage.updateReview(review);
     }
 

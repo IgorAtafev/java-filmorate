@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   is_positive boolean NOT NULL,
   film_id bigint NOT NULL REFERENCES films (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
   user_id bigint NOT NULL REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  useful int NOT NULL
+  useful int NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS review_likes (
