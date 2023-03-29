@@ -17,7 +17,7 @@ public class DirectorServiceImpl implements DirectorService {
     private static final String NOT_EMPTY_ID_ON_UPDATE = "The director must not have an empty ID when updating";
     private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d  does not exist";
 
-    final private DirectorStorage storage;
+    private final DirectorStorage storage;
 
 
     @Override
