@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class DirectorServiceTest {
     @Mock
@@ -33,6 +34,7 @@ class DirectorServiceTest {
 
         verify(storage, times(1)).getDirectors();
     }
+
     @Test
     void getDirectors_shouldReturnListOfDirectors() {
         Director director1 = initDirector(1);
@@ -122,6 +124,7 @@ class DirectorServiceTest {
         verify(storage, times(1)).directorExists(directorId);
         verify(storage, never()).update(director);
     }
+
     @Test
     void deleteDirector_shouldDeleteTheDirector() {
         Long directorId = 1L;

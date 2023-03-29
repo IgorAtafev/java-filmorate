@@ -8,6 +8,7 @@ public interface FilmService {
 
     /**
      * Returns a list of all films
+     *
      * @return list of all films
      */
     List<Film> getFilms();
@@ -15,6 +16,7 @@ public interface FilmService {
     /**
      * Returns film by id
      * If the film is not found throws NotFoundException
+     *
      * @param id
      * @return film by id
      */
@@ -22,6 +24,7 @@ public interface FilmService {
 
     /**
      * Creates a new film
+     *
      * @param film
      * @return new film
      */
@@ -29,6 +32,7 @@ public interface FilmService {
 
     /**
      * Updates the film
+     *
      * @param film
      * @return updated film
      */
@@ -37,6 +41,7 @@ public interface FilmService {
     /**
      * Adds a user like to a film
      * If the film or user is not found throws NotFoundException
+     *
      * @param id
      * @param userId
      */
@@ -45,6 +50,7 @@ public interface FilmService {
     /**
      * Removes a user like to a film
      * If the film or user is not found throws NotFoundException
+     *
      * @param id
      * @param userId
      */
@@ -53,6 +59,7 @@ public interface FilmService {
     /**
      * Returns a list of popular films by number of likes
      * The number of films is set by the parameter count
+     *
      * @param count
      * @return list of popular films
      */
@@ -60,8 +67,9 @@ public interface FilmService {
 
     /**
      * Returns a list of films for director, sorted by likes or year
+     *
      * @param directorId director's id
-     * @param sortBy sorted type (likes or year)
+     * @param sortBy     sorted type (likes or year)
      * @return list of films
      */
     List<Film> getFilmsForDirector(Long directorId, String sortBy);
