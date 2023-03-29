@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,6 +78,13 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.addFriend(id, friendId);
+        storage.addEvent(Event.builder()
+                .userId(id)
+                .entityId(friendId)
+                .eventType("FRIEND")
+                .operation("ADD")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
@@ -87,6 +98,13 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.removeFriend(id, friendId);
+        storage.addEvent(Event.builder()
+                .userId(id)
+                .entityId(friendId)
+                .eventType("FRIEND")
+                .operation("REMOVE")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
@@ -109,6 +127,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return storage.getCommonFriends(id, otherId);
+    }
+
+    @Override
+    public List<Event> getUserEvents(Long id) {
+        return storage.getUserEvents(id);
     }
 
     private void changeNameToLogin(User user) {

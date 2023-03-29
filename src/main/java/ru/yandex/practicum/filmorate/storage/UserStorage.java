@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -69,4 +70,18 @@ public interface UserStorage {
      * @return true or false
      */
     boolean userExists(Long id);
+
+    /**
+     * Returns a list of user events
+     * @param id
+     * @return list of user events
+     */
+    List<Event> getUserEvents(Long id);
+
+    /**
+     * Adds an event to the database
+     * @param Event
+     * @return Event
+     */
+    Event addEvent(Event event);
 }

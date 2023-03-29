@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -66,4 +67,12 @@ public interface UserService {
      * @return list of common friends of the user
      */
     List<User> getCommonFriends(Long id, Long otherId);
+
+    /**
+     * Returns a list of user events
+     * If the events is not found it will return an empty list
+     * @param id
+     * @return list of user events
+     */
+    List<Event> getUserEvents(Long id);
 }

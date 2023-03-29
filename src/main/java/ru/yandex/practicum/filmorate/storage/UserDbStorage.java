@@ -2,18 +2,20 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -48,15 +50,15 @@ public class UserDbStorage implements UserStorage {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(conn -> {
-                    PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
 
-                    ps.setString(1, user.getEmail());
-                    ps.setString(2, user.getLogin());
-                    ps.setString(3, user.getName());
-                    ps.setDate(4, Date.valueOf(user.getBirthday()));
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getName());
+            ps.setDate(4, Date.valueOf(user.getBirthday()));
 
-                    return ps;
-                }, generatedKeyHolder);
+            return ps;
+        }, generatedKeyHolder);
 
         Long id = generatedKeyHolder.getKey().longValue();
 
@@ -121,6 +123,69 @@ public class UserDbStorage implements UserStorage {
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         return row.next();
+    }
+
+    @Override
+    public Event addEvent(Event event) {
+        String sqlQuery = "INSERT INTO events " +
+                "(timestamp, " +
+                "user_id, " +
+                "event_type, " +
+                "operation, " +
+                "entity_id) " +
+                "VALUES (?, " +
+                "?, " +
+                "(SELECT id FROM event_types WHERE event_type_name = ?), " +
+                "(SELECT id FROM operations WHERE operation_name = ?), " +
+                "?)";
+
+        KeyHolder holder = new GeneratedKeyHolder();
+        PreparedStatementCreator preparedStatement = con -> {
+            PreparedStatement ps = con.prepareStatement(sqlQuery, new String[]{"event_id"});
+            ps.setLong(1, event.getTimestamp());
+            ps.setLong(2, event.getUserId());
+            ps.setString(3, event.getEventType());
+            ps.setString(4, event.getOperation());
+            ps.setLong(5, event.getEntityId());
+            return ps;
+        };
+        jdbcTemplate.update(preparedStatement, holder);
+        long eventId = Objects.requireNonNull(holder.getKey()).longValue();
+        if (eventId == 0) {
+            return null;
+        }
+        return event.withEventId(eventId);
+    }
+
+    @Override
+    public List<Event> getUserEvents(Long id) {
+        String sqlQuery = "SELECT e.timestamp, " +
+                "e.user_id, " +
+                "et.event_type_name, " +
+                "o.operation_name, " +
+                "e.event_id, " +
+                "e.entity_id " +
+                "FROM events e " +
+                "LEFT JOIN event_types et ON e.event_type = et.id " +
+                "LEFT JOIN operations o ON e.operation = o.id " +
+                "WHERE e.user_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToEvent, id);
+    }
+
+    public void removeEvent(Long userId) {
+        String sqlQuery = "DELETE FROM events WHERE USER_ID = ?";
+        jdbcTemplate.update(sqlQuery, userId);
+    }
+
+    private Event mapRowToEvent(ResultSet resultSet, int rowNum) throws SQLException {
+        return Event.builder()
+                .timestamp(resultSet.getLong("timestamp"))
+                .userId(resultSet.getLong("user_id"))
+                .eventType(resultSet.getString("event_type_name"))
+                .operation(resultSet.getString("operation_name"))
+                .eventId(resultSet.getLong("event_id"))
+                .entityId(resultSet.getLong("entity_id"))
+                .build();
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
