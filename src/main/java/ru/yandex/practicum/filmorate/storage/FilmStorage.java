@@ -62,4 +62,11 @@ public interface FilmStorage {
      * @return true or false
      */
     boolean filmExists(Long id);
+    /**
+     * Returns a list of films for director, sorted by likes or year
+     * @param directorId director's id
+     * @param sortBy sorted type (likes or year)
+     * @return list of films
+     */
+    List<Film> getFilmsForDirector(Long directorId, String sortBy);
 }
