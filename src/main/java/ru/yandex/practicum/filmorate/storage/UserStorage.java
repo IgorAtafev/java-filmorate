@@ -9,12 +9,14 @@ public interface UserStorage {
 
     /**
      * Returns a list of all users
+     *
      * @return list of all users
      */
     List<User> getUsers();
 
     /**
      * Returns a user by id
+     *
      * @param id
      * @return user or null if there was no one
      */
@@ -22,6 +24,7 @@ public interface UserStorage {
 
     /**
      * Creates a new user
+     *
      * @param user
      * @return new user
      */
@@ -29,6 +32,7 @@ public interface UserStorage {
 
     /**
      * Updates the user
+     *
      * @param user
      * @return updated user
      */
@@ -36,6 +40,7 @@ public interface UserStorage {
 
     /**
      * Adds a user as a friend
+     *
      * @param id
      * @param friendId
      */
@@ -43,6 +48,7 @@ public interface UserStorage {
 
     /**
      * Removes a user as a friend
+     *
      * @param id
      * @param friendId
      */
@@ -50,6 +56,7 @@ public interface UserStorage {
 
     /**
      * Returns a list of the user's friends
+     *
      * @param id
      * @return list of friends of the user
      */
@@ -57,6 +64,7 @@ public interface UserStorage {
 
     /**
      * Returns a list of common friends of users
+     *
      * @param id
      * @param otherId
      * @return list of common friends of the user
@@ -65,6 +73,7 @@ public interface UserStorage {
 
     /**
      * Checks for the existence of User by id
+     *
      * @param id
      * @return true or false
      */

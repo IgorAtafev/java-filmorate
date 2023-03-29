@@ -8,6 +8,7 @@ public interface GenreService {
 
     /**
      * Returns a list of all genres
+     *
      * @return list of all genres
      */
     List<Genre> getGenres();
@@ -15,6 +16,7 @@ public interface GenreService {
     /**
      * Returns genre by id
      * If the genre is not found throws NotFoundException
+     *
      * @param id
      * @return genre by id
      */

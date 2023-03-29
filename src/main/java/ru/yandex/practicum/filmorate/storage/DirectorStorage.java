@@ -54,6 +54,7 @@ public interface DirectorStorage {
 
     /**
      * Checks for the existence of Director by id
+     *
      * @param id
      * @return true or false
      */
