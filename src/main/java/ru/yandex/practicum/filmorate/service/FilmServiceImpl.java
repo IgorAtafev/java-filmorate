@@ -21,7 +21,7 @@ public class FilmServiceImpl implements FilmService {
     private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
     private static final String EMPTY_ID_ON_CREATION = "The film must have an empty ID when created";
     private static final String NOT_EMPTY_ID_ON_UPDATE = "The film must not have an empty ID when updating";
-    private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d  does not exist";
+    private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d does not exist";
 
     private final FilmStorage filmStorage;
     private final MpaStorage mpaStorage;
