@@ -15,7 +15,8 @@ import javax.validation.constraints.Size;
 @ToString
 public class Review {
 
-    private Long reviewId;
+    @JsonProperty("reviewId")
+    private Long id;
 
     @NotNull(message = "Content cannot be null")
     @Size(min = 2, max = 500, message = "Content must contain at least 2 and no more than 500 characters")

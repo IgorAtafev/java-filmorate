@@ -10,6 +10,9 @@ public interface ReviewService {
      * Returns a list of reviews by film id
      * The number of reviews is set by the parameter count
      * If film id is not specified, returns all reviews
+     *
+     * @param filmId
+     * @param count
      * @return list of reviews
      */
     List<Review> getReviews(Long filmId, int count);
@@ -17,6 +20,7 @@ public interface ReviewService {
     /**
      * Returns review by id
      * If the review is not found throws NotFoundException
+     *
      * @param id
      * @return review by id
      */
@@ -24,6 +28,7 @@ public interface ReviewService {
 
     /**
      * Creates a new review
+     *
      * @param review
      * @return new review
      */
@@ -31,6 +36,7 @@ public interface ReviewService {
 
     /**
      * Updates the review
+     *
      * @param review
      * @return updated review
      */
@@ -39,6 +45,7 @@ public interface ReviewService {
     /**
      * Removes review by id
      * If the review is not found throws NotFoundException
+     *
      * @param id
      */
     void removeReviewById(Long id);
@@ -46,6 +53,7 @@ public interface ReviewService {
     /**
      * Adds a user like to a review
      * If the review or user is not found throws NotFoundException
+     *
      * @param id
      * @param userId
      * @param isUseful
@@ -55,6 +63,7 @@ public interface ReviewService {
     /**
      * Removes a user like to a review
      * If the review or user is not found throws NotFoundException
+     *
      * @param id
      * @param userId
      * @param isUseful
