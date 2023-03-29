@@ -25,17 +25,17 @@ public class DirectorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Director create(@Valid @RequestBody Director obj) {
+    public Director create(@Valid @RequestBody Director director) {
         log.info("Request received POST '/directors' :");
-        log.info("add : {}", obj);
-        return service.create(obj);
+        log.info("add : {}", director);
+        return service.create(director);
     }
 
     @PutMapping
-    public Director update(@Valid @RequestBody Director obj) {
+    public Director update(@Valid @RequestBody Director director) {
         log.info("Request received PUT '/directors' :");
-        log.info("new data : {}", obj);
-        return service.update(obj);
+        log.info("new data : {}", director);
+        return service.update(director);
     }
 
     @GetMapping("/{id}")
