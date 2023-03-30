@@ -67,14 +67,14 @@ public class ReviewDbStorage implements ReviewStorage {
             PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
 
             ps.setString(1, review.getContent());
-            ps.setBoolean(2, review.getPositive());
+            ps.setBoolean(2, review.getIsPositive());
             ps.setLong(3, review.getFilmId());
             ps.setLong(4, review.getUserId());
 
             return ps;
         }, generatedKeyHolder);
 
-        review.setId(generatedKeyHolder.getKey().longValue());
+        review.setReviewId(generatedKeyHolder.getKey().longValue());
 
         return review;
     }
@@ -85,9 +85,9 @@ public class ReviewDbStorage implements ReviewStorage {
                 "SET content = ?, is_positive = ? " +
                 "WHERE id = ?";
 
-        jdbcTemplate.update(sqlQuery, review.getContent(), review.getPositive(), review.getId());
+        jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
 
-        return getReviewById(review.getId()).get();
+        return getReviewById(review.getReviewId()).get();
     }
 
     @Override
@@ -159,9 +159,9 @@ public class ReviewDbStorage implements ReviewStorage {
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
         Review review = new Review();
 
-        review.setId(resultSet.getLong("id"));
+        review.setReviewId(resultSet.getLong("id"));
         review.setContent(resultSet.getString("content"));
-        review.setPositive(resultSet.getBoolean("is_positive"));
+        review.setIsPositive(resultSet.getBoolean("is_positive"));
         review.setFilmId(resultSet.getLong("film_id"));
         review.setUserId(resultSet.getLong("user_id"));
         review.setUseful(resultSet.getInt("useful"));

@@ -15,16 +15,14 @@ import javax.validation.constraints.Size;
 @ToString
 public class Review {
 
-    @JsonProperty("reviewId")
-    private Long id;
+    private Long reviewId;
 
     @NotNull(message = "Content cannot be null")
     @Size(min = 2, max = 500, message = "Content must contain at least 2 and no more than 500 characters")
     private String content;
 
     @NotNull(message = "Review type cannot be null")
-    @JsonProperty("isPositive")
-    private Boolean positive;
+    private Boolean isPositive;
 
     @NotNull(message = "Film id cannot be null")
     private Long filmId;

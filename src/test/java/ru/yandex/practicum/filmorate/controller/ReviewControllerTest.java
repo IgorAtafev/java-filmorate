@@ -362,7 +362,7 @@ class ReviewControllerTest {
                 Arguments.of(initReview(review -> review.setContent(null))),
                 Arguments.of(initReview(review -> review.setContent("a"))),
                 Arguments.of(initReview(review -> review.setContent("long strin".repeat(50) + "g"))),
-                Arguments.of(initReview(review -> review.setPositive(null))),
+                Arguments.of(initReview(review -> review.setIsPositive(null))),
                 Arguments.of(initReview(review -> review.setFilmId(null))),
                 Arguments.of(initReview(review -> review.setUserId(null)))
         );
@@ -380,7 +380,7 @@ class ReviewControllerTest {
         Review review = new Review();
 
         review.setContent("This film is soo bad.");
-        review.setPositive(false);
+        review.setIsPositive(false);
         review.setFilmId(1L);
         review.setUserId(1L);
 
