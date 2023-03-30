@@ -65,12 +65,6 @@ public interface UserStorage {
     List<User> getCommonFriends(Long id, Long otherId);
 
     /**
-     * Removes a user
-     * @param id
-     */
-    void removeUser(Long id);
-
-    /**
      * Checks for the existence of User by id
      * @param id
      * @return true or false
@@ -86,7 +80,7 @@ public interface UserStorage {
 
     /**
      * Adds an event to the database
-     * @param Event
+     * @param event
      * @return Event
      */
     Event addEvent(Event event);

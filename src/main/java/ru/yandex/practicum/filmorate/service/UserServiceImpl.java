@@ -130,15 +130,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeUser(Long id) {
-        if (!storage.userExists(id)) {
-            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
-        }
-
-        storage.removeUser(id);
-    }
-
-    @Override
     public List<Event> getUserEvents(Long id) {
         return storage.getUserEvents(id);
     }
