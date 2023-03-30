@@ -6,7 +6,6 @@ import lombok.With;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
-import java.sql.Timestamp;
 
 @Value
 @Builder
@@ -17,7 +16,8 @@ public class Event {
     Long userId;
     String eventType;
     String operation;
-    @With Long eventId;
+    @With
+    Long eventId;
     @NotNull(message = "entityId cannot be null")
     Long entityId;
 }
