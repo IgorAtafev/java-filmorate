@@ -152,6 +152,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Event> getUserEvents(Long id) {
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
         return storage.getUserEvents(id);
     }
 
