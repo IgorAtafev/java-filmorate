@@ -341,6 +341,32 @@ class FilmServiceImplTest {
         verify(filmStorage, times(1)).getPopular(count);
     }
 
+    @Test
+    void removeUser_shouldRemoveTheUser() {
+        Long userId = 1L;
+
+        when(filmStorage.filmExists(userId)).thenReturn(true);
+
+        filmService.removeFilm(userId);
+
+        verify(filmStorage, times(1)).filmExists(userId);
+        verify(filmStorage, times(1)).removeFilm(userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeUser_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        when(filmStorage.filmExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> filmService.removeFilm(userId)
+        );
+
+        verify(filmStorage, times(1)).filmExists(userId);
+        verify(filmStorage, never()).removeFilm(userId);
+    }
+
     private Film initFilm() {
         Film film = new Film();
 

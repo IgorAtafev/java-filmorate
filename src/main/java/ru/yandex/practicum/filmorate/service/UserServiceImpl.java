@@ -111,6 +111,15 @@ public class UserServiceImpl implements UserService {
         return storage.getCommonFriends(id, otherId);
     }
 
+    @Override
+    public void removeUser(Long id) {
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
+
+        storage.removeUser(id);
+    }
+
     private void changeNameToLogin(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());

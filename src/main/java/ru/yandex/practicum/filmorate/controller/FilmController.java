@@ -2,27 +2,21 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
-
+    private static final Set<String> SORTED_BY = Set.of("likes", "year");
     private final FilmService service;
 
     @GetMapping
@@ -62,5 +56,22 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
         return service.getPopular(count);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public void removeFilm(@PathVariable Long filmId) {
+        log.info("Request received DELETE /films{}/", filmId);
+        service.removeFilm(filmId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsForDirector(
+            @PathVariable Long directorId,
+            @RequestParam(name = "sortBy", value = "sortBy", defaultValue = "year") String sortBy) {
+        log.info("Request received GET /films/director/{}?sortBy={}", directorId, sortBy);
+        if (!SORTED_BY.contains(sortBy.toLowerCase())) {
+            throw new ValidationException(String.format("Invalid request parameter sortBy='%s'", sortBy));
+        }
+        return service.getFilmsForDirector(directorId, sortBy.toLowerCase());
     }
 }

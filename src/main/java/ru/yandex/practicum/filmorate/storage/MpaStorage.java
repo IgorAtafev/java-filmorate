@@ -9,12 +9,14 @@ public interface MpaStorage {
 
     /**
      * Returns a list of all Mpa ratings
+     *
      * @return list of all Mpa ratings
      */
     List<Mpa> getMpaRatings();
 
     /**
      * Returns Mpa rating by id
+     *
      * @param id
      * @return Mpa rating or null if there was no one
      */
@@ -22,6 +24,7 @@ public interface MpaStorage {
 
     /**
      * Checks for the existence of Mpa rating by id
+     *
      * @param id
      * @return true or false
      */

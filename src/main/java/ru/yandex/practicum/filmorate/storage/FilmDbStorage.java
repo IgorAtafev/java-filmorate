@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -27,6 +28,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
+    private final DirectorStorage directorStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -75,6 +77,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(id);
 
         addGenres(film.getId(), film.getGenres());
+        addDirectors(film.getId(), film.getDirectors());
 
         return film;
     }
@@ -90,6 +93,7 @@ public class FilmDbStorage implements FilmStorage {
 
         removeGenres(film.getId());
         addGenres(film.getId(), film.getGenres());
+        addDirectors(film.getId(), film.getDirectors());
 
         return film;
     }
@@ -133,6 +137,53 @@ public class FilmDbStorage implements FilmStorage {
         return row.next();
     }
 
+    @Override
+    public void removeFilm(Long id) {
+        removeLikeFilm(id);
+        removeGenreFilm(id);
+
+        String sqlQuery = "DELETE FROM films " +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeLikeFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_likes " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeGenreFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_genres " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
+        String sqlTemplate = "SELECT DISTINCT f.*, m.name mpa_name\n" +
+                "FROM film_director fd \n" +
+                "LEFT JOIN films f ON f.id = fd.film_id \n" +
+                "INNER JOIN mpa m ON m.id = f.mpa_id \n" +
+                "%s";
+        String sqlQuery = "";
+        if ("year".equals(sortBy)) {
+            sqlQuery = String.format(sqlTemplate, "WHERE fd.director_ID = ? \n" +
+                    "ORDER BY EXTRACT(YEAR FROM f.release_date)");
+        } else {
+            sqlQuery = String.format(sqlTemplate, "LEFT JOIN film_likes fl ON fl.film_id =f.id \n" +
+                    "WHERE fd.director_ID = ? \n" +
+                    "GROUP BY f.id \n" +
+                    "ORDER BY COUNT(f.id)");
+        }
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+    }
+
     private void addGenres(Long filmId, Collection<Genre> filmGenres) {
         if (filmGenres == null || filmGenres.isEmpty()) {
             return;
@@ -165,6 +216,33 @@ public class FilmDbStorage implements FilmStorage {
                 });
     }
 
+    private void addDirectors(Long filmId, Collection<Director> directors) {
+        removeDirectorsFromFilm(filmId);
+        if (directors == null || directors.isEmpty()) {
+            return;
+        }
+
+        List<Director> listDirectors = new ArrayList<>(directors);
+        jdbcTemplate.batchUpdate("INSERT INTO film_director(film_id, director_id) VALUES(? , ?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setLong(1, filmId);
+                        ps.setLong(2, listDirectors.get(i).getId());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return listDirectors.size();
+                    }
+                });
+    }
+
+    private void removeDirectorsFromFilm(Long filmId) {
+        final String sql = "DELETE FROM film_director WHERE film_id = ?";
+        jdbcTemplate.update(sql, filmId);
+    }
+
     private void removeGenres(Long filmId) {
         String sqlQuery = "DELETE FROM film_genres " +
                 "WHERE film_id = ?";
@@ -187,6 +265,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setMpa(mpa);
 
         film.addGenres(genreStorage.getGenresByFilmId(film.getId()));
+        film.addDirectors(directorStorage.getDirectorsByFilmId(film.getId()));
 
         return film;
     }

@@ -392,6 +392,32 @@ class UserServiceImplTest {
         verify(storage, never()).getCommonFriends(userId1, userId2);
     }
 
+    @Test
+    void removeUser_shouldRemoveTheUser() {
+        Long userId = 1L;
+
+        when(storage.userExists(userId)).thenReturn(true);
+
+        service.removeUser(userId);
+
+        verify(storage, times(1)).userExists(userId);
+        verify(storage, times(1)).removeUser(userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeUser_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        when(storage.userExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> service.removeUser(userId)
+        );
+
+        verify(storage, times(1)).userExists(userId);
+        verify(storage, never()).removeUser(userId);
+    }
+
     private User initUser() {
         User user = new User();
 
