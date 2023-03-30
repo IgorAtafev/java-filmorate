@@ -17,10 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,6 +27,7 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
     private final DirectorStorage directorStorage;
+    private final ReviewStorage reviewStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -154,6 +152,10 @@ public class FilmDbStorage implements FilmStorage {
 
         if (filmDirectorExists(id)) {
             removeFilmDirector(id);
+        }
+        if (reviewStorage.reviewFilmExists(id)) {
+            List<Long> array = reviewStorage.getReviewIdByFilmId(id);
+            array.forEach(reviewStorage::removeReviewById);
         }
 
         String sqlQuery = "DELETE FROM films " +

@@ -12,7 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -140,6 +142,21 @@ public class ReviewDbStorage implements ReviewStorage {
         return row.next();
     }
 
+    @Override
+    public List<Long> getReviewIdByFilmId(Long id) {
+        String sqlQuery = "SELECT id FROM reviews WHERE film_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapToList, id);
+    }
+
+    @Override
+    public boolean reviewFilmExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM reviews WHERE film_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
     private String setUsefulOperationForAddLike(boolean isUseful) {
         if (isUseful) {
             return "+";
@@ -167,5 +184,13 @@ public class ReviewDbStorage implements ReviewStorage {
         review.setUseful(resultSet.getInt("useful"));
 
         return review;
+    }
+
+    private List<Long> mapToList(ResultSet resultSet, int rowNum) throws SQLException {
+        List<Long> reviewId = new ArrayList<>();
+
+        reviewId.add(resultSet.getLong("id"));
+
+        return reviewId;
     }
 }

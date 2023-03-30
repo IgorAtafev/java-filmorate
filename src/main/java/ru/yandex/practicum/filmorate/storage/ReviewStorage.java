@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface ReviewStorage {
@@ -82,4 +83,19 @@ public interface ReviewStorage {
      * @return true or false
      */
     boolean reviewExists(Long id);
+
+    /**
+     * Returns a list of reviews id
+     * @param id
+     * @return List<Map<String, Object>>
+     */
+    List<Long> getReviewIdByFilmId(Long id);
+
+    /**
+     * Checks for the review of film by id
+     *
+     * @param id
+     * @return true or false
+     */
+    boolean reviewFilmExists(Long id);
 }
