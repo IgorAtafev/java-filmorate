@@ -8,6 +8,7 @@ public interface MpaService {
 
     /**
      * Returns a list of all Mpa ratings
+     *
      * @return list of all Mpa ratings
      */
     List<Mpa> getMpaRatings();
@@ -15,6 +16,7 @@ public interface MpaService {
     /**
      * Returns Mpa rating by id
      * If the rating is not found throws NotFoundException
+     *
      * @param id
      * @return Mpa rating by id
      */
