@@ -130,15 +130,6 @@ public class    FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public boolean filmExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM films WHERE id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
-    }
-
-    @Override
     public void removeFilm(Long id) {
         removeLikeFilm(id);
         removeGenreFilm(id);
@@ -207,6 +198,25 @@ public class    FilmDbStorage implements FilmStorage {
                 "(SELECT film_id FROM film_likes WHERE user_id = ?)";
 
         return jdbcTemplate.query(sqlQueryForFilms, this::mapRowToFilm, userWithIntersections, id);
+    }
+
+    @Override
+    public boolean filmExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM films WHERE id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
+    @Override
+    public boolean likeExists(Long id, Long userId) {
+        String sqlQuery = "SELECT 1 FROM film_likes " +
+                "WHERE film_id = ? AND user_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id, userId);
+
+        return row.next();
     }
 
     private void addGenres(Long filmId, Collection<Genre> filmGenres) {
