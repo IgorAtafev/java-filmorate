@@ -65,6 +65,7 @@ public interface FilmStorage {
 
     /**
      * Removes a film
+     *
      * @param id
      */
     void removeFilm(Long id);
@@ -78,13 +79,24 @@ public interface FilmStorage {
     boolean filmExists(Long id);
 
     /**
+     * Returns a list of films related to users preferences
+     * If the user is not found throws NotFoundException
+     *
+     * @param id
+     * @return list of films recommended to user
+     */
+    List<Film> getRecommendations(Long id);
+
+    /**
      * Removes a film from film_likes
+     *
      * @param id
      */
     void removeLikeFilm(Long id);
 
     /**
      * Removes a film from film_genres
+     *
      * @param id
      */
     void removeGenreFilm(Long id);

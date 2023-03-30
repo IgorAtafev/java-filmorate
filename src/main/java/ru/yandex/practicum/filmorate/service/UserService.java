@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -75,11 +76,20 @@ public interface UserService {
      */
     List<User> getCommonFriends(Long id, Long otherId);
 
-
     /**
      * Removes a user
      * If the user is not found throws NotFoundException
+     *
      * @param id
      */
     void removeUser(Long id);
+
+    /**
+     * Returns a list of films related to users preferences
+     * If the user is not found throws NotFoundException
+     *
+     * @param id
+     * @return list of films recommended to user
+     */
+    List<Film> getRecommendations(Long id);
 }
