@@ -117,6 +117,19 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public void removeUser(Long id) {
+//        removeUserLike(id);
+//        removeUserFromFriends(id);
+
+//        String sqlQuery = "DELETE FROM users " +
+//                "WHERE id = ?";
+
+//        jdbcTemplate.update(sqlQuery, id);
+        String sqlQuery = "DELETE FROM events WHERE user_id = ?";
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
     public boolean userExists(Long id) {
         String sqlQuery = "SELECT 1 FROM users WHERE id = ?";
 
@@ -172,10 +185,10 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToEvent, id);
     }
 
-    public void removeEvent(Long userId) {
-        String sqlQuery = "DELETE FROM events WHERE USER_ID = ?";
-        jdbcTemplate.update(sqlQuery, userId);
-    }
+//    public void removeEvent(Long userId) {
+//        String sqlQuery = "DELETE FROM events WHERE USER_ID = ?";
+//        jdbcTemplate.update(sqlQuery, userId);
+//    }
 
     private Event mapRowToEvent(ResultSet resultSet, int rowNum) throws SQLException {
         return Event.builder()

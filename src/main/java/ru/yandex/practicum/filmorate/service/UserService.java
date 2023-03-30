@@ -69,6 +69,14 @@ public interface UserService {
     List<User> getCommonFriends(Long id, Long otherId);
 
     /**
+     * Removes a user
+     * If the user is not found throws NotFoundException
+     *
+     * @param id
+     */
+    void removeUser(Long id);
+
+    /**
      * Returns a list of user events
      * If the events is not found it will return an empty list
      * @param id
