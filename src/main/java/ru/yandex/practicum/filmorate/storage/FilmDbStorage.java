@@ -181,6 +181,30 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
 
+    @Override
+    public List<Film> getRecommendations(Long id) {
+        List<Film> recommendedFilms = new ArrayList<>();
+
+        /* Finding a user with the most intersections by likes with the primary user */
+        String sqlQueryForUserId = "SELECT user_id FROM film_likes " +
+                "WHERE film_id IN (SELECT film_id FROM film_likes WHERE user_id = ?) AND user_id != ? " +
+                "GROUP BY user_id ORDER BY COUNT(film_id) DESC";
+
+        SqlRowSet rowUser = jdbcTemplate.queryForRowSet(sqlQueryForUserId, id, id);
+
+        if (!rowUser.first()) return recommendedFilms;
+
+        Long userWithIntersections = rowUser.getLong("user_id");
+
+        /* Finding films according to the user with most intersections that primary user haven't liked yet */
+        String sqlQueryForFilms = "SELECT f.*, m.name mpa_name FROM film_likes fl " +
+                "LEFT JOIN films f ON fl.film_id = f.id INNER JOIN mpa m ON m.id = f.mpa_id " +
+                "WHERE user_id = ? AND film_id NOT IN " +
+                "(SELECT film_id FROM film_likes WHERE user_id = ?)";
+
+        return jdbcTemplate.query(sqlQueryForFilms, this::mapRowToFilm, userWithIntersections, id);
+    }
+
     private void addGenres(Long filmId, Collection<Genre> filmGenres) {
         if (filmGenres == null || filmGenres.isEmpty()) {
             return;
