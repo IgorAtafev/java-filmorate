@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage {
+public class    FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
@@ -188,7 +188,7 @@ public class FilmDbStorage implements FilmStorage {
         /* Finding a user with the most intersections by likes with the primary user */
         String sqlQueryForUserId = "SELECT user_id FROM film_likes " +
                 "WHERE film_id IN (SELECT film_id FROM film_likes WHERE user_id = ?) AND user_id != ? " +
-                "GROUP BY user_id ORDER BY COUNT(film_id) DESC";
+                "GROUP BY user_id ORDER BY COUNT(film_id) DESC LIMIT 1";
 
         SqlRowSet rowUser = jdbcTemplate.queryForRowSet(sqlQueryForUserId, id, id);
 
