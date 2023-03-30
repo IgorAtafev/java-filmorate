@@ -102,6 +102,15 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
+    public void removeFilm(Long id) {
+        if (!filmStorage.filmExists(id)) {
+            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+        }
+
+        filmStorage.removeFilm(id);
+    }
+
+    @Override
     public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
         if (!directorStorage.directorExists(directorId)) {
             throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));

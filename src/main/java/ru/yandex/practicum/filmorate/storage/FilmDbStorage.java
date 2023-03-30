@@ -135,6 +135,33 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public void removeFilm(Long id) {
+        removeLikeFilm(id);
+        removeGenreFilm(id);
+
+        String sqlQuery = "DELETE FROM films " +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeLikeFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_likes " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeGenreFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_genres " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
     public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
         String sqlTemplate = "SELECT DISTINCT f.*, m.name mpa_name\n" +
                 "FROM film_director fd \n" +

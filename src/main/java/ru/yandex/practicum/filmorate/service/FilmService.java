@@ -66,6 +66,13 @@ public interface FilmService {
     List<Film> getPopular(int count);
 
     /**
+     * Removes a film
+     * If the film is not found throws NotFoundException
+     * @param id
+     */
+    void removeFilm(Long id);
+
+    /**
      * Returns a list of films for director, sorted by likes or year
      *
      * @param directorId director's id

@@ -74,4 +74,12 @@ public interface UserService {
      * @return list of common friends of the user
      */
     List<User> getCommonFriends(Long id, Long otherId);
+
+
+    /**
+     * Removes a user
+     * If the user is not found throws NotFoundException
+     * @param id
+     */
+    void removeUser(Long id);
 }
