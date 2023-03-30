@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class    FilmDbStorage implements FilmStorage {
+public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
@@ -139,9 +139,22 @@ public class    FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public boolean filmDirectorExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM film_director WHERE film_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
+    @Override
     public void removeFilm(Long id) {
         removeLikeFilm(id);
         removeGenreFilm(id);
+
+        if (filmDirectorExists(id)) {
+            removeFilmDirector(id);
+        }
 
         String sqlQuery = "DELETE FROM films " +
                 "WHERE id = ?";
@@ -161,6 +174,13 @@ public class    FilmDbStorage implements FilmStorage {
     public void removeGenreFilm(Long id) {
         String sqlQuery = "DELETE FROM film_genres " +
                 "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeFilmDirector(long id) {
+        String sqlQuery = "DELETE FROM film_director WHERE director_id = ?";
 
         jdbcTemplate.update(sqlQuery, id);
     }

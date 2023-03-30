@@ -79,6 +79,14 @@ public interface FilmStorage {
     boolean filmExists(Long id);
 
     /**
+     * Checks for the existence of Director by id Film
+     *
+     * @param id
+     * @return true or false
+     */
+    boolean filmDirectorExists(Long id);
+
+    /**
      * Returns a list of films related to users preferences
      * If the user is not found throws NotFoundException
      *
@@ -100,6 +108,13 @@ public interface FilmStorage {
      * @param id
      */
     void removeGenreFilm(Long id);
+
+    /**
+     * Removes a film from film_director
+     *
+     * @param id
+     */
+    void removeFilmDirector(long id);
 
     /**
      * Returns a list of films for director, sorted by likes or year
