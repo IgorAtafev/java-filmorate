@@ -98,6 +98,15 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.getPopular(count);
     }
 
+    @Override
+    public void removeFilm(Long id) {
+        if (!filmStorage.filmExists(id)) {
+            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+        }
+
+        filmStorage.removeFilm(id);
+    }
+
     private boolean isIdValueNull(Film film) {
         return film.getId() == null;
     }

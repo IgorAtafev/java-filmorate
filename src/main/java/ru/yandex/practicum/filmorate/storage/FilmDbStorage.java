@@ -133,6 +133,33 @@ public class FilmDbStorage implements FilmStorage {
         return row.next();
     }
 
+    @Override
+    public void removeFilm(Long id) {
+        removeLikeFilm(id);
+        removeGenreFilm(id);
+
+        String sqlQuery = "DELETE FROM films " +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeLikeFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_likes " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeGenreFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_genres " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
     private void addGenres(Long filmId, Collection<Genre> filmGenres) {
         if (filmGenres == null || filmGenres.isEmpty()) {
             return;

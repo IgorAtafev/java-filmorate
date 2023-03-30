@@ -67,4 +67,10 @@ public class UserController {
     public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return service.getCommonFriends(id, otherId);
     }
+
+    @DeleteMapping("/{userId}")
+    public void removeUser(@PathVariable Long userId) {
+        log.info("Request received DELETE /users{}", userId);
+        service.removeUser(userId);
+    }
 }

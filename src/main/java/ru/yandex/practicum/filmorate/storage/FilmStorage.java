@@ -57,9 +57,27 @@ public interface FilmStorage {
     List<Film> getPopular(int count);
 
     /**
+     * Removes a film
+     * @param id
+     */
+    void removeFilm(Long id);
+
+    /**
      * Checks for the existence of Film by id
      * @param id
      * @return true or false
      */
     boolean filmExists(Long id);
+
+    /**
+     * Removes a film from film_likes
+     * @param id
+     */
+    void removeLikeFilm(Long id);
+
+    /**
+     * Removes a film from film_genres
+     * @param id
+     */
+    void removeGenreFilm(Long id);
 }

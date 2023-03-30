@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validator.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,9 +65,28 @@ public interface UserStorage {
     List<User> getCommonFriends(Long id, Long otherId);
 
     /**
+     * Removes a user
+     * @param id
+     */
+    void removeUser(Long id);
+
+    /**
      * Checks for the existence of User by id
      * @param id
      * @return true or false
      */
     boolean userExists(Long id);
+
+
+    /**
+     * Removes a user from film_genres
+     * @param id
+     */
+    void removeUserLike(Long id);
+
+    /**
+     * Removes a user from user_friends
+     * @param id
+     */
+    void removeUserFromFriends(Long id);
 }
