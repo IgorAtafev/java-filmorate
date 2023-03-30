@@ -142,7 +142,7 @@ class ReviewServiceImplTest {
     void createReview_shouldThrowAnException_ifReviewIdIsNotEmpty() {
         Long reviewId = 1L;
         Review review = initReview();
-        review.setId(reviewId);
+        review.setReviewId(reviewId);
 
         assertThrows(
                 ValidationException.class,
@@ -197,7 +197,7 @@ class ReviewServiceImplTest {
     void updateReview_shouldUpdateTheReview() {
         Long reviewId = 1L;
         Review review = initReview();
-        review.setId(reviewId);
+        review.setReviewId(reviewId);
 
         when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
         when(reviewStorage.updateReview(review)).thenReturn(review);
@@ -224,7 +224,7 @@ class ReviewServiceImplTest {
     @ValueSource(longs = {-1L, 0L, 999L})
     void updateReview_shouldThrowAnException_ifReviewDoesNotExist(Long reviewId) {
         Review review = initReview();
-        review.setId(reviewId);
+        review.setReviewId(reviewId);
 
         when(reviewStorage.reviewExists(reviewId)).thenReturn(false);
 
@@ -237,11 +237,137 @@ class ReviewServiceImplTest {
         verify(reviewStorage, never()).updateReview(review);
     }
 
+    @Test
+    void removeReviewById_shouldRemoveReviewById() {
+        Long reviewId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+
+        reviewService.removeReviewById(reviewId);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(reviewStorage, times(1)).removeReviewById(reviewId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeReviewById_shouldThrowAnException_ifReviewDoesNotExist(Long reviewId) {
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.removeReviewById(reviewId)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(reviewStorage, never()).removeReviewById(reviewId);
+    }
+
+    @Test
+    void addLike_shouldAddTheUserLikeToAReview() {
+        Long reviewId = 1L;
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
+
+        reviewService.addLike(reviewId, userId, true);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, times(1)).addLike(reviewId, userId, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addLike_shouldThrowAnException_ifReviewDoesNotExist(Long reviewId) {
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.addLike(reviewId, userId, true)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, never()).userExists(userId);
+        verify(reviewStorage, never()).addLike(reviewId, userId, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addLike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        Long reviewId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.addLike(reviewId, userId, true)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, never()).addLike(reviewId, userId, true);
+    }
+
+    @Test
+    void removeLike_shouldRemoveTheUserLikeToAReview() {
+        Long reviewId = 1L;
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
+
+        reviewService.removeLike(reviewId, userId, true);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, times(1)).removeLike(reviewId, userId, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeLike_shouldThrowAnException_ifReviewDoesNotExist(Long reviewId) {
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.removeLike(reviewId, userId, true)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, never()).userExists(userId);
+        verify(reviewStorage, never()).removeLike(reviewId, userId, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeLike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        Long reviewId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.removeLike(reviewId, userId, true)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, never()).removeLike(reviewId, userId, true);
+    }
+
     private Review initReview() {
         Review review = new Review();
 
         review.setContent("This film is soo bad.");
-        review.setPositive(false);
+        review.setIsPositive(false);
         review.setFilmId(1L);
         review.setUserId(1L);
 

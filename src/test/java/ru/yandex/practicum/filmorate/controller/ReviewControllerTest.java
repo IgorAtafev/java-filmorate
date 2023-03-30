@@ -236,14 +236,14 @@ class ReviewControllerTest {
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void addLike_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
-        Long filmId = 1L;
+        Long reviewId = 1L;
 
-        doThrow(NotFoundException.class).when(service).addLike(filmId, userId, true);
+        doThrow(NotFoundException.class).when(service).addLike(reviewId, userId, true);
 
-        mockMvc.perform(put("/reviews/{id}/like/{userId}", filmId, userId))
+        mockMvc.perform(put("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
 
-        verify(service, times(1)).addLike(filmId, userId, true);
+        verify(service, times(1)).addLike(reviewId, userId, true);
     }
 
     @Test
@@ -273,14 +273,14 @@ class ReviewControllerTest {
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void removeLike_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
-        Long filmId = 1L;
+        Long reviewId = 1L;
 
-        doThrow(NotFoundException.class).when(service).removeLike(filmId, userId, true);
+        doThrow(NotFoundException.class).when(service).removeLike(reviewId, userId, true);
 
-        mockMvc.perform(delete("/reviews/{id}/like/{userId}", filmId, userId))
+        mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
 
-        verify(service, times(1)).removeLike(filmId, userId, true);
+        verify(service, times(1)).removeLike(reviewId, userId, true);
     }
 
     @Test
@@ -310,14 +310,14 @@ class ReviewControllerTest {
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void addDisLike_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
-        Long filmId = 1L;
+        Long reviewId = 1L;
 
-        doThrow(NotFoundException.class).when(service).addLike(filmId, userId, false);
+        doThrow(NotFoundException.class).when(service).addLike(reviewId, userId, false);
 
-        mockMvc.perform(put("/reviews/{id}/dislike/{userId}", filmId, userId))
+        mockMvc.perform(put("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
 
-        verify(service, times(1)).addLike(filmId, userId, false);
+        verify(service, times(1)).addLike(reviewId, userId, false);
     }
 
     @Test
@@ -347,14 +347,14 @@ class ReviewControllerTest {
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L, 999L})
     void removeDisLike_shouldResponseWithNotFound_ifUserDoesNotExist(Long userId) throws Exception {
-        Long filmId = 1L;
+        Long reviewId = 1L;
 
-        doThrow(NotFoundException.class).when(service).removeLike(filmId, userId, false);
+        doThrow(NotFoundException.class).when(service).removeLike(reviewId, userId, false);
 
-        mockMvc.perform(delete("/reviews/{id}/dislike/{userId}", filmId, userId))
+        mockMvc.perform(delete("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
 
-        verify(service, times(1)).removeLike(filmId, userId, false);
+        verify(service, times(1)).removeLike(reviewId, userId, false);
     }
 
     private static Stream<Arguments> provideInvalidReviews() {
