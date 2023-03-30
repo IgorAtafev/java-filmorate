@@ -63,7 +63,7 @@ public class FilmController {
         log.info("Request received DELETE /films{}/", filmId);
         service.removeFilm(filmId);
     }
-    
+
     @GetMapping("/director/{directorId}")
     public List<Film> getFilmsForDirector(
             @PathVariable Long directorId,

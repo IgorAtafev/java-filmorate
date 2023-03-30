@@ -109,15 +109,15 @@ public class FilmServiceImpl implements FilmService {
 
         filmStorage.removeFilm(id);
     }
-    
+
     @Override
     public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
         if (!directorStorage.directorExists(directorId)) {
             throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));
         }
         return filmStorage.getFilmsForDirector(directorId, sortBy);
-    }     
-    
+    }
+
     private boolean isIdValueNull(Film film) {
         return film.getId() == null;
     }

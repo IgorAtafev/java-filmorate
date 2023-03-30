@@ -160,7 +160,7 @@ public class FilmDbStorage implements FilmStorage {
 
         jdbcTemplate.update(sqlQuery, id);
     }
-    
+
     @Override
     public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
         String sqlTemplate = "SELECT DISTINCT f.*, m.name mpa_name\n" +
@@ -180,7 +180,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
-    
+
     private void addGenres(Long filmId, Collection<Genre> filmGenres) {
         if (filmGenres == null || filmGenres.isEmpty()) {
             return;

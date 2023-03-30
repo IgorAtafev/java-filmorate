@@ -88,7 +88,7 @@ public interface FilmStorage {
      * @param id
      */
     void removeGenreFilm(Long id);
-    
+
     /**
      * Returns a list of films for director, sorted by likes or year
      *
