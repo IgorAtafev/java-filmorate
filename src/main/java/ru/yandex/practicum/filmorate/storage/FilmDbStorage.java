@@ -157,8 +157,8 @@ public class FilmDbStorage implements FilmStorage {
             removeFilmDirector(id);
         }
         if (reviewStorage.reviewFilmExists(id)) {
-            List<Long> array = reviewStorage.getReviewIdByFilmId(id);
-            array.forEach(reviewStorage::removeReviewById);
+            List<Long> reviewsId = reviewStorage.getReviewIdByFilmId(id);
+            reviewsId.forEach(reviewStorage::removeReviewById);
         }
 
         String sqlQuery = "DELETE FROM films " +
@@ -232,15 +232,6 @@ public class FilmDbStorage implements FilmStorage {
                 "(SELECT film_id FROM film_likes WHERE user_id = ?)";
 
         return jdbcTemplate.query(sqlQueryForFilms, this::mapRowToFilm, userWithIntersections, id);
-    }
-
-    @Override
-    public boolean filmExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM films WHERE id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
     }
 
     @Override

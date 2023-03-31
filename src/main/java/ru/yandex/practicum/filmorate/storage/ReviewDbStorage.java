@@ -12,10 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -144,13 +141,34 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public List<Long> getReviewIdByFilmId(Long id) {
+        List<Long> reviewId = new ArrayList<>();
+
         String sqlQuery = "SELECT id FROM reviews WHERE film_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapToList, id);
+
+        return jdbcTemplate.query(sqlQuery, this::mapToList, id);
+    }
+
+    @Override
+    public List<Long> getReviewIdByUserId(Long id) {
+        List<Long> reviewId = new ArrayList<>();
+
+        String sqlQuery = "SELECT id FROM reviews WHERE user_id = ?";
+
+        return jdbcTemplate.query(sqlQuery, this::mapToList, id);
     }
 
     @Override
     public boolean reviewFilmExists(Long id) {
         String sqlQuery = "SELECT 1 FROM reviews WHERE film_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
+    @Override
+    public boolean reviewUserExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM reviews WHERE user_id = ?";
 
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
@@ -196,11 +214,7 @@ public class ReviewDbStorage implements ReviewStorage {
         return review;
     }
 
-    private List<Long> mapToList(ResultSet resultSet, int rowNum) throws SQLException {
-        List<Long> reviewId = new ArrayList<>();
-
-        reviewId.add(resultSet.getLong("id"));
-
-        return reviewId;
+    private Long mapToList(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getLong("id");
     }
 }

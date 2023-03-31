@@ -17,6 +17,7 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ReviewStorage reviewStorage;
 
     @Override
     public List<User> getUsers() {
@@ -114,6 +115,11 @@ public class UserDbStorage implements UserStorage {
     public void removeUser(Long id) {
         removeUserLike(id);
         removeUserFromFriends(id);
+
+        if (reviewStorage.reviewUserExists(id)) {
+            List<Long> reviewsId = reviewStorage.getReviewIdByUserId(id);
+            reviewsId.forEach(reviewStorage::removeReviewById);
+        }
 
         String sqlQuery = "DELETE FROM users " +
                 "WHERE id = ?";

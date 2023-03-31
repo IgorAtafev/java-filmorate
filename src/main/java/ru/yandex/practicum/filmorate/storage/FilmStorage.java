@@ -126,14 +126,6 @@ public interface FilmStorage {
     List<Film> getFilmsForDirector(Long directorId, String sortBy);
 
     /**
-     * Checks for the existence of Film by id
-     *
-     * @param id
-     * @return true or false
-     */
-    boolean filmExists(Long id);
-
-    /**
      * Checks for the existence of a film like
      *
      * @param id
