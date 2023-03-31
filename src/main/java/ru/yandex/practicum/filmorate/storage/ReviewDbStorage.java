@@ -157,6 +157,16 @@ public class ReviewDbStorage implements ReviewStorage {
         return row.next();
     }
 
+    @Override
+    public boolean likeExists(Long id, Long userId, boolean isUseful) {
+        String sqlQuery = "SELECT 1 FROM review_likes " +
+                "WHERE review_id = ? AND user_id = ? AND is_useful = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id, userId, isUseful);
+
+        return row.next();
+    }
+
     private String setUsefulOperationForAddLike(boolean isUseful) {
         if (isUseful) {
             return "+";

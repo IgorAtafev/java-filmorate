@@ -98,4 +98,14 @@ public interface ReviewStorage {
      * @return true or false
      */
     boolean reviewFilmExists(Long id);
+
+    /**
+     * Checks for the existence of a review like
+     *
+     * @param id
+     * @param userId
+     * @param isUseful
+     * @return true or false
+     */
+    boolean likeExists(Long id, Long userId, boolean isUseful);
 }
