@@ -239,14 +239,16 @@ class ReviewServiceImplTest {
 
     @Test
     void removeReviewById_shouldRemoveReviewById() {
-//        Long reviewId = 1L;
+        Long reviewId = 1L;
+        Review review = initReview();
 
-//        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(reviewStorage.getReviewById(reviewId)).thenReturn(Optional.of(review));
 
-//        reviewService.removeReviewById(reviewId);
+        reviewService.removeReviewById(reviewId);
 
-//        verify(reviewStorage, times(1)).reviewExists(reviewId);
-//        verify(reviewStorage, times(1)).removeReviewById(reviewId);
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(reviewStorage, times(1)).removeReviewById(reviewId);
     }
 
     @ParameterizedTest
