@@ -13,10 +13,14 @@ public class Event {
     @NotNull(message = "Feed date cannot be null")
     @PastOrPresent(message = "Feed cannot be in the future")
     Long timestamp;
+    @NotNull(message = "Feed userId cannot be null")
     Long userId;
+    @NotNull(message = "Feed eventType cannot be null")
     String eventType;
+    @NotNull(message = "Feed operation cannot be null")
     String operation;
     @With
+    @NotNull(message = "Feed eventId cannot be null")
     Long eventId;
     @NotNull(message = "entityId cannot be null")
     Long entityId;
