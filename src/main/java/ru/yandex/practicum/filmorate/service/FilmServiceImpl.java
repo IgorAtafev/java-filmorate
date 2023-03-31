@@ -84,12 +84,6 @@ public class FilmServiceImpl implements FilmService {
         if (!userStorage.userExists(userId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
-
-        if (filmStorage.likeExists(id, userId)) {
-            throw new ValidationException(String.format(LIKE_FILM_EXISTS, id, userId));
-        }
-
-        filmStorage.addLike(id, userId);
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
@@ -97,6 +91,10 @@ public class FilmServiceImpl implements FilmService {
                 .operation("ADD")
                 .timestamp(System.currentTimeMillis())
                 .build());
+        if (filmStorage.likeExists(id, userId)) {
+            throw new ValidationException(String.format(LIKE_FILM_EXISTS, id, userId));
+        }
+        filmStorage.addLike(id, userId);
     }
 
     @Override
