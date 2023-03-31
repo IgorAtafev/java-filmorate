@@ -143,8 +143,6 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public List<Long> getReviewIdByFilmId(Long id) {
-        List<Long> reviewId = new ArrayList<>();
-
         String sqlQuery = "SELECT id FROM reviews WHERE film_id = ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapToList, id);
@@ -152,8 +150,6 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public List<Long> getReviewIdByUserId(Long id) {
-        List<Long> reviewId = new ArrayList<>();
-
         String sqlQuery = "SELECT id FROM reviews WHERE user_id = ?";
 
         return jdbcTemplate.query(sqlQuery, this::mapToList, id);
