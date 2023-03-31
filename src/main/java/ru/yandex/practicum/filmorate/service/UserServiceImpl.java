@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage storage;
     private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
 
     @Override
     public List<User> getUsers() {
@@ -78,7 +80,7 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.addFriend(id, friendId);
-        storage.addEvent(Event.builder()
+        eventStorage.addEvent(Event.builder()
                 .userId(id)
                 .entityId(friendId)
                 .eventType("FRIEND")
@@ -98,7 +100,7 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.removeFriend(id, friendId);
-        storage.addEvent(Event.builder()
+        eventStorage.addEvent(Event.builder()
                 .userId(id)
                 .entityId(friendId)
                 .eventType("FRIEND")
@@ -152,7 +154,7 @@ public class UserServiceImpl implements UserService {
         if (!storage.userExists(id)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
         }
-        return storage.getUserEvents(id);
+        return eventStorage.getUserEvents(id);
     }
 
     private void changeNameToLogin(User user) {

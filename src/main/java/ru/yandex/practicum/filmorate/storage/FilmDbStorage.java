@@ -25,11 +25,12 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class    FilmDbStorage implements FilmStorage {
+public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
     private final DirectorStorage directorStorage;
+    private final ReviewStorage reviewStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -130,9 +131,35 @@ public class    FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public boolean filmExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM films WHERE id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
+    @Override
+    public boolean filmDirectorExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM film_director WHERE film_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
+    @Override
     public void removeFilm(Long id) {
         removeLikeFilm(id);
         removeGenreFilm(id);
+
+        if (filmDirectorExists(id)) {
+            removeFilmDirector(id);
+        }
+        if (reviewStorage.reviewFilmExists(id)) {
+            List<Long> reviewsId = reviewStorage.getReviewIdByFilmId(id);
+            reviewsId.forEach(reviewStorage::removeReviewById);
+        }
 
         String sqlQuery = "DELETE FROM films " +
                 "WHERE id = ?";
@@ -152,6 +179,13 @@ public class    FilmDbStorage implements FilmStorage {
     public void removeGenreFilm(Long id) {
         String sqlQuery = "DELETE FROM film_genres " +
                 "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeFilmDirector(long id) {
+        String sqlQuery = "DELETE FROM film_director WHERE director_id = ?";
 
         jdbcTemplate.update(sqlQuery, id);
     }
@@ -198,15 +232,6 @@ public class    FilmDbStorage implements FilmStorage {
                 "(SELECT film_id FROM film_likes WHERE user_id = ?)";
 
         return jdbcTemplate.query(sqlQueryForFilms, this::mapRowToFilm, userWithIntersections, id);
-    }
-
-    @Override
-    public boolean filmExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM films WHERE id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -37,6 +38,9 @@ class ReviewServiceImplTest {
 
     @Mock
     private UserStorage userStorage;
+
+    @Mock
+    private EventStorage eventStorage;
 
     @InjectMocks
     private ReviewServiceImpl reviewService;

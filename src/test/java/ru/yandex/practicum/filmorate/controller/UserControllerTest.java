@@ -342,6 +342,33 @@ class UserControllerTest {
         verify(service, times(1)).getCommonFriends(userId, userOtherId);
     }
 
+    @Test
+    void getUserFeed_shouldReturnListOfEvents() throws Exception {
+        List<Event> events = initEvents();
+        String json = objectMapper.writeValueAsString(events);
+        long userId = 2L;
+
+        when(service.getUserEvents(userId)).thenReturn(events);
+
+        mockMvc.perform(get("/users/{id}/feed", userId))
+                .andExpect(status().isOk())
+                .andExpect(content().json(json));
+
+        verify(service, times(1)).getUserEvents(2L);
+    }
+
+    @Test
+    void getUserFeed_shouldResponseWithNotFound_ifUserDoesNotExist() throws Exception {
+        Long userId = 9999L;
+
+        when(service.getUserEvents(userId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}/feed", userId))
+                .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getUserEvents(userId);
+    }
+
     private static Stream<Arguments> provideInvalidUsers() {
         return Stream.of(
                 Arguments.of(initUser(user -> user.setEmail(null))),
@@ -396,30 +423,5 @@ class UserControllerTest {
         return List.of(event1, event2);
     }
 
-    @Test
-    void getUserFeed_shouldReturnListOfEvents() throws Exception {
-        List<Event> events = initEvents();
-        String json = objectMapper.writeValueAsString(events);
-        long userId = 2L;
 
-        when(service.getUserEvents(userId)).thenReturn(events);
-
-        mockMvc.perform(get("/users/{id}/feed", userId))
-                .andExpect(status().isOk())
-                .andExpect(content().json(json));
-
-        verify(service, times(1)).getUserEvents(2L);
-    }
-
-    @Test
-    void getUserFeed_shouldResponseWithNotFound_ifUserDoesNotExist() throws Exception {
-        Long userId = 9999L;
-
-        when(service.getUserEvents(userId)).thenThrow(NotFoundException.class);
-
-        mockMvc.perform(get("/users/{id}/feed", userId))
-                .andExpect(status().isNotFound());
-
-        verify(service, times(1)).getUserEvents(userId);
-    }
 }

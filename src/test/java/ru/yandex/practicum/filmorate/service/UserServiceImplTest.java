@@ -7,7 +7,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
@@ -30,6 +32,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserStorage storage;
+
+    @Mock
+    private EventStorage eventStorage;
 
     @InjectMocks
     private UserServiceImpl service;
@@ -418,6 +423,29 @@ class UserServiceImplTest {
         verify(storage, never()).removeUser(userId);
     }
 
+    @Test
+    void getUserEvent_shouldThrowNotFoundException_ifUserDoesNotExists() {
+        Long userId = 9999L;
+        assertThrows(NotFoundException.class,
+                () -> service.getUserEvents(userId));
+        verify(storage, times(1)).userExists(userId);
+    }
+
+    @Test
+    void getUserEvents_shouldReturnListOfEvents() {
+        List<Event> events = initEvents();
+        long userId = 2L;
+
+        when(eventStorage.getUserEvents(userId)).thenReturn(events);
+        when(storage.userExists(userId)).thenReturn(true);
+
+        assertEquals(service.getUserEvents(userId), events);
+
+        verify(storage, times(1)).userExists(userId);
+        verify(eventStorage, times(1)).getUserEvents(userId);
+    }
+
+
     private User initUser() {
         User user = new User();
 
@@ -428,4 +456,24 @@ class UserServiceImplTest {
 
         return user;
     }
+
+    private static List<Event> initEvents() {
+        Event event1 = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .eventType("LIKE")
+                .operation("ADD")
+                .eventId(3L)
+                .entityId(2L)
+                .build();
+
+        Event event2 = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .eventType("FRIEND")
+                .operation("REMOVE")
+                .eventId(4L)
+                .entityId(1L)
+                .build();
+        return List.of(event1, event2);
+    }
+
 }

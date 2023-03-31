@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -26,6 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final EventStorage eventStorage;
 
     @Override
     public List<Review> getReviews(Long filmId, int count) {
@@ -58,7 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review newReview = reviewStorage.createReview(review);
-        userStorage.addEvent(Event.builder()
+        eventStorage.addEvent(Event.builder()
                 .userId(newReview.getUserId())
                 .entityId(newReview.getReviewId())
                 .eventType("REVIEW")
@@ -79,7 +81,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review newReview = reviewStorage.updateReview(review);
-        userStorage.addEvent(Event.builder()
+        eventStorage.addEvent(Event.builder()
                 .userId(newReview.getUserId())
                 .entityId(newReview.getFilmId())
                 .eventType("REVIEW")
@@ -96,7 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review review = getReviewById(id);
-        userStorage.addEvent(Event.builder()
+        eventStorage.addEvent(Event.builder()
                 .userId(review.getUserId())
                 .entityId(review.getFilmId())
                 .eventType("REVIEW")
