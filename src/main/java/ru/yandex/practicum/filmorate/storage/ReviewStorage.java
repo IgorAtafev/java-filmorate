@@ -84,6 +84,36 @@ public interface ReviewStorage {
     boolean reviewExists(Long id);
 
     /**
+     * Returns a list of reviews id by film_id
+     * @param id
+     * @return List<Map<String, Object>>
+     */
+    List<Long> getReviewIdByFilmId(Long id);
+
+    /**
+     * Returns a list of reviews id by user_id
+     * @param id
+     * @return List<Map<String, Object>>
+     */
+    List<Long> getReviewIdByUserId(Long id);
+
+    /**
+     * Checks for the review of film by id
+     *
+     * @param id
+     * @return true or false
+     */
+    boolean reviewFilmExists(Long id);
+
+    /**
+     * Checks for the review of user by id
+     *
+     * @param id
+     * @return true or false
+     */
+    boolean reviewUserExists(Long id);
+
+    /**
      * Checks for the existence of a review like
      *
      * @param id

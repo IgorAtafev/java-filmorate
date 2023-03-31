@@ -8,7 +8,11 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.*;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +21,7 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ReviewStorage reviewStorage;
 
     @Override
     public List<User> getUsers() {
@@ -114,6 +119,11 @@ public class UserDbStorage implements UserStorage {
     public void removeUser(Long id) {
         removeUserLike(id);
         removeUserFromFriends(id);
+
+        if (reviewStorage.reviewUserExists(id)) {
+            List<Long> reviewsId = reviewStorage.getReviewIdByUserId(id);
+            reviewsId.forEach(reviewStorage::removeReviewById);
+        }
 
         String sqlQuery = "DELETE FROM users " +
                 "WHERE id = ?";
