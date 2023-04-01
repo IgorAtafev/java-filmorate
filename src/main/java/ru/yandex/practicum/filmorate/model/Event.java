@@ -20,7 +20,6 @@ public class Event {
     @NotNull(message = "Feed operation cannot be null")
     String operation;
     @With
-    @NotNull(message = "Feed eventId cannot be null")
     Long eventId;
     @NotNull(message = "entityId cannot be null")
     Long entityId;
