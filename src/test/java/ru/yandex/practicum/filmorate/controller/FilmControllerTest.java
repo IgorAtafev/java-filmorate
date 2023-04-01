@@ -237,25 +237,27 @@ class FilmControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
 
-        verify(service, times(1)).getPopular(10);
+        verify(service, times(1)).getPopular(10, null, null);
     }
 
     @Test
     void getPopular_shouldReturnListOfPopularFilmsByNumberOfLikes() throws Exception {
         int count = 2;
+        Integer genreId = null;
+        Integer year = null;
         Film film1 = initFilm();
         Film film2 = initFilm();
 
         List<Film> expected = List.of(film1, film2);
         String json = objectMapper.writeValueAsString(expected);
 
-        when(service.getPopular(count)).thenReturn(expected);
+        when(service.getPopular(count, genreId, year)).thenReturn(expected);
 
         mockMvc.perform(get("/films/popular?count={count}", count))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
 
-        verify(service, times(1)).getPopular(count);
+        verify(service, times(1)).getPopular(count, genreId, year);
     }
 
     private static Stream<Arguments> provideInvalidFilms() {

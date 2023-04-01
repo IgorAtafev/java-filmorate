@@ -117,15 +117,43 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(int count) {
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
         String sqlQuery = "SELECT f.*, m.name mpa_name, " +
                 "COUNT(fl.user_id) count_of_likes " +
                 "FROM films f " +
                 "INNER JOIN mpa m ON m.id = f.mpa_id " +
-                "LEFT JOIN film_likes fl ON fl.film_id = f.id " +
-                "GROUP BY f.id " +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.id ";
+
+        if (genreId != null) {
+            sqlQuery += "INNER JOIN film_genres fg ON fg.film_id = f.id " +
+                    "WHERE fg.genre_id = ? ";
+        }
+
+        if (year != null) {
+            if (genreId != null) {
+                sqlQuery += "AND ";
+            } else {
+                sqlQuery += "WHERE ";
+            }
+
+            sqlQuery += "EXTRACT(YEAR FROM f.release_date) = ? ";
+        }
+
+        sqlQuery += "GROUP BY f.id " +
                 "ORDER BY count_of_likes DESC " +
                 "LIMIT ?";
+
+        if (genreId != null && year != null ) {
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, genreId, year, count);
+        }
+
+        if (genreId != null) {
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, genreId, count);
+        }
+
+        if (year != null) {
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, year, count);
+        }
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }

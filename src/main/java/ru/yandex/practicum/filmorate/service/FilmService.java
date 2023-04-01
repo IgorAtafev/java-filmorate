@@ -59,11 +59,14 @@ public interface FilmService {
     /**
      * Returns a list of popular films by number of likes
      * The number of films is set by the parameter count
+     * Filtering should be based on two parameters: by genre and for the year
      *
      * @param count
+     * @param genreId
+     * @param year
      * @return list of popular films
      */
-    List<Film> getPopular(int count);
+    List<Film> getPopular(int count, Integer genreId, Integer year);
 
     /**
      * Removes a film
