@@ -20,7 +20,6 @@ public class ReviewServiceImpl implements ReviewService {
     private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
     private static final String EMPTY_ID_ON_CREATION = "The review must have an empty ID when created";
     private static final String NOT_EMPTY_ID_ON_UPDATE = "The review must not have an empty ID when updating";
-    private static final String LIKE_REVIEW_EXISTS = "Like review with id %d for user with id %d and useful %b exists";
 
     private final ReviewStorage reviewStorage;
     private final FilmStorage filmStorage;
@@ -92,7 +91,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if (reviewStorage.likeExists(id, userId, isUseful)) {
-            throw new ValidationException(String.format(LIKE_REVIEW_EXISTS, id, userId, isUseful));
+            return;
         }
 
         reviewStorage.addLike(id, userId, isUseful);

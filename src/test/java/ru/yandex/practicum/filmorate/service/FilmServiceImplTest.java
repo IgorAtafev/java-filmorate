@@ -312,17 +312,21 @@ class FilmServiceImplTest {
     @Test
     void getPopular_shouldReturnEmptyListOfPopularFilms() {
         int count = 10;
+        Integer genreId = null;
+        Integer year = null;
 
-        when(filmStorage.getPopular(count)).thenReturn(Collections.emptyList());
+        when(filmStorage.getPopular(count, genreId, year)).thenReturn(Collections.emptyList());
 
-        assertTrue(filmService.getPopular(10).isEmpty());
+        assertTrue(filmService.getPopular(10, genreId, year).isEmpty());
 
-        verify(filmStorage, times(1)).getPopular(count);
+        verify(filmStorage, times(1)).getPopular(count, genreId, year);
     }
 
     @Test
     void getPopular_shouldReturnListOfPopularFilmsByNumberOfLikes() {
         int count = 2;
+        Integer genreId = null;
+        Integer year = null;
         Long userId1 = 1L;
         Long userId2 = 2L;
         Film film1 = initFilm();
@@ -334,11 +338,11 @@ class FilmServiceImplTest {
 
         List<Film> expected = List.of(film2, film1);
 
-        when(filmStorage.getPopular(count)).thenReturn(expected);
+        when(filmStorage.getPopular(count, genreId, year)).thenReturn(expected);
 
-        assertEquals(expected, filmService.getPopular(count));
+        assertEquals(expected, filmService.getPopular(count, genreId, year));
 
-        verify(filmStorage, times(1)).getPopular(count);
+        verify(filmStorage, times(1)).getPopular(count, genreId, year);
     }
 
     @Test
