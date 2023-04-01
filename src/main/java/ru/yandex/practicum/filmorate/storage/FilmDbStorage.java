@@ -143,7 +143,7 @@ public class FilmDbStorage implements FilmStorage {
                 "ORDER BY count_of_likes DESC " +
                 "LIMIT ?";
 
-        if (genreId != null && year != null ) {
+        if (genreId != null && year != null) {
             return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, genreId, year, count);
         }
 
