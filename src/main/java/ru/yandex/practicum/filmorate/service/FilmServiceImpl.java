@@ -24,7 +24,6 @@ public class FilmServiceImpl implements FilmService {
     private static final String EMPTY_ID_ON_CREATION = "The film must have an empty ID when created";
     private static final String NOT_EMPTY_ID_ON_UPDATE = "The film must not have an empty ID when updating";
     private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d does not exist";
-    private static final String LIKE_FILM_EXISTS = "Like film with id %d for user with id %d exists";
 
     private final FilmStorage filmStorage;
     private final MpaStorage mpaStorage;
@@ -92,7 +91,7 @@ public class FilmServiceImpl implements FilmService {
                 .timestamp(System.currentTimeMillis())
                 .build());
         if (filmStorage.likeExists(id, userId)) {
-            throw new ValidationException(String.format(LIKE_FILM_EXISTS, id, userId));
+            return;
         }
         filmStorage.addLike(id, userId);
     }
@@ -118,8 +117,8 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> getPopular(int count) {
-        return filmStorage.getPopular(count);
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        return filmStorage.getPopular(count, genreId, year);
     }
 
     @Override
