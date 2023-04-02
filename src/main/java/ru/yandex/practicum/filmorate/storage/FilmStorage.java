@@ -136,4 +136,13 @@ public interface FilmStorage {
      * @return true or false
      */
     boolean likeExists(Long id, Long userId);
+
+    /**
+     * Returns a list of films for search substring by title or/and director's name
+     *
+     * @param query search substring
+     * @param by search param title or/and director's name
+     * @return list of films
+     */
+    List<Film> search(String query, String[] by);
 }
