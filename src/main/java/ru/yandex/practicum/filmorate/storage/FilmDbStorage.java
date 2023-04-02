@@ -127,7 +127,8 @@ public class FilmDbStorage implements FilmStorage {
                 "COUNT(fl.user_id) count_of_likes " +
                 "FROM films f " +
                 "INNER JOIN mpa m ON m.id = f.mpa_id " +
-                "LEFT JOIN film_likes fl ON fl.film_id = f.id %s" +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.id " +
+                "%s " +
                 "GROUP BY f.id " +
                 "ORDER BY count_of_likes DESC " +
                 "LIMIT :limit";
