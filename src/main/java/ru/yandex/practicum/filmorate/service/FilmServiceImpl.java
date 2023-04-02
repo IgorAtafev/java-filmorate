@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -27,6 +29,8 @@ public class FilmServiceImpl implements FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
+
+    private final EventStorage eventStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -79,11 +83,16 @@ public class FilmServiceImpl implements FilmService {
         if (!userStorage.userExists(userId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
-
+        eventStorage.addEvent(Event.builder()
+                .userId(userId)
+                .entityId(id)
+                .eventType("LIKE")
+                .operation("ADD")
+                .timestamp(System.currentTimeMillis())
+                .build());
         if (filmStorage.likeExists(id, userId)) {
             return;
         }
-
         filmStorage.addLike(id, userId);
     }
 
@@ -98,6 +107,13 @@ public class FilmServiceImpl implements FilmService {
         }
 
         filmStorage.removeLike(id, userId);
+        eventStorage.addEvent(Event.builder()
+                .userId(userId)
+                .entityId(id)
+                .eventType("LIKE")
+                .operation("REMOVE")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override

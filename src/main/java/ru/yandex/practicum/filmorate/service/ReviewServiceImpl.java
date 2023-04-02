@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -24,6 +26,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final EventStorage eventStorage;
 
     @Override
     public List<Review> getReviews(Long filmId, int count) {
@@ -55,7 +58,15 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, review.getUserId()));
         }
 
-        return reviewStorage.createReview(review);
+        Review newReview = reviewStorage.createReview(review);
+        eventStorage.addEvent(Event.builder()
+                .userId(newReview.getUserId())
+                .entityId(newReview.getReviewId())
+                .eventType("REVIEW")
+                .operation("ADD")
+                .timestamp(System.currentTimeMillis())
+                .build());
+        return newReview;
     }
 
     @Override
@@ -68,7 +79,15 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, review.getReviewId()));
         }
 
-        return reviewStorage.updateReview(review);
+        Review newReview = reviewStorage.updateReview(review);
+        eventStorage.addEvent(Event.builder()
+                .userId(newReview.getUserId())
+                .entityId(newReview.getFilmId())
+                .eventType("REVIEW")
+                .operation("UPDATE")
+                .timestamp(System.currentTimeMillis())
+                .build());
+        return newReview;
     }
 
     @Override
@@ -76,6 +95,15 @@ public class ReviewServiceImpl implements ReviewService {
         if (!reviewStorage.reviewExists(id)) {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
         }
+
+        Review review = getReviewById(id);
+        eventStorage.addEvent(Event.builder()
+                .userId(review.getUserId())
+                .entityId(review.getFilmId())
+                .eventType("REVIEW")
+                .operation("REMOVE")
+                .timestamp(System.currentTimeMillis())
+                .build());
 
         reviewStorage.removeReviewById(id);
     }

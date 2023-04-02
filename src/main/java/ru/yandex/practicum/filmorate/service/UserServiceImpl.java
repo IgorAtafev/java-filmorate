@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage storage;
     private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
 
     @Override
     public List<User> getUsers() {
@@ -77,6 +80,13 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.addFriend(id, friendId);
+        eventStorage.addEvent(Event.builder()
+                .userId(id)
+                .entityId(friendId)
+                .eventType("FRIEND")
+                .operation("ADD")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
@@ -90,6 +100,13 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.removeFriend(id, friendId);
+        eventStorage.addEvent(Event.builder()
+                .userId(id)
+                .entityId(friendId)
+                .eventType("FRIEND")
+                .operation("REMOVE")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
@@ -130,6 +147,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return filmStorage.getRecommendations(id);
+    }
+
+    @Override
+    public List<Event> getUserEvents(Long id) {
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
+        return eventStorage.getUserEvents(id);
     }
 
     private void changeNameToLogin(User user) {
