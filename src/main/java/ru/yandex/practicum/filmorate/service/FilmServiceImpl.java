@@ -138,6 +138,11 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.getFilmsForDirector(directorId, sortBy);
     }
 
+    @Override
+    public List<Film> search(String query, String[] by) {
+        return filmStorage.search(query, by);
+    }
+
     private boolean isIdValueNull(Film film) {
         return film.getId() == null;
     }
