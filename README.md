@@ -58,6 +58,57 @@
     film_id — идентификатор фильма (первичный ключ, внешний ключ - отсылает к таблице films);
     user_id — идентификатор пользователя (первичный ключ, внешний ключ - отсылает к таблице users);
 
+**Таблица director**
+Информация о режиссёре:
+
+    director_id — идентификатор (первичный ключ);
+    name — имя режиссёра;
+
+**Таблица film_director**  
+Режиссёры фильмов:
+
+    film_id — идентификатор фильма (первичный ключ, внешний ключ - отсылает к таблице films);
+    director_id — идентификатор режиссёра (первичный ключ, внешний ключ - отсылает к таблице director);
+
+**Таблица events**
+Летна событий:
+    
+    event_id — идентификатор (первичный ключ);
+    timestamp — время события;
+    user_id — идентификатор пользователя (первичный ключ, внешний ключ - отсылает к таблице users);
+    event_type — идентификатор типа события (первичный ключ, внешний ключ - отсылает к таблице event_type);
+    operation — идентификатор операции (первичный ключ, внешний ключ - отсылает к таблице operation);
+    entity_id — идентификатор сущности, с которой произошло событие;
+
+**Таблица event_type**
+Типы событий:
+    
+    id — идентификатор (первичный ключ);
+    event_type_name — тип события (LIKE, REVIEW или FRIEND);
+
+**Таблица operation**
+Операции:
+
+    id — идентификатор (первичный ключ);
+    operation_name — операция (REMOVE, ADD, UPDATE);
+
+**Таблица reviews**
+Информация об отзыве:
+
+    id — идентификатор (первичный ключ);
+    content — содержание отзыва;
+    is_positive — тип отзыва (негативный/положительный);
+    film_id — идентификатор фильма (первичный ключ, внешний ключ - отсылает к таблице films);
+    user_id — идентификатор пользователя (первичный ключ, внешний ключ - отсылает к таблице users);
+    useful — рейтинг отзыва;
+
+**Таблица review_likes**
+Лайки отзывов:
+    
+    review_id — идентификатор отзыва (первичный ключ, внешний ключ - отсылает к таблице reviews);
+    user_id — идентификатор пользвателя (первичный ключ, внешний ключ - отсылает к таблице users);
+    is_useful — оценка отзыва (полезно/бесполезно);
+
 ------ 
 
 ### Примеры запросов  
@@ -85,6 +136,19 @@ FROM users;
 SELECT *
 FROM users
 WHERE id = 1;
+```
+
+**Все режиссёры**
+```roomsql
+SELECT *
+FROM director;
+```
+
+**Режиссёры по id**
+```roomsql
+SELECT *
+FROM director
+WHERE director_id = 1;
 ```
 
 **Друзья пользователя (вариант с JOIN)**
@@ -133,4 +197,68 @@ LEFT JOIN film_likes fl ON fl.film_id = f.id
 GROUP BY f.id
 ORDER BY count_of_likes DESC
 LIMIT 10;
+```
+
+**Режиссёры фильма**
+```roomsql
+SELECT d.* 
+FROM director AS d 
+RIGHT JOIN film_director fd ON d.director_id = fd.director_id 
+WHERE film_id = 1 ORDER BY director_id
+```
+
+**Все фильмы режиссёра, отсортированных по годам**
+```roomsql
+SELECT DISTINCT f.*, m.name mpa_name
+FROM film_director fd 
+LEFT JOIN films f ON f.id = fd.film_id 
+INNER JOIN mpa m ON m.id = f.mpa_id 
+WHERE fd.director_ID = 1
+ORDER BY EXTRACT(YEAR FROM f.release_date)
+```
+
+**Все фильмы режиссёра, отсортированных по количеству лайков**
+```roomsql
+SELECT DISTINCT f.*, m.name mpa_name
+FROM film_director fd 
+LEFT JOIN films f ON f.id = fd.film_id 
+INNER JOIN mpa m ON m.id = f.mpa_id 
+LEFT JOIN film_likes fl ON fl.film_id =f.id 
+WHERE fd.director_ID = 1 
+GROUP BY f.id 
+ORDER BY COUNT(f.id)
+```
+
+**Поиск фильмов по названию**
+```roomsql
+SELECT f.*, m.name mpa_name FROM films f 
+INNER JOIN mpa m ON m.id = f.mpa_id 
+LEFT JOIN film_likes fl ON fl.film_id = f.id 
+WHERE lower(f.name) LIKE lower('%крад%')
+GROUP BY f.id
+ORDER BY COUNT(fl.film_id) DESC, f.id ASC
+```
+
+**Поиск фильмов по режиссёру**
+```roomsql
+SELECT f.*, m.name mpa_name FROM films f 
+INNER JOIN mpa m ON m.id = f.mpa_id 
+LEFT JOIN film_likes fl ON fl.film_id = f.id 
+INNER JOIN film_director df ON f.id = df.film_id 
+INNER JOIN director d ON d.director_id = df.director_id 
+WHERE lower(d.name) LIKE lower('%крад%')
+GROUP BY f.id
+ORDER BY COUNT(fl.film_id) DESC, f.id ASC
+```
+
+**Поиск фильмов по названию и режиссёру**
+```roomsql
+SELECT f.*, m.name mpa_name FROM films f
+INNER JOIN mpa m ON m.id = f.mpa_id 
+LEFT JOIN film_likes fl ON fl.film_id = f.id 
+LEFT JOIN film_director df ON f.id = df.film_id 
+LEFT JOIN director d ON d.director_id = df.director_id
+WHERE lower(d.name) LIKE lower('%крад%') OR lower(f.name) LIKE lower('%крад%')
+GROUP BY f.id
+ORDER BY COUNT(fl.film_id) DESC, f.id ASC
 ```
