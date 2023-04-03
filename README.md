@@ -322,3 +322,12 @@ SELECT *
 FROM reviews
 WHERE id = 1
 ```
+
+**Лента событий пользователя**
+```roomsql
+SELECT e.timestamp, e.user_id, et.event_type_name, o.operation_name, e.event_id, e.entity_id
+FROM events e
+LEFT JOIN event_types et ON e.event_type = et.id
+LEFT JOIN operations o ON e.operation = o.id
+WHERE e.user_id = 1
+```
