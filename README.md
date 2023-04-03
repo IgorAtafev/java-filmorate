@@ -115,40 +115,40 @@
 **Все фильмы**
 ```roomsql
 SELECT *
-FROM films;
+FROM films
 ```
 
 **Фильм по id**
 ```roomsql
 SELECT *
 FROM films
-WHERE id = 1;
+WHERE id = 1
 ```
 
 **Все пользователи**
 ```roomsql
 SELECT *
-FROM users;
+FROM users
 ```
 
 **Пользователь по id**
 ```roomsql
 SELECT *
 FROM users
-WHERE id = 1;
+WHERE id = 1
 ```
 
 **Все режиссёры**
 ```roomsql
 SELECT *
-FROM director;
+FROM director
 ```
 
 **Режиссёры по id**
 ```roomsql
 SELECT *
 FROM director
-WHERE director_id = 1;
+WHERE director_id = 1
 ```
 
 **Друзья пользователя (вариант с JOIN)**
@@ -156,7 +156,7 @@ WHERE director_id = 1;
 SELECT u.*
 FROM users u
 INNER JOIN user_friends uf ON uf.friend_id = u.id
-WHERE uf.user_id = 1;
+WHERE uf.user_id = 1
 ```
 
 **Друзья пользователя (вариант с подзапросом)**
@@ -165,7 +165,7 @@ SELECT *
 FROM users
 WHERE id IN (SELECT friend_id
              FROM user_friends
-             WHERE user_id = 1);
+             WHERE user_id = 1)
 ```
 
 **Общие друзья пользователей (вариант с JOIN)**
@@ -174,7 +174,7 @@ SELECT u.*
 FROM users u
 INNER JOIN user_friends uf ON uf.friend_id = u.id
 INNER JOIN user_friends ufc ON ufc.friend_id = uf.friend_id
-WHERE uf.user_id = 1 AND ufc.user_id = 2;
+WHERE uf.user_id = 1 AND ufc.user_id = 2
 ```
 
 **Общие друзья пользователей (вариант с подзапросом)**
@@ -185,7 +185,7 @@ WHERE id IN (SELECT friend_id
              FROM user_friends
              WHERE user_id = 1 AND friend_id IN (SELECT friend_id
                                                  FROM user_friends
-                                                 WHERE user_id = 2));
+                                                 WHERE user_id = 2))
 ```
 
 **10 наиболее популярных фильмов по количеству лайков**
@@ -196,7 +196,45 @@ FROM films f
 LEFT JOIN film_likes fl ON fl.film_id = f.id
 GROUP BY f.id
 ORDER BY count_of_likes DESC
-LIMIT 10;
+LIMIT 10
+```
+
+**10 наиболее популярных фильмов по количеству лайков, отфильтрованных по жанру**
+```roomsql
+SELECT f.*,
+       COUNT(fl.user_id) count_of_likes
+FROM films f
+LEFT JOIN film_likes fl ON fl.film_id = f.id
+INNER JOIN film_genres fg ON fg.film_id = f.id
+WHERE fg.genre_id = 1
+GROUP BY f.id
+ORDER BY count_of_likes DESC
+LIMIT 10
+```
+
+**10 наиболее популярных фильмов по количеству лайков за указанный год**
+```roomsql
+SELECT f.*,
+       COUNT(fl.user_id) count_of_likes
+FROM films f
+LEFT JOIN film_likes fl ON fl.film_id = f.id
+WHERE EXTRACT(YEAR FROM f.release_date) = 2000
+GROUP BY f.id
+ORDER BY count_of_likes DESC
+LIMIT 10
+```
+
+**10 наиболее популярных фильмов по количеству лайков, отфильтрованных по жанру за указанный год**
+```roomsql
+SELECT f.*,
+       COUNT(fl.user_id) count_of_likes
+FROM films f
+LEFT JOIN film_likes fl ON fl.film_id = f.id
+INNER JOIN film_genres fg ON fg.film_id = f.id
+WHERE fg.genre_id = 1 AND EXTRACT(YEAR FROM f.release_date) = 2000
+GROUP BY f.id
+ORDER BY count_of_likes DESC
+LIMIT 10
 ```
 
 **Режиссёры фильма**
@@ -261,4 +299,26 @@ LEFT JOIN director d ON d.director_id = df.director_id
 WHERE lower(d.name) LIKE lower('%крад%') OR lower(f.name) LIKE lower('%крад%')
 GROUP BY f.id
 ORDER BY COUNT(fl.film_id) DESC, f.id ASC
+```
+
+**10 отзывов, отсортированные по рейтингу**
+```roomsql
+SELECT *
+FROM reviews
+ORDER BY useful DESC
+``````
+
+**10 отзывов о фильме, отсортированные по рейтингу**
+```roomsql
+SELECT *
+FROM reviews
+WHERE film_id = 1 
+ORDER BY useful DESC
+```
+
+**Отзыв по id**
+```roomsql
+SELECT *
+FROM reviews
+WHERE id = 1
 ```
