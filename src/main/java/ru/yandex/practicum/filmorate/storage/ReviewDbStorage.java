@@ -104,28 +104,56 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void addLike(Long id, Long userId, boolean isUseful) {
+    public void addLike(Long id, Long userId) {
         String sqlQuery = "INSERT INTO review_likes (review_id, user_id, is_useful) " +
                 "VALUES (?, ?, ?)";
 
-        jdbcTemplate.update(sqlQuery, id, userId, isUseful);
+        jdbcTemplate.update(sqlQuery, id, userId, true);
 
         sqlQuery = "UPDATE reviews " +
-                "SET useful = useful " + setUsefulOperationForAddLike(isUseful) + " 1 " +
+                "SET useful = useful + 1 " +
                 "WHERE id = ?";
 
         jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
-    public void removeLike(Long id, Long userId, boolean isUseful) {
+    public void removeLike(Long id, Long userId) {
         String sqlQuery = "DELETE FROM review_likes " +
                 "WHERE review_id = ? AND user_id = ? AND is_useful = ?";
 
-        jdbcTemplate.update(sqlQuery, id, userId, isUseful);
+        jdbcTemplate.update(sqlQuery, id, userId, true);
 
         sqlQuery = "UPDATE reviews " +
-                "SET useful = useful " + setUsefulOperationForRemoveLike(isUseful) + " 1 " +
+                "SET useful = useful - 1" +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void addDislike(Long id, Long userId) {
+        String sqlQuery = "INSERT INTO review_likes (review_id, user_id, is_useful) " +
+                "VALUES (?, ?, ?)";
+
+        jdbcTemplate.update(sqlQuery, id, userId, false);
+
+        sqlQuery = "UPDATE reviews " +
+                "SET useful = useful - 1 " +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeDislike(Long id, Long userId) {
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE review_id = ? AND user_id = ? AND is_useful = ?";
+
+        jdbcTemplate.update(sqlQuery, id, userId, false);
+
+        sqlQuery = "UPDATE reviews " +
+                "SET useful = useful + 1" +
                 "WHERE id = ?";
 
         jdbcTemplate.update(sqlQuery, id);
@@ -173,29 +201,23 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public boolean likeExists(Long id, Long userId, boolean isUseful) {
+    public boolean likeExists(Long id, Long userId) {
         String sqlQuery = "SELECT 1 FROM review_likes " +
                 "WHERE review_id = ? AND user_id = ? AND is_useful = ?";
 
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id, userId, isUseful);
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id, userId, true);
 
         return row.next();
     }
 
-    private String setUsefulOperationForAddLike(boolean isUseful) {
-        if (isUseful) {
-            return "+";
-        }
+    @Override
+    public boolean disLikeExists(Long id, Long userId) {
+        String sqlQuery = "SELECT 1 FROM review_likes " +
+                "WHERE review_id = ? AND user_id = ? AND is_useful = ?";
 
-        return "-";
-    }
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id, userId, false);
 
-    private String setUsefulOperationForRemoveLike(boolean isUseful) {
-        if (isUseful) {
-            return "-";
-        }
-
-        return "+";
+        return row.next();
     }
 
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {

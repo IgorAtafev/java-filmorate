@@ -276,12 +276,29 @@ class ReviewServiceImplTest {
 
         when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
         when(userStorage.userExists(userId)).thenReturn(true);
+        when(reviewStorage.likeExists(reviewId, userId)).thenReturn(false);
 
-        reviewService.addLike(reviewId, userId, true);
+        reviewService.addLike(reviewId, userId);
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, times(1)).userExists(userId);
-        verify(reviewStorage, times(1)).addLike(reviewId, userId, true);
+        verify(reviewStorage, times(1)).likeExists(reviewId, userId);
+        verify(reviewStorage, times(1)).addLike(reviewId, userId);
+    }
+
+    @Test
+    void addLike_shouldNotAddTheUserDisLikeToAReview_ifLikeIfExists() {
+        Long reviewId = 1L;
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
+        when(reviewStorage.likeExists(reviewId, userId)).thenReturn(true);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, times(1)).likeExists(reviewId, userId);
+        verify(reviewStorage, never()).addLike(reviewId, userId);
     }
 
     @ParameterizedTest
@@ -293,12 +310,12 @@ class ReviewServiceImplTest {
 
         assertThrows(
                 NotFoundException.class,
-                () -> reviewService.addLike(reviewId, userId, true)
+                () -> reviewService.addLike(reviewId, userId)
         );
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, never()).userExists(userId);
-        verify(reviewStorage, never()).addLike(reviewId, userId, true);
+        verify(reviewStorage, never()).addLike(reviewId, userId);
     }
 
     @ParameterizedTest
@@ -311,12 +328,12 @@ class ReviewServiceImplTest {
 
         assertThrows(
                 NotFoundException.class,
-                () -> reviewService.addLike(reviewId, userId, true)
+                () -> reviewService.addLike(reviewId, userId)
         );
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, times(1)).userExists(userId);
-        verify(reviewStorage, never()).addLike(reviewId, userId, true);
+        verify(reviewStorage, never()).addLike(reviewId, userId);
     }
 
     @Test
@@ -327,11 +344,11 @@ class ReviewServiceImplTest {
         when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
         when(userStorage.userExists(userId)).thenReturn(true);
 
-        reviewService.removeLike(reviewId, userId, true);
+        reviewService.removeLike(reviewId, userId);
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, times(1)).userExists(userId);
-        verify(reviewStorage, times(1)).removeLike(reviewId, userId, true);
+        verify(reviewStorage, times(1)).removeLike(reviewId, userId);
     }
 
     @ParameterizedTest
@@ -343,12 +360,12 @@ class ReviewServiceImplTest {
 
         assertThrows(
                 NotFoundException.class,
-                () -> reviewService.removeLike(reviewId, userId, true)
+                () -> reviewService.removeLike(reviewId, userId)
         );
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, never()).userExists(userId);
-        verify(reviewStorage, never()).removeLike(reviewId, userId, true);
+        verify(reviewStorage, never()).removeLike(reviewId, userId);
     }
 
     @ParameterizedTest
@@ -361,12 +378,129 @@ class ReviewServiceImplTest {
 
         assertThrows(
                 NotFoundException.class,
-                () -> reviewService.removeLike(reviewId, userId, true)
+                () -> reviewService.removeLike(reviewId, userId)
         );
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, times(1)).userExists(userId);
-        verify(reviewStorage, never()).removeLike(reviewId, userId, true);
+        verify(reviewStorage, never()).removeLike(reviewId, userId);
+    }
+
+    @Test
+    void addDislike_shouldAddTheUserDisLikeToAReview() {
+        Long reviewId = 1L;
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
+        when(reviewStorage.disLikeExists(reviewId, userId)).thenReturn(false);
+
+        reviewService.addDislike(reviewId, userId);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, times(1)).disLikeExists(reviewId, userId);
+        verify(reviewStorage, times(1)).addDislike(reviewId, userId);
+    }
+
+    @Test
+    void addDislike_shouldNotAddTheUserDisLikeToAReview_ifDislikeIfExists() {
+        Long reviewId = 1L;
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
+        when(reviewStorage.disLikeExists(reviewId, userId)).thenReturn(true);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, times(1)).disLikeExists(reviewId, userId);
+        verify(reviewStorage, never()).addDislike(reviewId, userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addDislike_shouldThrowAnException_ifReviewDoesNotExist(Long reviewId) {
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.addDislike(reviewId, userId)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, never()).userExists(userId);
+        verify(reviewStorage, never()).addDislike(reviewId, userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void addDislike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        Long reviewId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.addDislike(reviewId, userId)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, never()).addDislike(reviewId, userId);
+    }
+
+    @Test
+    void removeDislike_shouldRemoveTheUserLikeToAReview() {
+        Long reviewId = 1L;
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(true);
+
+        reviewService.removeDislike(reviewId, userId);
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, times(1)).removeDislike(reviewId, userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeDislike_shouldThrowAnException_ifReviewDoesNotExist(Long reviewId) {
+        Long userId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.removeDislike(reviewId, userId)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, never()).userExists(userId);
+        verify(reviewStorage, never()).removeDislike(reviewId, userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeDislike_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        Long reviewId = 1L;
+
+        when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
+        when(userStorage.userExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reviewService.removeDislike(reviewId, userId)
+        );
+
+        verify(reviewStorage, times(1)).reviewExists(reviewId);
+        verify(userStorage, times(1)).userExists(userId);
+        verify(reviewStorage, never()).removeDislike(reviewId, userId);
     }
 
     private Review initReview() {

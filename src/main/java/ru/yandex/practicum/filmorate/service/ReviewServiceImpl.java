@@ -59,6 +59,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review newReview = reviewStorage.createReview(review);
+
         eventStorage.addEvent(Event.builder()
                 .userId(newReview.getUserId())
                 .entityId(newReview.getReviewId())
@@ -66,6 +67,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .operation("ADD")
                 .timestamp(System.currentTimeMillis())
                 .build());
+
         return newReview;
     }
 
@@ -80,6 +82,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review newReview = reviewStorage.updateReview(review);
+
         eventStorage.addEvent(Event.builder()
                 .userId(newReview.getUserId())
                 .entityId(newReview.getFilmId())
@@ -87,6 +90,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .operation("UPDATE")
                 .timestamp(System.currentTimeMillis())
                 .build());
+
         return newReview;
     }
 
@@ -97,6 +101,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review review = getReviewById(id);
+
         eventStorage.addEvent(Event.builder()
                 .userId(review.getUserId())
                 .entityId(review.getFilmId())
@@ -109,7 +114,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void addLike(Long id, Long userId, boolean isUseful) {
+    public void addLike(Long id, Long userId) {
         if (!reviewStorage.reviewExists(id)) {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
         }
@@ -118,15 +123,15 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
 
-        if (reviewStorage.likeExists(id, userId, isUseful)) {
+        if (reviewStorage.likeExists(id, userId)) {
             return;
         }
 
-        reviewStorage.addLike(id, userId, isUseful);
+        reviewStorage.addLike(id, userId);
     }
 
     @Override
-    public void removeLike(Long id, Long userId, boolean isUseful) {
+    public void removeLike(Long id, Long userId) {
         if (!reviewStorage.reviewExists(id)) {
             throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
         }
@@ -135,7 +140,37 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
 
-        reviewStorage.removeLike(id, userId, isUseful);
+        reviewStorage.removeLike(id, userId);
+    }
+
+    @Override
+    public void addDislike(Long id, Long userId) {
+        if (!reviewStorage.reviewExists(id)) {
+            throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
+        }
+
+        if (!userStorage.userExists(userId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
+        }
+
+        if (reviewStorage.disLikeExists(id, userId)) {
+            return;
+        }
+
+        reviewStorage.addDislike(id, userId);
+    }
+
+    @Override
+    public void removeDislike(Long id, Long userId) {
+        if (!reviewStorage.reviewExists(id)) {
+            throw new NotFoundException(String.format(REVIEW_DOES_NOT_EXIST, id));
+        }
+
+        if (!userStorage.userExists(userId)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
+        }
+
+        reviewStorage.removeDislike(id, userId);
     }
 
     private boolean isIdValueNull(Review review) {
