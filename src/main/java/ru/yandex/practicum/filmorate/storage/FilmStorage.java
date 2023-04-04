@@ -57,11 +57,21 @@ public interface FilmStorage {
     /**
      * Returns a list of popular films by number of likes
      * The number of films is set by the parameter count
+     * Filtering should be based on two parameters: by genre and for the year
      *
      * @param count
+     * @param genreId
+     * @param year
      * @return list of popular films
      */
-    List<Film> getPopular(int count);
+    List<Film> getPopular(int count, Integer genreId, Integer year);
+
+    /**
+     * Removes a film
+     *
+     * @param id
+     */
+    void removeFilm(Long id);
 
     /**
      * Checks for the existence of Film by id
@@ -72,6 +82,44 @@ public interface FilmStorage {
     boolean filmExists(Long id);
 
     /**
+     * Checks for the existence of Director by id Film
+     *
+     * @param id
+     * @return true or false
+     */
+    boolean filmDirectorExists(Long id);
+
+    /**
+     * Returns a list of films related to users preferences
+     * If the user is not found throws NotFoundException
+     *
+     * @param id
+     * @return list of films recommended to user
+     */
+    List<Film> getRecommendations(Long id);
+
+    /**
+     * Removes a film from film_likes
+     *
+     * @param id
+     */
+    void removeLikeFilm(Long id);
+
+    /**
+     * Removes a film from film_genres
+     *
+     * @param id
+     */
+    void removeGenreFilm(Long id);
+
+    /**
+     * Removes a film from film_director
+     *
+     * @param id
+     */
+    void removeFilmDirector(long id);
+
+    /**
      * Returns a list of films for director, sorted by likes or year
      *
      * @param directorId director's id
@@ -79,4 +127,22 @@ public interface FilmStorage {
      * @return list of films
      */
     List<Film> getFilmsForDirector(Long directorId, String sortBy);
+
+    /**
+     * Checks for the existence of a film like
+     *
+     * @param id
+     * @param userId
+     * @return true or false
+     */
+    boolean likeExists(Long id, Long userId);
+
+    /**
+     * Returns a list of films for search substring by title or/and director's name
+     *
+     * @param query search substring
+     * @param by search param title or/and director's name
+     * @return list of films
+     */
+    List<Film> search(String query, String[] by);
 }

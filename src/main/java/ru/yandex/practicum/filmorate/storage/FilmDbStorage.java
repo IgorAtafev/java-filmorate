@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -12,10 +14,16 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.sql.*;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,6 +34,8 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
     private final DirectorStorage directorStorage;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final ReviewStorage reviewStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -112,17 +122,42 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(int count) {
-        String sqlQuery = "SELECT f.*, m.name mpa_name, " +
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        String sqlTemplate = "SELECT f.*, m.name mpa_name, " +
                 "COUNT(fl.user_id) count_of_likes " +
                 "FROM films f " +
                 "INNER JOIN mpa m ON m.id = f.mpa_id " +
                 "LEFT JOIN film_likes fl ON fl.film_id = f.id " +
+                "%s " +
                 "GROUP BY f.id " +
                 "ORDER BY count_of_likes DESC " +
-                "LIMIT ?";
+                "LIMIT :limit";
 
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        String sqlWhere = "";
+        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
+
+        sqlParameterSource.addValue("limit", count);
+
+        if (genreId != null) {
+            sqlWhere = "INNER JOIN film_genres fg ON fg.film_id = f.id " +
+                    "WHERE fg.genre_id = :genre_id ";
+            sqlParameterSource.addValue("genre_id", genreId);
+        }
+
+        if (year != null) {
+            if (genreId != null) {
+                sqlWhere += "AND ";
+            } else {
+                sqlWhere += "WHERE ";
+            }
+
+            sqlWhere += "EXTRACT(YEAR FROM f.release_date) = :year ";
+            sqlParameterSource.addValue("year", year);
+        }
+
+        String sqlQuery = String.format(sqlTemplate, sqlWhere);
+
+        return namedParameterJdbcTemplate.query(sqlQuery, sqlParameterSource, this::mapRowToFilm);
     }
 
     @Override
@@ -132,6 +167,57 @@ public class FilmDbStorage implements FilmStorage {
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         return row.next();
+    }
+
+    @Override
+    public boolean filmDirectorExists(Long id) {
+        String sqlQuery = "SELECT 1 FROM film_director WHERE film_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+
+        return row.next();
+    }
+
+    @Override
+    public void removeFilm(Long id) {
+        removeLikeFilm(id);
+        removeGenreFilm(id);
+
+        if (filmDirectorExists(id)) {
+            removeFilmDirector(id);
+        }
+        if (reviewStorage.reviewFilmExists(id)) {
+            List<Long> reviewsId = reviewStorage.getReviewIdByFilmId(id);
+            reviewsId.forEach(reviewStorage::removeReviewById);
+        }
+
+        String sqlQuery = "DELETE FROM films " +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeLikeFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_likes " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeGenreFilm(Long id) {
+        String sqlQuery = "DELETE FROM film_genres " +
+                "WHERE film_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeFilmDirector(long id) {
+        String sqlQuery = "DELETE FROM film_director WHERE director_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
@@ -152,6 +238,74 @@ public class FilmDbStorage implements FilmStorage {
                     "ORDER BY COUNT(f.id)");
         }
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+    }
+
+    @Override
+    public List<Film> getRecommendations(Long id) {
+        List<Film> recommendedFilms = new ArrayList<>();
+
+        /* Finding a user with the most intersections by likes with the primary user */
+        String sqlQueryForUserId = "SELECT user_id FROM film_likes " +
+                "WHERE film_id IN (SELECT film_id FROM film_likes WHERE user_id = ?) AND user_id != ? " +
+                "GROUP BY user_id ORDER BY COUNT(film_id) DESC LIMIT 1";
+
+        SqlRowSet rowUser = jdbcTemplate.queryForRowSet(sqlQueryForUserId, id, id);
+
+        if (!rowUser.first()) {
+            return recommendedFilms;
+        }
+
+        Long userWithIntersections = rowUser.getLong("user_id");
+
+        /* Finding films according to the user with most intersections that primary user haven't liked yet */
+        String sqlQueryForFilms = "SELECT f.*, m.name mpa_name FROM film_likes fl " +
+                "LEFT JOIN films f ON fl.film_id = f.id INNER JOIN mpa m ON m.id = f.mpa_id " +
+                "WHERE user_id = ? AND film_id NOT IN " +
+                "(SELECT film_id FROM film_likes WHERE user_id = ?)";
+
+        return jdbcTemplate.query(sqlQueryForFilms, this::mapRowToFilm, userWithIntersections, id);
+    }
+
+    @Override
+    public boolean likeExists(Long id, Long userId) {
+        String sqlQuery = "SELECT 1 FROM film_likes " +
+                "WHERE film_id = ? AND user_id = ?";
+
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id, userId);
+
+        return row.next();
+    }
+
+    @Override
+    public List<Film> search(String query, String[] by) {
+        String sqlTemplate = "SELECT f.*, m.name mpa_name FROM films f \n" +
+                "INNER JOIN mpa m ON m.id = f.mpa_id \n" +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.id \n" +
+                "%s \n" +
+                "GROUP BY f.id \n" +
+                "ORDER BY COUNT(fl.film_id) DESC, f.id ASC";
+        String sql;
+        if ((by.length == 1) && by[0].equals("title")) {
+            sql = String.format(sqlTemplate, "WHERE lower(f.name) LIKE lower(:query)");
+        } else {
+            if (by.length == 1) {
+                sql = String.format(sqlTemplate,
+                        "INNER JOIN film_director df ON f.id = df.film_id \n" +
+                        "INNER JOIN director d ON d.director_id = df.director_id \n" +
+                        "WHERE lower(d.name) LIKE lower(:query)");
+            } else {
+                sql = String.format(sqlTemplate,
+                        "LEFT JOIN film_director df ON f.id = df.film_id \n" +
+                        "LEFT JOIN director d ON d.director_id = df.director_id \n" +
+                        "WHERE lower(d.name) LIKE lower(:query) OR lower(f.name) LIKE lower(:query)");
+            }
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", "%" + query + "%");
+
+        MapSqlParameterSource param = new MapSqlParameterSource(params);
+
+        return namedParameterJdbcTemplate.query(sql, param, this::mapRowToFilm);
     }
 
     private void addGenres(Long filmId, Collection<Genre> filmGenres) {

@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -27,6 +29,8 @@ public class FilmServiceImpl implements FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
+
+    private final EventStorage eventStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -79,7 +83,16 @@ public class FilmServiceImpl implements FilmService {
         if (!userStorage.userExists(userId)) {
             throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
         }
-
+        eventStorage.addEvent(Event.builder()
+                .userId(userId)
+                .entityId(id)
+                .eventType("LIKE")
+                .operation("ADD")
+                .timestamp(System.currentTimeMillis())
+                .build());
+        if (filmStorage.likeExists(id, userId)) {
+            return;
+        }
         filmStorage.addLike(id, userId);
     }
 
@@ -94,11 +107,27 @@ public class FilmServiceImpl implements FilmService {
         }
 
         filmStorage.removeLike(id, userId);
+        eventStorage.addEvent(Event.builder()
+                .userId(userId)
+                .entityId(id)
+                .eventType("LIKE")
+                .operation("REMOVE")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
-    public List<Film> getPopular(int count) {
-        return filmStorage.getPopular(count);
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        return filmStorage.getPopular(count, genreId, year);
+    }
+
+    @Override
+    public void removeFilm(Long id) {
+        if (!filmStorage.filmExists(id)) {
+            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+        }
+
+        filmStorage.removeFilm(id);
     }
 
     @Override
@@ -107,6 +136,11 @@ public class FilmServiceImpl implements FilmService {
             throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));
         }
         return filmStorage.getFilmsForDirector(directorId, sortBy);
+    }
+
+    @Override
+    public List<Film> search(String query, String[] by) {
+        return filmStorage.search(query, by);
     }
 
     private boolean isIdValueNull(Film film) {

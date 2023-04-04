@@ -2,7 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
@@ -14,12 +18,14 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
+    private static final String USER_DOES_NOT_EXIST = "User with id %d does not exist";
     private static final String EMPTY_ID_ON_CREATION = "The user must have an empty ID when created";
     private static final String NOT_EMPTY_ID_ON_UPDATE = "The user must not have an empty ID when updating";
     private static final String USER_CANNOT_ADD_HIMSELF_AS_FRIEND = "The user cannot add himself as a friend";
 
     private final UserStorage storage;
+    private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
 
     @Override
     public List<User> getUsers() {
@@ -74,6 +80,13 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.addFriend(id, friendId);
+        eventStorage.addEvent(Event.builder()
+                .userId(id)
+                .entityId(friendId)
+                .eventType("FRIEND")
+                .operation("ADD")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
@@ -87,6 +100,13 @@ public class UserServiceImpl implements UserService {
         }
 
         storage.removeFriend(id, friendId);
+        eventStorage.addEvent(Event.builder()
+                .userId(id)
+                .entityId(friendId)
+                .eventType("FRIEND")
+                .operation("REMOVE")
+                .timestamp(System.currentTimeMillis())
+                .build());
     }
 
     @Override
@@ -109,6 +129,32 @@ public class UserServiceImpl implements UserService {
         }
 
         return storage.getCommonFriends(id, otherId);
+    }
+
+    @Override
+    public void removeUser(Long id) {
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
+
+        storage.removeUser(id);
+    }
+
+    @Override
+    public List<Film> getRecommendations(Long id) {
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
+
+        return filmStorage.getRecommendations(id);
+    }
+
+    @Override
+    public List<Event> getUserEvents(Long id) {
+        if (!storage.userExists(id)) {
+            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, id));
+        }
+        return eventStorage.getUserEvents(id);
     }
 
     private void changeNameToLogin(User user) {
