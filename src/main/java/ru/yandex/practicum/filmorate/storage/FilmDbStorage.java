@@ -33,7 +33,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
-    private final DirectorStorage directorStorage;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final ReviewStorage reviewStorage;
 
@@ -389,7 +388,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setMpa(mpa);
 
         film.addGenres(genreStorage.getGenresByFilmId(film.getId()));
-        film.addDirectors(directorStorage.getDirectorsByFilmId(film.getId()));
 
         return film;
     }

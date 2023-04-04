@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
@@ -44,6 +45,8 @@ class FilmServiceImplTest {
 
     @Mock
     private EventStorage eventStorage;
+    @Mock
+    private DirectorStorage directorStorage;
 
     @InjectMocks
     private FilmServiceImpl filmService;
