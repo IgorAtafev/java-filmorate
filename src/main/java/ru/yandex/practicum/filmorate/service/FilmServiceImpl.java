@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -29,8 +31,6 @@ public class FilmServiceImpl implements FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
-    private final EventStorage eventStorage;
-
     private final EventStorage eventStorage;
 
     @Override
@@ -94,8 +94,8 @@ public class FilmServiceImpl implements FilmService {
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
-                .eventType("LIKE")
-                .operation("ADD")
+                .eventType(EventType.LIKE)
+                .operation(Operations.ADD)
                 .timestamp(System.currentTimeMillis())
                 .build());
         if (filmStorage.likeExists(id, userId)) {
@@ -118,8 +118,8 @@ public class FilmServiceImpl implements FilmService {
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
-                .eventType("LIKE")
-                .operation("REMOVE")
+                .eventType(EventType.LIKE)
+                .operation(Operations.REMOVE)
                 .timestamp(System.currentTimeMillis())
                 .build());
     }

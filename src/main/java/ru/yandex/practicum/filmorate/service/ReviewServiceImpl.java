@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -62,8 +64,8 @@ public class ReviewServiceImpl implements ReviewService {
         eventStorage.addEvent(Event.builder()
                 .userId(newReview.getUserId())
                 .entityId(newReview.getReviewId())
-                .eventType("REVIEW")
-                .operation("ADD")
+                .eventType(EventType.REVIEW)
+                .operation(Operations.ADD)
                 .timestamp(System.currentTimeMillis())
                 .build());
         return newReview;
@@ -83,8 +85,8 @@ public class ReviewServiceImpl implements ReviewService {
         eventStorage.addEvent(Event.builder()
                 .userId(newReview.getUserId())
                 .entityId(newReview.getFilmId())
-                .eventType("REVIEW")
-                .operation("UPDATE")
+                .eventType(EventType.REVIEW)
+                .operation(Operations.UPDATE)
                 .timestamp(System.currentTimeMillis())
                 .build());
         return newReview;
@@ -100,8 +102,8 @@ public class ReviewServiceImpl implements ReviewService {
         eventStorage.addEvent(Event.builder()
                 .userId(review.getUserId())
                 .entityId(review.getFilmId())
-                .eventType("REVIEW")
-                .operation("REMOVE")
+                .eventType(EventType.REVIEW)
+                .operation(Operations.REMOVE)
                 .timestamp(System.currentTimeMillis())
                 .build());
 

@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -460,16 +462,16 @@ class UserServiceImplTest {
     private static List<Event> initEvents() {
         Event event1 = Event.builder()
                 .timestamp(System.currentTimeMillis())
-                .eventType("LIKE")
-                .operation("ADD")
+                .eventType(EventType.LIKE)
+                .operation(Operations.ADD)
                 .eventId(3L)
                 .entityId(2L)
                 .build();
 
         Event event2 = Event.builder()
                 .timestamp(System.currentTimeMillis())
-                .eventType("FRIEND")
-                .operation("REMOVE")
+                .eventType(EventType.FRIEND)
+                .operation(Operations.REMOVE)
                 .eventId(4L)
                 .entityId(1L)
                 .build();
