@@ -84,7 +84,7 @@ public class FilmController {
         if (!SORTED_BY.contains(sortBy.toLowerCase())) {
             throw new ValidationException(String.format("Invalid request parameter sortBy='%s'", sortBy));
         }
-        return service.getFilmsForDirector(directorId, sortBy.toLowerCase());
+        return service.getFilmsByDirector(directorId, sortBy.toLowerCase());
     }
 
     @GetMapping("/search")

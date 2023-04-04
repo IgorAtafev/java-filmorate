@@ -16,6 +16,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+
 @Component
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
@@ -49,15 +50,15 @@ public class UserDbStorage implements UserStorage {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(conn -> {
-                    PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
 
-                    ps.setString(1, user.getEmail());
-                    ps.setString(2, user.getLogin());
-                    ps.setString(3, user.getName());
-                    ps.setDate(4, Date.valueOf(user.getBirthday()));
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getName());
+            ps.setDate(4, Date.valueOf(user.getBirthday()));
 
-                    return ps;
-                }, generatedKeyHolder);
+            return ps;
+        }, generatedKeyHolder);
 
         Long id = generatedKeyHolder.getKey().longValue();
 

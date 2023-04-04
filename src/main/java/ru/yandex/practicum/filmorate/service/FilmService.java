@@ -82,7 +82,7 @@ public interface FilmService {
      * @param sortBy sorted type (likes or year)
      * @return list of films
      */
-    List<Film> getFilmsForDirector(Long directorId, String sortBy);
+    List<Film> getFilmsByDirector(Long directorId, String sortBy);
 
     /**
      * Returns a list of films for search substring by title or/and director's name

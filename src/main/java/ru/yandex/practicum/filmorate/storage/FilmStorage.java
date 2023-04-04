@@ -126,7 +126,7 @@ public interface FilmStorage {
      * @param sortBy     sorted type (likes or year)
      * @return list of films
      */
-    List<Film> getFilmsForDirector(Long directorId, String sortBy);
+    List<Film> getFilmsByDirector(Long directorId, String sortBy);
 
     /**
      * Checks for the existence of a film like
