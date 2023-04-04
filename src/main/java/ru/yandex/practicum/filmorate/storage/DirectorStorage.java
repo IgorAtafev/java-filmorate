@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface DirectorStorage {
     /**
@@ -59,4 +61,10 @@ public interface DirectorStorage {
      * @return true or false
      */
     boolean directorExists(long id);
+
+    /**
+     * Add directors to films
+     * @param films - collection of films
+     */
+    void addDirectorsToFilms(List<Film> films);
 }

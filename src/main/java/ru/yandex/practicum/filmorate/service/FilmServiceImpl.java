@@ -29,19 +29,27 @@ public class FilmServiceImpl implements FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
+    private final EventStorage eventStorage;
 
     private final EventStorage eventStorage;
 
     @Override
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        List<Film> films = filmStorage.getFilms();
+
+        directorStorage.addDirectorsToFilms(films);
+        return films;
     }
 
     @Override
     public Film getFilmById(Long id) {
-        return filmStorage.getFilmById(id).orElseThrow(
+        Film film = filmStorage.getFilmById(id).orElseThrow(
                 () -> new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id))
         );
+
+        film.addDirectors(directorStorage.getDirectorsByFilmId(film.getId()));
+        return film;
+
     }
 
     @Override
@@ -118,7 +126,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
-        return filmStorage.getPopular(count, genreId, year);
+        List<Film> films = filmStorage.getPopular(count, genreId, year);
+        directorStorage.addDirectorsToFilms(films);
+        return films;
     }
 
     @Override
@@ -131,11 +141,20 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         if (!directorStorage.directorExists(directorId)) {
             throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));
         }
-        return filmStorage.getFilmsForDirector(directorId, sortBy);
+        List<Film> films = filmStorage.getFilmsByDirector(directorId, sortBy);
+        directorStorage.addDirectorsToFilms(films);
+        return films;
+    }
+
+    @Override
+    public List<Film> search(String query, String[] by) {
+        List<Film> films = filmStorage.search(query, by);
+        directorStorage.addDirectorsToFilms(films);
+        return films;
     }
 
     private boolean isIdValueNull(Film film) {

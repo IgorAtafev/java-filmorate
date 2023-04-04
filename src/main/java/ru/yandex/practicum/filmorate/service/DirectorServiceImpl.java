@@ -14,8 +14,6 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class DirectorServiceImpl implements DirectorService {
-    private static final String NOT_EMPTY_ID_ON_UPDATE = "The director must not have an empty ID when updating";
-    private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d  does not exist";
 
     private final DirectorStorage storage;
 
@@ -37,7 +35,7 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public int delete(long id) {
         if (!storage.directorExists(id)) {
-            throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, id));
+            throw new NotFoundException(String.format("Director with id %d  does not exist", id));
         }
         return storage.delete(id);
     }
@@ -45,10 +43,10 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public Director update(Director obj) {
         if (isIdValueNull(obj)) {
-            throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
+            throw new ValidationException("The director must not have an empty ID when updating");
         }
         if (!storage.directorExists(obj.getId())) {
-            throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, obj.getId()));
+            throw new NotFoundException(String.format("Director with id %d  does not exist", obj.getId()));
         }
         return storage.update(obj);
     }

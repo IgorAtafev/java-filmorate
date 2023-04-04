@@ -57,7 +57,7 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received DELETE /films{}/like/{}", id, userId);
+        log.info("Request received DELETE /films/{}/like/{}", id, userId);
         service.removeLike(id, userId);
     }
 
@@ -72,7 +72,7 @@ public class FilmController {
 
     @DeleteMapping("/{filmId}")
     public void removeFilm(@PathVariable Long filmId) {
-        log.info("Request received DELETE /films{}/", filmId);
+        log.info("Request received DELETE /films/{}", filmId);
         service.removeFilm(filmId);
     }
 
@@ -84,6 +84,17 @@ public class FilmController {
         if (!SORTED_BY.contains(sortBy.toLowerCase())) {
             throw new ValidationException(String.format("Invalid request parameter sortBy='%s'", sortBy));
         }
-        return service.getFilmsForDirector(directorId, sortBy.toLowerCase());
+        return service.getFilmsByDirector(directorId, sortBy.toLowerCase());
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchFilm(
+            @RequestParam(name = "query", value = "query") String query,
+            @RequestParam(name = "by", value = "by", defaultValue = "title", required = false) String... by) {
+        log.info("Request received GET 'GET /films/search?query={}&by={}'", query, by);
+        if (query.isBlank()) {
+            throw new ValidationException("Request parameter 'query' should not be empty.");
+        }
+        return service.search(query, by);
     }
 }
