@@ -221,20 +221,20 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
-        String sqlTemplate = "SELECT DISTINCT f.*, m.name mpa_name\n" +
-                "FROM film_director fd \n" +
-                "LEFT JOIN films f ON f.id = fd.film_id \n" +
-                "INNER JOIN mpa m ON m.id = f.mpa_id \n" +
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        String sqlTemplate = "SELECT DISTINCT f.*, m.name mpa_name " +
+                "FROM film_director fd " +
+                "LEFT JOIN films f ON f.id = fd.film_id " +
+                "INNER JOIN mpa m ON m.id = f.mpa_id " +
                 "%s";
         String sqlQuery = "";
         if ("year".equals(sortBy)) {
-            sqlQuery = String.format(sqlTemplate, "WHERE fd.director_ID = ? \n" +
+            sqlQuery = String.format(sqlTemplate, "WHERE fd.director_ID = ? " +
                     "ORDER BY EXTRACT(YEAR FROM f.release_date)");
         } else {
-            sqlQuery = String.format(sqlTemplate, "LEFT JOIN film_likes fl ON fl.film_id =f.id \n" +
-                    "WHERE fd.director_ID = ? \n" +
-                    "GROUP BY f.id \n" +
+            sqlQuery = String.format(sqlTemplate, "LEFT JOIN film_likes fl ON fl.film_id =f.id " +
+                    "WHERE fd.director_ID = ? " +
+                    "GROUP BY f.id " +
                     "ORDER BY COUNT(f.id)");
         }
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
@@ -278,11 +278,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> search(String query, String[] by) {
-        String sqlTemplate = "SELECT f.*, m.name mpa_name FROM films f \n" +
-                "INNER JOIN mpa m ON m.id = f.mpa_id \n" +
-                "LEFT JOIN film_likes fl ON fl.film_id = f.id \n" +
-                "%s \n" +
-                "GROUP BY f.id \n" +
+        String sqlTemplate = "SELECT f.*, m.name mpa_name FROM films f " +
+                "INNER JOIN mpa m ON m.id = f.mpa_id " +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.id " +
+                "%s " +
+                "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.film_id) DESC, f.id ASC";
         String sql;
         if ((by.length == 1) && by[0].equals("title")) {
@@ -290,14 +290,14 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             if (by.length == 1) {
                 sql = String.format(sqlTemplate,
-                        "INNER JOIN film_director df ON f.id = df.film_id \n" +
-                        "INNER JOIN director d ON d.director_id = df.director_id \n" +
-                        "WHERE lower(d.name) LIKE lower(:query)");
+                        "INNER JOIN film_director df ON f.id = df.film_id " +
+                                "INNER JOIN director d ON d.director_id = df.director_id " +
+                                "WHERE lower(d.name) LIKE lower(:query)");
             } else {
                 sql = String.format(sqlTemplate,
-                        "LEFT JOIN film_director df ON f.id = df.film_id \n" +
-                        "LEFT JOIN director d ON d.director_id = df.director_id \n" +
-                        "WHERE lower(d.name) LIKE lower(:query) OR lower(f.name) LIKE lower(:query)");
+                        "LEFT JOIN film_director df ON f.id = df.film_id " +
+                                "LEFT JOIN director d ON d.director_id = df.director_id " +
+                                "WHERE lower(d.name) LIKE lower(:query) OR lower(f.name) LIKE lower(:query)");
             }
         }
         Map<String, Object> params = new HashMap<>();

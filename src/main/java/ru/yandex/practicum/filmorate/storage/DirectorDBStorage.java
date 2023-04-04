@@ -8,11 +8,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
-import ru.yandex.practicum.filmorate.validator.UpdateStorageException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -22,17 +23,13 @@ public class DirectorDBStorage implements DirectorStorage {
 
     @Override
     public Director create(Director director) {
-        try {
-            SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                    .withTableName("director")
-                    .usingGeneratedKeyColumns("director_id");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("director")
+                .usingGeneratedKeyColumns("director_id");
 
-            final long directorId = simpleJdbcInsert.executeAndReturnKey(director.toMap()).longValue();
-            return getDirectorById(directorId);
-        } catch (Exception ex) {
-            log.error(ex.getMessage());
-            throw new UpdateStorageException(String.format("An error occurred while adding a director: {%s}", director));
-        }
+        final long directorId = simpleJdbcInsert.executeAndReturnKey(toMap(director)).longValue();
+        director.setId(directorId);
+        return director;
     }
 
 
@@ -55,16 +52,10 @@ public class DirectorDBStorage implements DirectorStorage {
 
     @Override
     public Director update(Director director) {
-        try {
-            jdbcTemplate.update(
-                    "UPDATE director SET name = ? WHERE director_id = ?",
-                    director.getName(), director.getId());
-            return getDirectorById(director.getId());
-        } catch (Exception ex) {
-            log.error(ex.getMessage());
-            throw new UpdateStorageException(
-                    String.format("An error occurred while updating the director's data: {%s}", director));
-        }
+        jdbcTemplate.update(
+                "UPDATE director SET name = ? WHERE director_id = ?",
+                director.getName(), director.getId());
+        return getDirectorById(director.getId());
     }
 
     @Override
@@ -78,14 +69,14 @@ public class DirectorDBStorage implements DirectorStorage {
         final String sql =
                 "SELECT d.* \n" +
                         "FROM director AS d \n" +
-                        "RIGHT JOIN film_director fd ON d.director_id = fd.director_id \n" +
+                        "RIGHT JOIN film_director fd ON d.director_id = fd.director_id " +
                         "WHERE film_id = ? ORDER BY director_id";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeDirector(rs), id);
     }
 
     @Override
     public boolean directorExists(long id) {
-        String sql = "SELECT COUNT(*) FROM director WHERE director_id = ?";
+        String sql = "SELECT COUNT(1) FROM director WHERE director_id = ?";
         int count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count > 0;
     }
@@ -95,6 +86,12 @@ public class DirectorDBStorage implements DirectorStorage {
         director.setId(rs.getLong("director_id"));
         director.setName(rs.getString("name"));
         return director;
+    }
+
+    private Map<String, Object> toMap(Director director) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", director.getName());
+        return values;
     }
 
 }

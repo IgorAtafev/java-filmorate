@@ -131,11 +131,11 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         if (!directorStorage.directorExists(directorId)) {
             throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));
         }
-        return filmStorage.getFilmsForDirector(directorId, sortBy);
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 
     @Override
