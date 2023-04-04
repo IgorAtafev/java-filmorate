@@ -7,12 +7,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -36,20 +38,18 @@ public class EventDbStorage implements EventStorage {
 
         KeyHolder holder = new GeneratedKeyHolder();
         PreparedStatementCreator preparedStatement = con -> {
-            PreparedStatement ps = con.prepareStatement(sqlQuery, new String[]{"event_id"});
+            PreparedStatement ps = con.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, event.getTimestamp());
             ps.setLong(2, event.getUserId());
-            ps.setString(3, event.getEventType());
-            ps.setString(4, event.getOperation());
+            ps.setString(3, event.getEventType().toString());
+            ps.setString(4, event.getOperation().toString());
             ps.setLong(5, event.getEntityId());
             return ps;
         };
         jdbcTemplate.update(preparedStatement, holder);
-        long eventId = Objects.requireNonNull(holder.getKey()).longValue();
-        if (eventId == 0) {
-            return null;
-        }
-        return event.withEventId(eventId);
+        long eventId = holder.getKey().longValue();
+        event.setEventId(eventId);
+        return event;
     }
 
     @Override
@@ -71,8 +71,8 @@ public class EventDbStorage implements EventStorage {
         return Event.builder()
                 .timestamp(resultSet.getLong("timestamp"))
                 .userId(resultSet.getLong("user_id"))
-                .eventType(resultSet.getString("event_type_name"))
-                .operation(resultSet.getString("operation_name"))
+                .eventType(EventType.valueOf(resultSet.getString("event_type_name")))
+                .operation(Operation.valueOf(resultSet.getString("operation_name")))
                 .eventId(resultSet.getLong("event_id"))
                 .entityId(resultSet.getLong("entity_id"))
                 .build();
