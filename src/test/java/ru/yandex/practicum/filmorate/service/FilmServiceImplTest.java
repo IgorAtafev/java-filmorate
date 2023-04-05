@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -395,16 +394,5 @@ class FilmServiceImplTest {
         film.setMpa(new Mpa());
 
         return film;
-    }
-
-    private User initUser() {
-        User user = new User();
-
-        user.setEmail("mail@mail.ru");
-        user.setLogin("dolore");
-        user.setName("Nick Name");
-        user.setBirthday(LocalDate.of(1946, 8, 20));
-
-        return user;
     }
 }

@@ -92,7 +92,9 @@ public class DirectorDBStorage implements DirectorStorage {
 
     @Override
     public void addDirectorsToFilms(List<Film> films) {
-        if (films.isEmpty()) return;
+        if (films.isEmpty()) {
+            return;
+        }
 
         MapSqlParameterSource parameters = new MapSqlParameterSource(
                 "ids",
