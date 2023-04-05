@@ -45,6 +45,7 @@ class FilmServiceImplTest {
 
     @Mock
     private EventStorage eventStorage;
+
     @Mock
     private DirectorStorage directorStorage;
 
