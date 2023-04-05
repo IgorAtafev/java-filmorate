@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface GenreStorage {
 
@@ -23,18 +25,18 @@ public interface GenreStorage {
     Optional<Genre> getGenreById(Integer id);
 
     /**
-     * Returns a list of genres by id list
-     *
-     * @param ids
-     * @return list of genres by id list
-     */
-    List<Genre> getGenresByIds(List<Integer> ids);
-
-    /**
      * Returns a list of genres by film id
      *
      * @param filmId
      * @return list of genres by film id
      */
     List<Genre> getGenresByFilmId(Long filmId);
+
+    /**
+     * Returns a list of genres by film id list
+     *
+     * @param filmIds
+     * @return list of genres by film id list
+     */
+    Map<Long, Set<Genre>> getGenresByFilmIds(List<Long> filmIds);
 }

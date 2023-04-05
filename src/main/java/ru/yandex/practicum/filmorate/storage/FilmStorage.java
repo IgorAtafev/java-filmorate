@@ -74,20 +74,19 @@ public interface FilmStorage {
     void removeFilm(Long id);
 
     /**
+     * Removes a review by film_id
+     *
+     * @param id
+     */
+    void removeReviewByFilmId(Long id);
+
+    /**
      * Checks for the existence of Film by id
      *
      * @param id
      * @return true or false
      */
     boolean filmExists(Long id);
-
-    /**
-     * Checks for the existence of Director by id Film
-     *
-     * @param id
-     * @return true or false
-     */
-    boolean filmDirectorExists(Long id);
 
     /**
      * Returns a list of films related to users preferences
@@ -106,14 +105,14 @@ public interface FilmStorage {
     void removeLikeFilm(Long id);
 
     /**
-     * Removes a film from film_genres
+     * Removes film genres
      *
      * @param id
      */
     void removeGenreFilm(Long id);
 
     /**
-     * Removes a film from film_director
+     * Removes film directors
      *
      * @param id
      */

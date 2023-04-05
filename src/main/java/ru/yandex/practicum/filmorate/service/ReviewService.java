@@ -56,9 +56,8 @@ public interface ReviewService {
      *
      * @param id
      * @param userId
-     * @param isUseful
      */
-    void addLike(Long id, Long userId, boolean isUseful);
+    void addLike(Long id, Long userId);
 
     /**
      * Removes a user like to a review
@@ -66,7 +65,24 @@ public interface ReviewService {
      *
      * @param id
      * @param userId
-     * @param isUseful
      */
-    void removeLike(Long id, Long userId, boolean isUseful);
+    void removeLike(Long id, Long userId);
+
+    /**
+     * Adds a user dislike to a review
+     * If the review or user is not found throws NotFoundException
+     *
+     * @param id
+     * @param userId
+     */
+    void addDislike(Long id, Long userId);
+
+    /**
+     * Removes a user dislike to a review
+     * If the review or user is not found throws NotFoundException
+     *
+     * @param id
+     * @param userId
+     */
+    void removeDislike(Long id, Long userId);
 }

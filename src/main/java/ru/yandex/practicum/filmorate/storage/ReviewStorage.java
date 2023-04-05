@@ -44,6 +44,7 @@ public interface ReviewStorage {
 
     /**
      * Updates the review
+     * Film id and user id don't change on update
      *
      * @param review
      * @return updated review
@@ -62,18 +63,32 @@ public interface ReviewStorage {
      *
      * @param id
      * @param userId
-     * @param isUseful
      */
-    void addLike(Long id, Long userId, boolean isUseful);
+    void addLike(Long id, Long userId);
 
     /**
      * Removes a user like to a review
      *
      * @param id
      * @param userId
-     * @param isUseful
      */
-    void removeLike(Long id, Long userId, boolean isUseful);
+    void removeLike(Long id, Long userId);
+
+    /**
+     * Adds a user dislike to a review
+     *
+     * @param id
+     * @param userId
+     */
+    void addDislike(Long id, Long userId);
+
+    /**
+     * Removes a user dislike to a review
+     *
+     * @param id
+     * @param userId
+     */
+    void removeDislike(Long id, Long userId);
 
     /**
      * Checks for the existence of review by id
@@ -84,42 +99,20 @@ public interface ReviewStorage {
     boolean reviewExists(Long id);
 
     /**
-     * Returns a list of reviews id by film_id
-     * @param id
-     * @return List<Map<String, Object>>
-     */
-    List<Long> getReviewIdByFilmId(Long id);
-
-    /**
-     * Returns a list of reviews id by user_id
-     * @param id
-     * @return List<Map<String, Object>>
-     */
-    List<Long> getReviewIdByUserId(Long id);
-
-    /**
-     * Checks for the review of film by id
-     *
-     * @param id
-     * @return true or false
-     */
-    boolean reviewFilmExists(Long id);
-
-    /**
-     * Checks for the review of user by id
-     *
-     * @param id
-     * @return true or false
-     */
-    boolean reviewUserExists(Long id);
-
-    /**
      * Checks for the existence of a review like
      *
      * @param id
      * @param userId
-     * @param isUseful
      * @return true or false
      */
-    boolean likeExists(Long id, Long userId, boolean isUseful);
+    boolean likeExists(Long id, Long userId);
+
+    /**
+     * Checks for the existence of a review dislike
+     *
+     * @param id
+     * @param userId
+     * @return true or false
+     */
+    boolean disLikeExists(Long id, Long userId);
 }

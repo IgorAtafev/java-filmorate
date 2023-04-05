@@ -22,7 +22,6 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final ReviewStorage reviewStorage;
 
     @Override
     public List<User> getUsers() {
@@ -120,14 +119,23 @@ public class UserDbStorage implements UserStorage {
     public void removeUser(Long id) {
         removeUserLike(id);
         removeUserFromFriends(id);
-
-        if (reviewStorage.reviewUserExists(id)) {
-            List<Long> reviewsId = reviewStorage.getReviewIdByUserId(id);
-            reviewsId.forEach(reviewStorage::removeReviewById);
-        }
+        removeReviewByUserId(id);
 
         String sqlQuery = "DELETE FROM users " +
                 "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeReviewByUserId(Long id) {
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE user_id  = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+
+        sqlQuery = "DELETE FROM reviews " +
+                "WHERE user_id  = ?";
 
         jdbcTemplate.update(sqlQuery, id);
     }
