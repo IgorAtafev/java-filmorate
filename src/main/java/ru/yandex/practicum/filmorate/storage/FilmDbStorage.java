@@ -181,14 +181,8 @@ public class FilmDbStorage implements FilmStorage {
     public void removeFilm(Long id) {
         removeLikeFilm(id);
         removeGenreFilm(id);
-
-        if (filmDirectorExists(id)) {
-            removeFilmDirector(id);
-        }
-        if (reviewStorage.reviewFilmExists(id)) {
-            List<Long> reviewsId = reviewStorage.getReviewIdByFilmId(id);
-            reviewsId.forEach(reviewStorage::removeReviewById);
-        }
+        removeFilmDirector(id);
+        reviewStorage.removeReviewByFilmId(id);
 
         String sqlQuery = "DELETE FROM films " +
                 "WHERE id = ?";

@@ -58,6 +58,20 @@ public interface ReviewStorage {
     void removeReviewById(Long id);
 
     /**
+     * Removes review by film_id
+     *
+     * @param id
+     */
+    void removeReviewByFilmId(Long id);
+
+    /**
+     * Removes review by user_id
+     *
+     * @param id
+     */
+    void removeReviewByUserId(Long id);
+
+    /**
      * Adds a user like to a review
      *
      * @param id
@@ -82,13 +96,6 @@ public interface ReviewStorage {
      * @return true or false
      */
     boolean reviewExists(Long id);
-
-    /**
-     * Returns a list of reviews id by film_id
-     * @param id
-     * @return List<Map<String, Object>>
-     */
-    List<Long> getReviewIdByFilmId(Long id);
 
     /**
      * Returns a list of reviews id by user_id
