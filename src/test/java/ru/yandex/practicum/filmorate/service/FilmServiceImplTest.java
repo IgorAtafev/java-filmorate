@@ -9,10 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
@@ -44,10 +44,13 @@ class FilmServiceImplTest {
     private UserStorage userStorage;
 
     @Mock
-    private EventStorage eventStorage;
+    private GenreStorage genreStorage;
 
     @Mock
     private DirectorStorage directorStorage;
+
+    @Mock
+    private EventStorage eventStorage;
 
     @InjectMocks
     private FilmServiceImpl filmService;
@@ -65,6 +68,8 @@ class FilmServiceImplTest {
     void getFilms_shouldReturnListOfFilms() {
         Film film1 = initFilm();
         Film film2 = initFilm();
+        film1.setId(1L);
+        film2.setId(2L);
 
         List<Film> expected = List.of(film1, film2);
 
@@ -389,16 +394,5 @@ class FilmServiceImplTest {
         film.setMpa(new Mpa());
 
         return film;
-    }
-
-    private User initUser() {
-        User user = new User();
-
-        user.setEmail("mail@mail.ru");
-        user.setLogin("dolore");
-        user.setName("Nick Name");
-        user.setBirthday(LocalDate.of(1946, 8, 20));
-
-        return user;
     }
 }

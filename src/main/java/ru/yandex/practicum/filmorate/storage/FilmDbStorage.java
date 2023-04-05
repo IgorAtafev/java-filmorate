@@ -25,14 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final GenreStorage genreStorage;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final ReviewStorage reviewStorage;
 
@@ -81,7 +79,6 @@ public class FilmDbStorage implements FilmStorage {
         Long id = generatedKeyHolder.getKey().longValue();
 
         film.setId(id);
-
         addGenres(film.getId(), film.getGenres());
         addDirectors(film.getId(), film.getDirectors());
 
@@ -97,7 +94,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getMpa().getId(), film.getId());
 
-        removeGenres(film.getId());
+        removeGenreFilm(film.getId());
         addGenres(film.getId(), film.getGenres());
         addDirectors(film.getId(), film.getDirectors());
 
@@ -169,26 +166,14 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public boolean filmDirectorExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM film_director WHERE film_id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
-    }
-
-    @Override
     public void removeFilm(Long id) {
         removeLikeFilm(id);
         removeGenreFilm(id);
 
-        if (filmDirectorExists(id)) {
-            removeFilmDirector(id);
-        }
-        if (reviewStorage.reviewFilmExists(id)) {
-            List<Long> reviewsId = reviewStorage.getReviewIdByFilmId(id);
-            reviewsId.forEach(reviewStorage::removeReviewById);
-        }
+        removeFilmDirector(id);
+
+        List<Long> reviewsId = reviewStorage.getReviewIdByFilmId(id);
+        reviewsId.forEach(reviewStorage::removeReviewById);
 
         String sqlQuery = "DELETE FROM films " +
                 "WHERE id = ?";
@@ -312,14 +297,7 @@ public class FilmDbStorage implements FilmStorage {
             return;
         }
 
-        List<Integer> genreIds = filmGenres.stream()
-                .map(Genre::getId)
-                .collect(Collectors.toList());
-        List<Genre> genres = genreStorage.getGenresByIds(genreIds);
-
-        if (genres.isEmpty()) {
-            return;
-        }
+        List<Genre> genres = new ArrayList<>(filmGenres);
 
         String sqlQuery = "INSERT INTO film_genres (film_id, genre_id) " +
                 "VALUES (?, ?)";
@@ -366,13 +344,6 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql, filmId);
     }
 
-    private void removeGenres(Long filmId) {
-        String sqlQuery = "DELETE FROM film_genres " +
-                "WHERE film_id = ?";
-
-        jdbcTemplate.update(sqlQuery, filmId);
-    }
-
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = new Film();
 
@@ -386,8 +357,6 @@ public class FilmDbStorage implements FilmStorage {
         mpa.setId(resultSet.getInt("mpa_id"));
         mpa.setName(resultSet.getString("mpa_name"));
         film.setMpa(mpa);
-
-        film.addGenres(genreStorage.getGenresByFilmId(film.getId()));
 
         return film;
     }
