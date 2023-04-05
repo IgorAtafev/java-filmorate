@@ -120,11 +120,7 @@ public class UserDbStorage implements UserStorage {
     public void removeUser(Long id) {
         removeUserLike(id);
         removeUserFromFriends(id);
-
-        if (reviewStorage.reviewUserExists(id)) {
-            List<Long> reviewsId = reviewStorage.getReviewIdByUserId(id);
-            reviewsId.forEach(reviewStorage::removeReviewById);
-        }
+        reviewStorage.removeReviewByUserId(id);
 
         String sqlQuery = "DELETE FROM users " +
                 "WHERE id = ?";

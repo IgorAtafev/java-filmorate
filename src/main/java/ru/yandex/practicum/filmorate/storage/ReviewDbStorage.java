@@ -104,6 +104,36 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
+    public void removeReviewByFilmId(Long id) {
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE review_id IN " +
+                "(SELECT rl.review_id " +
+                "FROM reviews r " +
+                "JOIN review_likes rl ON r.ID  = rl.review_id " +
+                "WHERE r.film_id = ?)";
+
+        jdbcTemplate.update(sqlQuery, id);
+
+        sqlQuery = "DELETE FROM reviews " +
+                "WHERE film_id  = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeReviewByUserId(Long id) {
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE user_id  = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+
+        sqlQuery = "DELETE FROM reviews " +
+                "WHERE user_id  = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
     public void addLike(Long id, Long userId) {
         String sqlQuery = "INSERT INTO review_likes (review_id, user_id, is_useful) " +
                 "VALUES (?, ?, ?)";
@@ -166,13 +196,6 @@ public class ReviewDbStorage implements ReviewStorage {
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         return row.next();
-    }
-
-    @Override
-    public List<Long> getReviewIdByFilmId(Long id) {
-        String sqlQuery = "SELECT id FROM reviews WHERE film_id = ?";
-
-        return jdbcTemplate.query(sqlQuery, this::mapToList, id);
     }
 
     @Override
