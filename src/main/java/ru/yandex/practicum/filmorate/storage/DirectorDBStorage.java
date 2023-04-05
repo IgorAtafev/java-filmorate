@@ -109,7 +109,7 @@ public class DirectorDBStorage implements DirectorStorage {
         namedParameterJdbcTemplate.query(sql, parameters, (rs, rowNum) -> addDirectors(rs, films));
     }
 
-    private Object addDirectors(ResultSet rs, List<Film> films) throws SQLException {
+    private Set<Director> addDirectors(ResultSet rs, List<Film> films) throws SQLException {
         Long filmId = rs.getLong("film_id");
         Film film = films.stream()
                 .filter(f -> f.getId() == filmId)
