@@ -171,31 +171,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public List<Long> getReviewIdByUserId(Long id) {
-        String sqlQuery = "SELECT id FROM reviews WHERE user_id = ?";
-
-        return jdbcTemplate.query(sqlQuery, this::mapToList, id);
-    }
-
-    @Override
-    public boolean reviewFilmExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM reviews WHERE film_id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
-    }
-
-    @Override
-    public boolean reviewUserExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM reviews WHERE user_id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
-    }
-
-    @Override
     public boolean likeExists(Long id, Long userId, boolean isUseful) {
         String sqlQuery = "SELECT 1 FROM review_likes " +
                 "WHERE review_id = ? AND user_id = ? AND is_useful = ?";
@@ -232,9 +207,5 @@ public class ReviewDbStorage implements ReviewStorage {
         review.setUseful(resultSet.getInt("useful"));
 
         return review;
-    }
-
-    private Long mapToList(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getLong("id");
     }
 }
