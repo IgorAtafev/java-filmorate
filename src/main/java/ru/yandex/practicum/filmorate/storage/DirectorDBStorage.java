@@ -64,7 +64,7 @@ public class DirectorDBStorage implements DirectorStorage {
         jdbcTemplate.update(
                 "UPDATE director SET name = ? WHERE director_id = ?",
                 director.getName(), director.getId());
-        return getDirectorById(director.getId());
+        return director;
     }
 
     @Override
@@ -92,10 +92,6 @@ public class DirectorDBStorage implements DirectorStorage {
 
     @Override
     public void addDirectorsToFilms(List<Film> films) {
-        if (films.isEmpty()) {
-            return;
-        }
-
         MapSqlParameterSource parameters = new MapSqlParameterSource(
                 "ids",
                 films.stream()

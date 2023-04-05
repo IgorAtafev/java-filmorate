@@ -99,4 +99,11 @@ public interface FilmService {
      * @param films
      */
     void addGenresToFilms(List<Film> films);
+
+    /**
+     * Adds directors to the film list
+     *
+     * @param films
+     */
+    void addDirectorsToFilms(List<Film> films);
 }
