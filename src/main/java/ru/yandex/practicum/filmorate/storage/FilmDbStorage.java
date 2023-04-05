@@ -32,7 +32,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final ReviewStorage reviewStorage;
 
     @Override
     public List<Film> getFilms() {
@@ -170,10 +169,26 @@ public class FilmDbStorage implements FilmStorage {
         removeLikeFilm(id);
         removeGenreFilm(id);
         removeFilmDirector(id);
-        reviewStorage.removeReviewByFilmId(id);
+        removeReviewByFilmId(id);
 
         String sqlQuery = "DELETE FROM films " +
                 "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeReviewByFilmId(Long id) {
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE review_id IN " +
+                "(SELECT id " +
+                "FROM reviews " +
+                "WHERE film_id = ?)";
+
+        jdbcTemplate.update(sqlQuery, id);
+
+        sqlQuery = "DELETE FROM reviews " +
+                "WHERE film_id  = ?";
 
         jdbcTemplate.update(sqlQuery, id);
     }

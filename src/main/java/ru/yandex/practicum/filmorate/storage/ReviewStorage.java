@@ -59,20 +59,6 @@ public interface ReviewStorage {
     void removeReviewById(Long id);
 
     /**
-     * Removes review by film_id
-     *
-     * @param id
-     */
-    void removeReviewByFilmId(Long id);
-
-    /**
-     * Removes review by user_id
-     *
-     * @param id
-     */
-    void removeReviewByUserId(Long id);
-
-    /**
      * Adds a user like to a review
      *
      * @param id
