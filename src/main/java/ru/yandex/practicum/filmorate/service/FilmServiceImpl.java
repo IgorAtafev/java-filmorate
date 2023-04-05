@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
@@ -92,8 +94,8 @@ public class FilmServiceImpl implements FilmService {
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
-                .eventType("LIKE")
-                .operation("ADD")
+                .eventType(EventType.LIKE)
+                .operation(Operation.ADD)
                 .timestamp(System.currentTimeMillis())
                 .build());
 
@@ -119,8 +121,8 @@ public class FilmServiceImpl implements FilmService {
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
-                .eventType("LIKE")
-                .operation("REMOVE")
+                .eventType(EventType.LIKE)
+                .operation(Operation.REMOVE)
                 .timestamp(System.currentTimeMillis())
                 .build());
     }

@@ -1,13 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
-import lombok.Value;
-import lombok.With;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
-@Value
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @Builder
 public class Event {
     @NotNull(message = "Feed date cannot be null")
@@ -16,10 +21,9 @@ public class Event {
     @NotNull(message = "Feed userId cannot be null")
     Long userId;
     @NotNull(message = "Feed eventType cannot be null")
-    String eventType;
+    EventType eventType;
     @NotNull(message = "Feed operation cannot be null")
-    String operation;
-    @With
+    Operation operation;
     Long eventId;
     @NotNull(message = "entityId cannot be null")
     Long entityId;

@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
@@ -407,16 +409,16 @@ class UserControllerTest {
     private static List<Event> initEvents() {
         Event event1 = Event.builder()
                 .timestamp(System.currentTimeMillis())
-                .eventType("LIKE")
-                .operation("ADD")
+                .eventType(EventType.LIKE)
+                .operation(Operation.ADD)
                 .eventId(3L)
                 .entityId(2L)
                 .build();
 
         Event event2 = Event.builder()
                 .timestamp(System.currentTimeMillis())
-                .eventType("FRIEND")
-                .operation("REMOVE")
+                .eventType(EventType.FRIEND)
+                .operation(Operation.REMOVE)
                 .eventId(4L)
                 .entityId(1L)
                 .build();
