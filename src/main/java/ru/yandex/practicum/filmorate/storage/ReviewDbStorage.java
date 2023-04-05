@@ -246,8 +246,4 @@ public class ReviewDbStorage implements ReviewStorage {
 
         return review;
     }
-
-    private Long mapToList(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getLong("id");
-    }
 }
