@@ -78,6 +78,12 @@ public interface UserStorage {
     void removeUser(Long id);
 
     /**
+     * Removes a review by user_id
+     * @param id
+     */
+    void removeReviewByUserId(Long id);
+
+    /**
      * Checks for the existence of User by id
      *
      * @param id
