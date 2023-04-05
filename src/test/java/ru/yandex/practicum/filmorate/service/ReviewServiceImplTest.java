@@ -295,6 +295,8 @@ class ReviewServiceImplTest {
         when(userStorage.userExists(userId)).thenReturn(true);
         when(reviewStorage.likeExists(reviewId, userId)).thenReturn(true);
 
+        reviewService.addLike(reviewId, userId);
+
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, times(1)).userExists(userId);
         verify(reviewStorage, times(1)).likeExists(reviewId, userId);
@@ -411,6 +413,8 @@ class ReviewServiceImplTest {
         when(reviewStorage.reviewExists(reviewId)).thenReturn(true);
         when(userStorage.userExists(userId)).thenReturn(true);
         when(reviewStorage.disLikeExists(reviewId, userId)).thenReturn(true);
+
+        reviewService.addDislike(reviewId, userId);
 
         verify(reviewStorage, times(1)).reviewExists(reviewId);
         verify(userStorage, times(1)).userExists(userId);

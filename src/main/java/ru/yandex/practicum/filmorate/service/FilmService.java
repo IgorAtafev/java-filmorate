@@ -92,4 +92,11 @@ public interface FilmService {
      * @return list of films
      */
     List<Film> search(String query, String[] by);
+
+    /**
+     * Adds genres to the film list
+     *
+     * @param films
+     */
+    void addGenresToFilms(List<Film> films);
 }

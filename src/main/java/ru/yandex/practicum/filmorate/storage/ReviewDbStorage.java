@@ -183,15 +183,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public boolean reviewFilmExists(Long id) {
-        String sqlQuery = "SELECT 1 FROM reviews WHERE film_id = ?";
-
-        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-
-        return row.next();
-    }
-
-    @Override
     public boolean reviewUserExists(Long id) {
         String sqlQuery = "SELECT 1 FROM reviews WHERE user_id = ?";
 

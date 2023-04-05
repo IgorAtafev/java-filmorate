@@ -44,6 +44,7 @@ public interface ReviewStorage {
 
     /**
      * Updates the review
+     * Film id and user id don't change on update
      *
      * @param review
      * @return updated review
@@ -110,14 +111,6 @@ public interface ReviewStorage {
      * @return List<Map<String, Object>>
      */
     List<Long> getReviewIdByUserId(Long id);
-
-    /**
-     * Checks for the review of film by id
-     *
-     * @param id
-     * @return true or false
-     */
-    boolean reviewFilmExists(Long id);
 
     /**
      * Checks for the review of user by id

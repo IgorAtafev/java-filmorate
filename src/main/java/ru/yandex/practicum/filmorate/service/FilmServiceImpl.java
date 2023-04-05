@@ -4,37 +4,36 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    private static final String FILM_DOES_NOT_EXIST = "Film width id %d does not exist";
-    private static final String MPA_RATING_DOES_NOT_EXIST = "Mpa rating width id %d does not exist";
-    private static final String USER_DOES_NOT_EXIST = "User width id %d does not exist";
-    private static final String EMPTY_ID_ON_CREATION = "The film must have an empty ID when created";
-    private static final String NOT_EMPTY_ID_ON_UPDATE = "The film must not have an empty ID when updating";
-    private static final String DIRECTOR_DOSE_NOT_EXIST = "Director with id %d does not exist";
-
     private final FilmStorage filmStorage;
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
+    private final GenreStorage genreStorage;
     private final DirectorStorage directorStorage;
     private final EventStorage eventStorage;
 
     @Override
     public List<Film> getFilms() {
         List<Film> films = filmStorage.getFilms();
-
+        addGenresToFilms(films);
         directorStorage.addDirectorsToFilms(films);
         return films;
     }
@@ -42,22 +41,22 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film getFilmById(Long id) {
         Film film = filmStorage.getFilmById(id).orElseThrow(
-                () -> new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id))
+                () -> new NotFoundException(String.format("Film width id %d does not exist", id))
         );
 
+        film.addGenres(genreStorage.getGenresByFilmId(film.getId()));
         film.addDirectors(directorStorage.getDirectorsByFilmId(film.getId()));
         return film;
-
     }
 
     @Override
     public Film createFilm(Film film) {
         if (!isIdValueNull(film)) {
-            throw new ValidationException(EMPTY_ID_ON_CREATION);
+            throw new ValidationException("The film must have an empty ID when created");
         }
 
         if (!mpaStorage.mpaRatingExists(film.getMpa().getId())) {
-            throw new NotFoundException(String.format(MPA_RATING_DOES_NOT_EXIST, film.getMpa().getId()));
+            throw new NotFoundException(String.format("Mpa rating width id %d does not exist", film.getMpa().getId()));
         }
 
         return filmStorage.createFilm(film);
@@ -66,15 +65,15 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film updateFilm(Film film) {
         if (isIdValueNull(film)) {
-            throw new ValidationException(NOT_EMPTY_ID_ON_UPDATE);
+            throw new ValidationException("The film must not have an empty ID when updating");
         }
 
         if (!filmStorage.filmExists(film.getId())) {
-            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, film.getId()));
+            throw new NotFoundException(String.format("Film width id %d does not exist", film.getId()));
         }
 
         if (!mpaStorage.mpaRatingExists(film.getMpa().getId())) {
-            throw new NotFoundException(String.format(MPA_RATING_DOES_NOT_EXIST, film.getMpa().getId()));
+            throw new NotFoundException(String.format("Mpa rating width id %d does not exist", film.getMpa().getId()));
         }
 
         return filmStorage.updateFilm(film);
@@ -83,12 +82,13 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void addLike(Long id, Long userId) {
         if (!filmStorage.filmExists(id)) {
-            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+            throw new NotFoundException(String.format("Film width id %d does not exist", id));
         }
 
         if (!userStorage.userExists(userId)) {
-            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
+            throw new NotFoundException(String.format("User width id %d does not exist", userId));
         }
+
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
@@ -96,23 +96,26 @@ public class FilmServiceImpl implements FilmService {
                 .operation("ADD")
                 .timestamp(System.currentTimeMillis())
                 .build());
+
         if (filmStorage.likeExists(id, userId)) {
             return;
         }
+
         filmStorage.addLike(id, userId);
     }
 
     @Override
     public void removeLike(Long id, Long userId) {
         if (!filmStorage.filmExists(id)) {
-            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+            throw new NotFoundException(String.format("Film width id %d does not exist", id));
         }
 
         if (!userStorage.userExists(userId)) {
-            throw new NotFoundException(String.format(USER_DOES_NOT_EXIST, userId));
+            throw new NotFoundException(String.format("User width id %d does not exist", userId));
         }
 
         filmStorage.removeLike(id, userId);
+
         eventStorage.addEvent(Event.builder()
                 .userId(userId)
                 .entityId(id)
@@ -125,6 +128,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
         List<Film> films = filmStorage.getPopular(count, genreId, year);
+        addGenresToFilms(films);
         directorStorage.addDirectorsToFilms(films);
         return films;
     }
@@ -132,7 +136,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void removeFilm(Long id) {
         if (!filmStorage.filmExists(id)) {
-            throw new NotFoundException(String.format(FILM_DOES_NOT_EXIST, id));
+            throw new NotFoundException(String.format("Film width id %d does not exist", id));
         }
 
         filmStorage.removeFilm(id);
@@ -141,9 +145,11 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         if (!directorStorage.directorExists(directorId)) {
-            throw new NotFoundException(String.format(DIRECTOR_DOSE_NOT_EXIST, directorId));
+            throw new NotFoundException(String.format("Director with id %d does not exist", directorId));
         }
+
         List<Film> films = filmStorage.getFilmsByDirector(directorId, sortBy);
+        addGenresToFilms(films);
         directorStorage.addDirectorsToFilms(films);
         return films;
     }
@@ -151,8 +157,32 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> search(String query, String[] by) {
         List<Film> films = filmStorage.search(query, by);
+        addGenresToFilms(films);
         directorStorage.addDirectorsToFilms(films);
         return films;
+    }
+
+    @Override
+    public void addGenresToFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        List<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, Set<Genre>> filmsGenres = genreStorage.getGenresByFilmIds(filmIds);
+
+        if (filmsGenres.isEmpty()) {
+            return;
+        }
+
+        for (Film film : films) {
+            if (filmsGenres.containsKey(film.getId())) {
+                film.addGenres(filmsGenres.get(film.getId()));
+            }
+        }
     }
 
     private boolean isIdValueNull(Film film) {
