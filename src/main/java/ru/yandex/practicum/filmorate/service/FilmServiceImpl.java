@@ -171,9 +171,7 @@ public class FilmServiceImpl implements FilmService {
             return;
         }
 
-        List<Long> filmIds = films.stream()
-                .map(Film::getId)
-                .collect(Collectors.toList());
+        List<Long> filmIds = getFilmIds(films);
 
         Map<Long, Set<Genre>> filmsGenres = genreStorage.getGenresByFilmIds(filmIds);
 
@@ -194,9 +192,7 @@ public class FilmServiceImpl implements FilmService {
             return;
         }
 
-        List<Long> filmIds = films.stream()
-                .map(Film::getId)
-                .collect(Collectors.toList());
+        List<Long> filmIds = getFilmIds(films);
 
         Map<Long, Set<Director>> filmsDirectors = directorStorage.getDirectorsByFilmIds(filmIds);
 
@@ -209,6 +205,12 @@ public class FilmServiceImpl implements FilmService {
                 film.addDirectors(filmsDirectors.get(film.getId()));
             }
         }
+    }
+
+    private List<Long> getFilmIds(List<Film> films) {
+        return films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
     }
 
     private boolean isIdValueNull(Film film) {
