@@ -115,12 +115,53 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public void removeUser(Long id) {
+        removeUserLike(id);
+        removeUserFromFriends(id);
+        removeReviewByUserId(id);
+
+        String sqlQuery = "DELETE FROM users " +
+                "WHERE id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeReviewByUserId(Long id) {
+        String sqlQuery = "DELETE FROM review_likes " +
+                "WHERE user_id  = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+
+        sqlQuery = "DELETE FROM reviews " +
+                "WHERE user_id  = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
     public boolean userExists(Long id) {
         String sqlQuery = "SELECT 1 FROM users WHERE id = ?";
 
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         return row.next();
+    }
+
+    @Override
+    public void removeUserLike(Long id) {
+        String sqlQuery = "DELETE FROM film_likes " +
+                "WHERE user_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public void removeUserFromFriends(Long id) {
+        String sqlQuery = "DELETE FROM user_friends " +
+                "WHERE user_id = ? OR friend_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id, id);
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

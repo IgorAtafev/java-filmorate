@@ -9,8 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
@@ -41,6 +43,15 @@ class FilmServiceImplTest {
     @Mock
     private UserStorage userStorage;
 
+    @Mock
+    private GenreStorage genreStorage;
+
+    @Mock
+    private DirectorStorage directorStorage;
+
+    @Mock
+    private EventStorage eventStorage;
+
     @InjectMocks
     private FilmServiceImpl filmService;
 
@@ -57,6 +68,8 @@ class FilmServiceImplTest {
     void getFilms_shouldReturnListOfFilms() {
         Film film1 = initFilm();
         Film film2 = initFilm();
+        film1.setId(1L);
+        film2.setId(2L);
 
         List<Film> expected = List.of(film1, film2);
 
@@ -312,17 +325,21 @@ class FilmServiceImplTest {
     @Test
     void getPopular_shouldReturnEmptyListOfPopularFilms() {
         int count = 10;
+        Integer genreId = null;
+        Integer year = null;
 
-        when(filmStorage.getPopular(count)).thenReturn(Collections.emptyList());
+        when(filmStorage.getPopular(count, genreId, year)).thenReturn(Collections.emptyList());
 
-        assertTrue(filmService.getPopular(10).isEmpty());
+        assertTrue(filmService.getPopular(10, genreId, year).isEmpty());
 
-        verify(filmStorage, times(1)).getPopular(count);
+        verify(filmStorage, times(1)).getPopular(count, genreId, year);
     }
 
     @Test
     void getPopular_shouldReturnListOfPopularFilmsByNumberOfLikes() {
         int count = 2;
+        Integer genreId = null;
+        Integer year = null;
         Long userId1 = 1L;
         Long userId2 = 2L;
         Film film1 = initFilm();
@@ -334,11 +351,37 @@ class FilmServiceImplTest {
 
         List<Film> expected = List.of(film2, film1);
 
-        when(filmStorage.getPopular(count)).thenReturn(expected);
+        when(filmStorage.getPopular(count, genreId, year)).thenReturn(expected);
 
-        assertEquals(expected, filmService.getPopular(count));
+        assertEquals(expected, filmService.getPopular(count, genreId, year));
 
-        verify(filmStorage, times(1)).getPopular(count);
+        verify(filmStorage, times(1)).getPopular(count, genreId, year);
+    }
+
+    @Test
+    void removeUser_shouldRemoveTheUser() {
+        Long userId = 1L;
+
+        when(filmStorage.filmExists(userId)).thenReturn(true);
+
+        filmService.removeFilm(userId);
+
+        verify(filmStorage, times(1)).filmExists(userId);
+        verify(filmStorage, times(1)).removeFilm(userId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 999L})
+    void removeUser_shouldThrowAnException_ifUserDoesNotExist(Long userId) {
+        when(filmStorage.filmExists(userId)).thenReturn(false);
+
+        assertThrows(
+                NotFoundException.class,
+                () -> filmService.removeFilm(userId)
+        );
+
+        verify(filmStorage, times(1)).filmExists(userId);
+        verify(filmStorage, never()).removeFilm(userId);
     }
 
     private Film initFilm() {
@@ -351,16 +394,5 @@ class FilmServiceImplTest {
         film.setMpa(new Mpa());
 
         return film;
-    }
-
-    private User initUser() {
-        User user = new User();
-
-        user.setEmail("mail@mail.ru");
-        user.setLogin("dolore");
-        user.setName("Nick Name");
-        user.setBirthday(LocalDate.of(1946, 8, 20));
-
-        return user;
     }
 }

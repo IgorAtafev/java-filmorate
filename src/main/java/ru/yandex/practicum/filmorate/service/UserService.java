@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -8,6 +10,7 @@ public interface UserService {
 
     /**
      * Returns a list of all users
+     *
      * @return list of all users
      */
     List<User> getUsers();
@@ -15,6 +18,7 @@ public interface UserService {
     /**
      * Returns user by id
      * If the user is not found throws NotFoundException
+     *
      * @param id
      * @return user by id
      */
@@ -22,6 +26,7 @@ public interface UserService {
 
     /**
      * Creates a new user
+     *
      * @param user
      * @return new user
      */
@@ -29,6 +34,7 @@ public interface UserService {
 
     /**
      * Updates the user
+     *
      * @param user
      * @return updated user
      */
@@ -37,6 +43,7 @@ public interface UserService {
     /**
      * Adds a user as a friend
      * If the user or friend is not found throws NotFoundException
+     *
      * @param id
      * @param friendId
      */
@@ -45,6 +52,7 @@ public interface UserService {
     /**
      * Removes a user as a friend
      * If the user or friend is not found throws NotFoundException
+     *
      * @param id
      * @param friendId
      */
@@ -53,6 +61,7 @@ public interface UserService {
     /**
      * Returns a list of the user's friends
      * If the user or friend is not found throws NotFoundException
+     *
      * @param id
      * @return list of friends of the user
      */
@@ -61,9 +70,36 @@ public interface UserService {
     /**
      * Returns a list of common friends of users
      * If the user or other user is not found throws NotFoundException
+     *
      * @param id
      * @param otherId
      * @return list of common friends of the user
      */
     List<User> getCommonFriends(Long id, Long otherId);
+
+    /**
+     * Removes a user
+     * If the user is not found throws NotFoundException
+     *
+     * @param id
+     */
+    void removeUser(Long id);
+
+    /**
+     * Returns a list of films related to users preferences
+     * If the user is not found throws NotFoundException
+     *
+     * @param id
+     * @return list of films recommended to user
+     */
+    List<Film> getRecommendations(Long id);
+
+    /**
+     * Returns a list of user events
+     * If the events is not found it will return an empty list
+     *
+     * @param id
+     * @return list of user events
+     */
+    List<Event> getUserEvents(Long id);
 }

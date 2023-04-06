@@ -47,6 +47,9 @@ public class Film {
     private final Set<Long> likes = new HashSet<>();
 
     @JsonDeserialize(as = LinkedHashSet.class)
+    private Set<Director> directors = new HashSet<>();
+
+    @JsonDeserialize(as = LinkedHashSet.class)
     private final Set<Genre> genres = new HashSet<>();
 
     public Collection<Long> getLikes() {
@@ -65,7 +68,11 @@ public class Film {
         return Collections.unmodifiableSet(genres);
     }
 
-    public void addGenres(Long id, Collection<Genre> otherGenres) {
+    public void addGenres(Collection<Genre> otherGenres) {
         genres.addAll(otherGenres);
+    }
+
+    public void addDirectors(Collection<Director> otherDirectors) {
+        directors.addAll(otherDirectors);
     }
 }

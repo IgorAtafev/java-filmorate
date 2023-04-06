@@ -15,14 +15,16 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
-
+    private static final Set<String> SORTED_BY = Set.of("likes", "year");
     private final FilmService service;
 
     @GetMapping
@@ -55,12 +57,44 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received DELETE /films{}/like/{}", id, userId);
+        log.info("Request received DELETE /films/{}/like/{}", id, userId);
         service.removeLike(id, userId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
-        return service.getPopular(count);
+    public List<Film> getPopular(
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer year
+    ) {
+        return service.getPopular(count, genreId, year);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public void removeFilm(@PathVariable Long filmId) {
+        log.info("Request received DELETE /films/{}", filmId);
+        service.removeFilm(filmId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsByDirector(
+            @PathVariable Long directorId,
+            @RequestParam(name = "sortBy", value = "sortBy", defaultValue = "year") String sortBy) {
+        log.info("Request received GET /films/director/{}?sortBy={}", directorId, sortBy);
+        if (!SORTED_BY.contains(sortBy.toLowerCase())) {
+            throw new ValidationException(String.format("Invalid request parameter sortBy='%s'", sortBy));
+        }
+        return service.getFilmsByDirector(directorId, sortBy.toLowerCase());
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchFilm(
+            @RequestParam(name = "query", value = "query") String query,
+            @RequestParam(name = "by", value = "by", defaultValue = "title", required = false) String... by) {
+        log.info("Request received GET 'GET /films/search?query={}&by={}'", query, by);
+        if (query.isBlank()) {
+            throw new ValidationException("Request parameter 'query' should not be empty.");
+        }
+        return service.search(query, by);
     }
 }

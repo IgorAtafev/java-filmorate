@@ -14,6 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
@@ -341,6 +344,33 @@ class UserControllerTest {
         verify(service, times(1)).getCommonFriends(userId, userOtherId);
     }
 
+    @Test
+    void getUserFeed_shouldReturnListOfEvents() throws Exception {
+        List<Event> events = initEvents();
+        String json = objectMapper.writeValueAsString(events);
+        long userId = 2L;
+
+        when(service.getUserEvents(userId)).thenReturn(events);
+
+        mockMvc.perform(get("/users/{id}/feed", userId))
+                .andExpect(status().isOk())
+                .andExpect(content().json(json));
+
+        verify(service, times(1)).getUserEvents(2L);
+    }
+
+    @Test
+    void getUserFeed_shouldResponseWithNotFound_ifUserDoesNotExist() throws Exception {
+        Long userId = 9999L;
+
+        when(service.getUserEvents(userId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/users/{id}/feed", userId))
+                .andExpect(status().isNotFound());
+
+        verify(service, times(1)).getUserEvents(userId);
+    }
+
     private static Stream<Arguments> provideInvalidUsers() {
         return Stream.of(
                 Arguments.of(initUser(user -> user.setEmail(null))),
@@ -375,4 +405,25 @@ class UserControllerTest {
 
         return user;
     }
+
+    private static List<Event> initEvents() {
+        Event event1 = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .eventType(EventType.LIKE)
+                .operation(Operation.ADD)
+                .eventId(3L)
+                .entityId(2L)
+                .build();
+
+        Event event2 = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .eventType(EventType.FRIEND)
+                .operation(Operation.REMOVE)
+                .eventId(4L)
+                .entityId(1L)
+                .build();
+        return List.of(event1, event2);
+    }
+
+
 }
