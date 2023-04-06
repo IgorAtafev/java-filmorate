@@ -146,6 +146,7 @@ public class UserServiceImpl implements UserService {
 
         List<Film> films = filmStorage.getRecommendations(id);
         filmService.addGenresToFilms(films);
+        filmService.addDirectorsToFilms(films);
 
         return films;
     }

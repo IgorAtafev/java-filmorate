@@ -61,7 +61,7 @@ public class DirectorDBStorage implements DirectorStorage {
         jdbcTemplate.update(
                 "UPDATE director SET name = ? WHERE director_id = ?",
                 director.getName(), director.getId());
-        return getDirectorById(director.getId());
+        return director;
     }
 
     @Override
