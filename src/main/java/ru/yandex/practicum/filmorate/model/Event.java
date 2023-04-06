@@ -15,16 +15,22 @@ import javax.validation.constraints.PastOrPresent;
 @ToString
 @Builder
 public class Event {
+
     @NotNull(message = "Feed date cannot be null")
     @PastOrPresent(message = "Feed cannot be in the future")
-    Long timestamp;
+    private Long timestamp;
+
     @NotNull(message = "Feed userId cannot be null")
-    Long userId;
+    private Long userId;
+
     @NotNull(message = "Feed eventType cannot be null")
-    EventType eventType;
+    private EventType eventType;
+
     @NotNull(message = "Feed operation cannot be null")
-    Operation operation;
-    Long eventId;
+    private Operation operation;
+
+    private Long eventId;
+
     @NotNull(message = "entityId cannot be null")
-    Long entityId;
+    private Long entityId;
 }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -36,7 +37,7 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> getFilms() {
         List<Film> films = filmStorage.getFilms();
         addGenresToFilms(films);
-        directorStorage.addDirectorsToFilms(films);
+        addDirectorsToFilms(films);
         return films;
     }
 
@@ -131,7 +132,7 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
         List<Film> films = filmStorage.getPopular(count, genreId, year);
         addGenresToFilms(films);
-        directorStorage.addDirectorsToFilms(films);
+        addDirectorsToFilms(films);
         return films;
     }
 
@@ -152,7 +153,7 @@ public class FilmServiceImpl implements FilmService {
 
         List<Film> films = filmStorage.getFilmsByDirector(directorId, sortBy);
         addGenresToFilms(films);
-        directorStorage.addDirectorsToFilms(films);
+        addDirectorsToFilms(films);
         return films;
     }
 
@@ -160,7 +161,7 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> search(String query, String[] by) {
         List<Film> films = filmStorage.search(query, by);
         addGenresToFilms(films);
-        directorStorage.addDirectorsToFilms(films);
+        addDirectorsToFilms(films);
         return films;
     }
 
@@ -183,6 +184,29 @@ public class FilmServiceImpl implements FilmService {
         for (Film film : films) {
             if (filmsGenres.containsKey(film.getId())) {
                 film.addGenres(filmsGenres.get(film.getId()));
+            }
+        }
+    }
+
+    @Override
+    public void addDirectorsToFilms(List<Film> films) {
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        List<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, Set<Director>> filmsDirectors = directorStorage.getDirectorsByFilmIds(filmIds);
+
+        if (filmsDirectors.isEmpty()) {
+            return;
+        }
+
+        for (Film film : films) {
+            if (filmsDirectors.containsKey(film.getId())) {
+                film.addDirectors(filmsDirectors.get(film.getId()));
             }
         }
     }
