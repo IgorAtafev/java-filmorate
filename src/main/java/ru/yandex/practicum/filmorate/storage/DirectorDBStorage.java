@@ -4,31 +4,28 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.NotFoundException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class DirectorDBStorage implements DirectorStorage {
-    protected static final int DATA_COLUMN = 2;
+
     private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
     public Director create(Director director) {
@@ -41,7 +38,6 @@ public class DirectorDBStorage implements DirectorStorage {
         return director;
     }
 
-
     @Override
     public Collection<Director> getDirectors() {
         final String sql = "SELECT * FROM director ORDER BY director_id";
@@ -51,6 +47,7 @@ public class DirectorDBStorage implements DirectorStorage {
     @Override
     public Director getDirectorById(long id) {
         final String sql = "SELECT * FROM director WHERE director_id = ? ORDER BY director_id";
+
         try {
             return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeDirector(rs), id);
         } catch (EmptyResultDataAccessException ex) {
@@ -91,48 +88,32 @@ public class DirectorDBStorage implements DirectorStorage {
     }
 
     @Override
-    public void addDirectorsToFilms(List<Film> films) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource(
-                "ids",
-                films.stream()
-                        .map(Film::getId)
-                        .collect(Collectors.toList()));
+    public Map<Long, Set<Director>> getDirectorsByFilmIds(List<Long> filmIds) {
+        String sqlQuery = String.format("SELECT fd.film_id, d.* " +
+                        "FROM director d " +
+                        "INNER JOIN film_director fd ON fd.director_id = d.director_id " +
+                        "WHERE fd.film_id IN (%s)",
+                String.join(", ", Collections.nCopies(filmIds.size(), "?")));
 
-        final String sql =
-                "SELECT array_agg(DISTINCT d.director_id || ',' || d.name  ORDER BY d.director_id) AS directors_data, " +
-                        "fd.film_id " +
-                        "FROM director AS d  " +
-                        "RIGHT JOIN film_director fd ON d.director_id = fd.director_id " +
-                        "WHERE fd.film_id IN (:ids) " +
-                        "GROUP BY fd.film_id";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sqlQuery, filmIds.toArray());
+        Map<Long, Set<Director>> filmsDirectors = new HashMap<>();
 
-        namedParameterJdbcTemplate.query(sql, parameters, (rs, rowNum) -> addDirectors(rs, films));
-    }
+        while (rowSet.next()) {
+            Long filmId = rowSet.getLong("film_id");
 
-    private Set<Director> addDirectors(ResultSet rs, List<Film> films) throws SQLException {
-        Long filmId = rs.getLong("film_id");
-        Film film = films.stream()
-                .filter(f -> f.getId() == filmId)
-                .findFirst()
-                .get();
-        ResultSet directorsDataResultSet = rs.getArray("directors_data").getResultSet();
-        Set<Director> directors = new HashSet<>();
-        while (directorsDataResultSet.next()) {
-            String directorData = directorsDataResultSet.getString(DATA_COLUMN);
+            Director director = new Director();
+            director.setId(rowSet.getLong("director_id"));
+            director.setName(rowSet.getString("name"));
 
-            if (directorData == null) {
-                break;
+            if (!filmsDirectors.containsKey(filmId)) {
+                Set<Director> directors = new HashSet<>();
+                filmsDirectors.put(filmId, directors);
             }
 
-            String[] data = directorData.split(",");
-            Director director = new Director();
-            director.setId(Long.parseLong(data[0]));
-            director.setName(data[1]);
-            directors.add(director);
+            filmsDirectors.get(filmId).add(director);
         }
-        film.addDirectors(directors);
-        directorsDataResultSet.close();
-        return directors;
+
+        return filmsDirectors;
     }
 
     private Director makeDirector(ResultSet rs) throws SQLException {

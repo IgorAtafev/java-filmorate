@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface DirectorStorage {
+
     /**
      * Returns a list of all directors
      *
@@ -63,8 +65,10 @@ public interface DirectorStorage {
     boolean directorExists(long id);
 
     /**
-     * Add directors to films
-     * @param films - collection of films
+     * Returns a list of directors by film id list
+     *
+     * @param filmIds
+     * @return list of directors by film id list
      */
-    void addDirectorsToFilms(List<Film> films);
+    Map<Long, Set<Director>> getDirectorsByFilmIds(List<Long> filmIds);
 }

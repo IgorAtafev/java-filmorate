@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -189,8 +190,24 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addDirectorsToFilms(List<Film> films) {
-        if (!films.isEmpty()) {
-            directorStorage.addDirectorsToFilms(films);
+        if (films == null || films.isEmpty()) {
+            return;
+        }
+
+        List<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, Set<Director>> filmsDirectors = directorStorage.getDirectorsByFilmIds(filmIds);
+
+        if (filmsDirectors.isEmpty()) {
+            return;
+        }
+
+        for (Film film : films) {
+            if (filmsDirectors.containsKey(film.getId())) {
+                film.addDirectors(filmsDirectors.get(film.getId()));
+            }
         }
     }
 
