@@ -223,7 +223,9 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN films f ON f.id = fd.film_id " +
                 "INNER JOIN mpa m ON m.id = f.mpa_id " +
                 "%s";
+
         String sqlQuery = "";
+
         if ("year".equals(sortBy)) {
             sqlQuery = String.format(sqlTemplate, "WHERE fd.director_ID = ? " +
                     "ORDER BY EXTRACT(YEAR FROM f.release_date)");
@@ -233,6 +235,7 @@ public class FilmDbStorage implements FilmStorage {
                     "GROUP BY f.id " +
                     "ORDER BY COUNT(f.id)");
         }
+
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
 
@@ -280,7 +283,9 @@ public class FilmDbStorage implements FilmStorage {
                 "%s " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.film_id) DESC, f.id ASC";
+
         String sql;
+
         if ((by.length == 1) && by[0].equals("title")) {
             sql = String.format(sqlTemplate, "WHERE lower(f.name) LIKE lower(:query)");
         } else {
@@ -296,6 +301,7 @@ public class FilmDbStorage implements FilmStorage {
                                 "WHERE lower(d.name) LIKE lower(:query) OR lower(f.name) LIKE lower(:query)");
             }
         }
+
         Map<String, Object> params = new HashMap<>();
         params.put("query", "%" + query + "%");
 

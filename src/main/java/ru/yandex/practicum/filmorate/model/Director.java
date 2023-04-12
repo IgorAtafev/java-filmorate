@@ -14,7 +14,9 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Director {
+
     private Long id;
+
     @NotBlank(message = "Director name cannot be empty")
     private String name;
 }

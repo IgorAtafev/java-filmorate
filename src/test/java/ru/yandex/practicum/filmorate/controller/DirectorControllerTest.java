@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class DirectorControllerTest {
+
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
 
@@ -152,7 +153,6 @@ class DirectorControllerTest {
 
         verify(service, never()).update(director);
     }
-
 
     @Test
     void deleteDirectorById_shouldReturnDirectorById() throws Exception {

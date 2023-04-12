@@ -37,6 +37,7 @@ public class EventDbStorage implements EventStorage {
                 "?)";
 
         KeyHolder holder = new GeneratedKeyHolder();
+
         PreparedStatementCreator preparedStatement = con -> {
             PreparedStatement ps = con.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, event.getTimestamp());
@@ -46,7 +47,9 @@ public class EventDbStorage implements EventStorage {
             ps.setLong(5, event.getEntityId());
             return ps;
         };
+
         jdbcTemplate.update(preparedStatement, holder);
+
         long eventId = holder.getKey().longValue();
         event.setEventId(eventId);
         return event;
@@ -64,6 +67,7 @@ public class EventDbStorage implements EventStorage {
                 "LEFT JOIN event_types et ON e.event_type = et.id " +
                 "LEFT JOIN operations o ON e.operation = o.id " +
                 "WHERE e.user_id = ?";
+
         return jdbcTemplate.query(sqlQuery, this::mapRowToEvent, id);
     }
 

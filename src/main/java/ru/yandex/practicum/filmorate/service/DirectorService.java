@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.Collection;
 
 public interface DirectorService {
+
     /**
      * Returns a list of all directors
      *

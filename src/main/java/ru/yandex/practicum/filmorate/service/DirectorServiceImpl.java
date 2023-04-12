@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
@@ -10,13 +9,11 @@ import ru.yandex.practicum.filmorate.validator.ValidationException;
 
 import java.util.Collection;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DirectorServiceImpl implements DirectorService {
 
     private final DirectorStorage storage;
-
 
     @Override
     public Director create(Director obj) {
@@ -37,6 +34,7 @@ public class DirectorServiceImpl implements DirectorService {
         if (!storage.directorExists(id)) {
             throw new NotFoundException(String.format("Director with id %d  does not exist", id));
         }
+
         return storage.delete(id);
     }
 
@@ -45,9 +43,11 @@ public class DirectorServiceImpl implements DirectorService {
         if (isIdValueNull(obj)) {
             throw new ValidationException("The director must not have an empty ID when updating");
         }
+
         if (!storage.directorExists(obj.getId())) {
             throw new NotFoundException(String.format("Director with id %d  does not exist", obj.getId()));
         }
+
         return storage.update(obj);
     }
 

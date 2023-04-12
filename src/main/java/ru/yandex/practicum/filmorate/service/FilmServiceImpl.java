@@ -36,8 +36,10 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getFilms() {
         List<Film> films = filmStorage.getFilms();
+
         addGenresToFilms(films);
         addDirectorsToFilms(films);
+
         return films;
     }
 
@@ -49,6 +51,7 @@ public class FilmServiceImpl implements FilmService {
 
         film.addGenres(genreStorage.getGenresByFilmId(film.getId()));
         film.addDirectors(directorStorage.getDirectorsByFilmId(film.getId()));
+
         return film;
     }
 
@@ -131,8 +134,10 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
         List<Film> films = filmStorage.getPopular(count, genreId, year);
+
         addGenresToFilms(films);
         addDirectorsToFilms(films);
+
         return films;
     }
 
@@ -152,16 +157,20 @@ public class FilmServiceImpl implements FilmService {
         }
 
         List<Film> films = filmStorage.getFilmsByDirector(directorId, sortBy);
+
         addGenresToFilms(films);
         addDirectorsToFilms(films);
+
         return films;
     }
 
     @Override
     public List<Film> search(String query, String[] by) {
         List<Film> films = filmStorage.search(query, by);
+
         addGenresToFilms(films);
         addDirectorsToFilms(films);
+
         return films;
     }
 
