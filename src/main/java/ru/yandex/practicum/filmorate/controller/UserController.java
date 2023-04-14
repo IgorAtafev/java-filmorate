@@ -50,13 +50,13 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        log.info("Request received PUT /users{}/friends/{}", id, friendId);
+        log.info("Request received PUT /users/{}/friends/{}", id, friendId);
         service.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        log.info("Request received DELETE /users{}/friends/{}", id, friendId);
+        log.info("Request received DELETE /users/{}/friends/{}", id, friendId);
         service.removeFriend(id, friendId);
     }
 
@@ -72,7 +72,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public void removeUser(@PathVariable Long userId) {
-        log.info("Request received DELETE /users{}", userId);
+        log.info("Request received DELETE /users/{}", userId);
         service.removeUser(userId);
     }
 

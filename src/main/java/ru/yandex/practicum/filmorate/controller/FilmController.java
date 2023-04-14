@@ -51,7 +51,7 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received PUT /films{}/like/{}", id, userId);
+        log.info("Request received PUT /films/{}/like/{}", id, userId);
         service.addLike(id, userId);
     }
 

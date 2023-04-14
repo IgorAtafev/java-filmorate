@@ -52,31 +52,31 @@ public class ReviewController {
 
     @DeleteMapping("/{id}")
     public void removeReviewById(@PathVariable Long id) {
-        log.info("Request received DELETE /reviews{}", id);
+        log.info("Request received DELETE /reviews/{}", id);
         service.removeReviewById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received PUT /reviews{}/like/{}", id, userId);
+        log.info("Request received PUT /reviews/{}/like/{}", id, userId);
         service.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received DELETE /reviews{}/like/{}", id, userId);
+        log.info("Request received DELETE /reviews/{}/like/{}", id, userId);
         service.removeLike(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void addDisLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received PUT /reviews{}/dislike/{}", id, userId);
+        log.info("Request received PUT /reviews/{}/dislike/{}", id, userId);
         service.addDislike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void removeDisLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Request received DELETE /reviews{}/dislike/{}", id, userId);
+        log.info("Request received DELETE /reviews/{}/dislike/{}", id, userId);
         service.removeDislike(id, userId);
     }
 }
