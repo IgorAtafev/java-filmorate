@@ -57,7 +57,7 @@ public interface DirectorStorage {
     Collection<Director> getDirectorsByFilmId(Long id);
 
     /**
-     * Checks for the existence of Director by id
+     * Checks for the existence of director by id
      *
      * @param id
      * @return true or false

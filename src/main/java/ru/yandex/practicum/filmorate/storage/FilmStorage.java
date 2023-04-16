@@ -81,7 +81,7 @@ public interface FilmStorage {
     void removeReviewByFilmId(Long id);
 
     /**
-     * Checks for the existence of Film by id
+     * Checks for the existence of film by id
      *
      * @param id
      * @return true or false

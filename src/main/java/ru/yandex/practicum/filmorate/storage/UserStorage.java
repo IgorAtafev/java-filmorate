@@ -73,33 +73,36 @@ public interface UserStorage {
 
     /**
      * Removes a user
+     *
      * @param id
      */
     void removeUser(Long id);
 
     /**
      * Removes a review by user_id
+     *
      * @param id
      */
     void removeReviewByUserId(Long id);
 
     /**
-     * Checks for the existence of User by id
+     * Checks for the existence of user by id
      *
      * @param id
      * @return true or false
      */
     boolean userExists(Long id);
 
-
     /**
-     * Removes a user from film_genres
+     * Removes a user from film_likes
+     *
      * @param id
      */
     void removeUserLike(Long id);
 
     /**
      * Removes a user from user_friends
+     *
      * @param id
      */
     void removeUserFromFriends(Long id);
