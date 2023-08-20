@@ -25,11 +25,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DirectorServiceImplTest {
+
     @Mock
     DirectorStorage storage;
+
     @InjectMocks
     private DirectorServiceImpl service;
-
 
     @Test
     void getDirectors_shouldReturnEmptyListOfDirectors() {

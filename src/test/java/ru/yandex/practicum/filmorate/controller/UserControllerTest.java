@@ -424,6 +424,4 @@ class UserControllerTest {
                 .build();
         return List.of(event1, event2);
     }
-
-
 }
