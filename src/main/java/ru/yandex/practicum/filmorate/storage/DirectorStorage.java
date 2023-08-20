@@ -51,7 +51,7 @@ public interface DirectorStorage {
     /**
      * Get collection of directors for film
      *
-     * @param id film
+     * @param id
      * @return collection of directors or empty collection
      */
     Collection<Director> getDirectorsByFilmId(Long id);
