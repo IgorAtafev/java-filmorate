@@ -23,6 +23,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RequestMapping("/directors")
 public class DirectorController {
+
     private final DirectorService service;
 
     @GetMapping
